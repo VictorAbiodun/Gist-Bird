@@ -5,6 +5,7 @@ import './globals.css';
 import { OfflineBanner } from '@/components/OfflineBanner';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://gist-bird.vercel.app'),
   title: 'Gist Bird',
   description: 'Send a paper across campus. Chief Coo carries it.',
   manifest: '/manifest.webmanifest',

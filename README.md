@@ -1,5 +1,7 @@
 # Gist Bird
 
+> 🚀 **Live App:** [https://gist-bird.vercel.app](https://gist-bird.vercel.app)
+
 A campus pen-pal app. Write a short paper, Chief Coo the pigeon carries it across the campus map to another verified student, and if they say hi, a chat opens. Built from the Figma design (Direction B, Green-White-Green).
 
 **Stack:** Next.js 14 (App Router, TypeScript) · Tailwind · Supabase (Auth email codes, Postgres with row level security, Realtime) · installable PWA. Fonts are self-hosted to save data.

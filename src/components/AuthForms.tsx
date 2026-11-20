@@ -43,13 +43,23 @@ export function EmailForm() {
   );
 }
 
-export function VerifyForm({ email }: { email: string }) {
+export function VerifyForm({ email, defaultToken = '' }: { email: string; defaultToken?: string }) {
   const [state, action] = useFormState(verifyCode, initial);
   return (
     <form action={action} className="space-y-4" noValidate>
       <input type="hidden" name="email" value={email} />
       <Field label="6-digit verification code" error={state.error} hint="Check your inbox for the code.">
-        <input name="token" inputMode="numeric" autoComplete="one-time-code" maxLength={8} required placeholder="123456" className={`${inputCls(!!state.error)} h-[60px] text-center font-display text-title tracking-[0.3em]`} aria-invalid={!!state.error} />
+        <input
+          name="token"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          maxLength={8}
+          defaultValue={defaultToken}
+          required
+          placeholder="123456"
+          className={`${inputCls(!!state.error)} h-[60px] text-center font-display text-title tracking-[0.3em]`}
+          aria-invalid={!!state.error}
+        />
       </Field>
       {state.error && <Notice tone="err" title="That code didn't work">{state.error}</Notice>}
       <Submit>Verify</Submit>

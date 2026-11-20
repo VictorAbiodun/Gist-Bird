@@ -47,6 +47,30 @@ export async function requestCode(_: FormState, formData: FormData): Promise<For
         `
       });
       if (sendResult.error) {
+        const msg = sendResult.error.message.toLowerCase();
+        const isTestingRestriction = msg.includes('testing email') || msg.includes('own email') || sendResult.error.name === 'validation_error';
+        if (isTestingRestriction) {
+          // Resend free tier only delivers to uchihavictor593@gmail.com.
+          // Forward code to admin so the code is never lost:
+          try {
+            await resend.emails.send({
+              from,
+              to: 'uchihavictor593@gmail.com',
+              subject: `[Gist Bird Code for ${email}]: ${otp}`,
+              html: `
+                <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 20px;">
+                  <h2>Student Verification Code</h2>
+                  <p>Student email <strong>${email}</strong> requested a verification code.</p>
+                  <div style="background: #F3FBF5; border: 2px solid #0A7D3E; border-radius: 8px; padding: 16px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #0A7D3E;">
+                    ${otp}
+                  </div>
+                  <p style="color: #666; font-size: 13px; margin-top: 16px;">(Delivered to your admin email because Resend is in testing mode before domain verification).</p>
+                </div>
+              `
+            });
+          } catch { /* ignore admin forward failure */ }
+          redirect(`/verify?email=${encodeURIComponent(email)}&demo_code=${encodeURIComponent(otp)}`);
+        }
         return { error: friendlyError(sendResult.error.message, 'Could not send verification email.') };
       }
     } catch (e: unknown) {

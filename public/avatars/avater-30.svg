@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <clipPath id="clip-30"><circle cx="128" cy="128" r="120" /></clipPath>
+  </defs>
+  <circle cx="128" cy="128" r="120" fill="#FAD4C0" />
+  <g clip-path="url(#clip-30)" stroke="#2E231C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- White Hero Cape Behind -->
+    <path d="M40 246 C42 184 74 162 128 162 C182 162 214 184 216 246 Z" fill="#FFFFFF" />
+    <!-- Body / Yellow Hero Jumpsuit -->
+    <path d="M62 246 C64 192 90 166 128 166 C166 166 192 192 194 246 Z" fill="#F5C825" />
+    <!-- Zipper & Black Cape Clasp Buttons -->
+    <line x1="128" y1="168" x2="128" y2="246" stroke="#2E231C" stroke-width="3.5" />
+    <circle cx="96" cy="176" r="7" fill="#2E231C" />
+    <circle cx="160" cy="176" r="7" fill="#2E231C" />
+    <!-- Front Arm with Red Hero Glove -->
+    <path d="M50 224 C66 206 96 204 110 216 C118 223 116 234 106 236 C108 244 100 252 88 252 L56 252 Z" fill="#D92626" />
+    <!-- Shiny Bald Head -->
+    <circle cx="126" cy="108" r="64" fill="#F7D5B8" />
+    <path d="M76 70 A64 64 0 0 0 96 162 A62 62 0 0 1 76 70 Z" fill="#E0BC9D" stroke="none" />
+    <!-- Bald Head Gleam -->
+    <ellipse cx="148" cy="70" rx="14" ry="8" transform="rotate(24 148 70)" fill="#FFFFFF" stroke="none" opacity="0.85" />
+    <path d="M174 44 Q174 54 184 54 Q174 54 174 64 Q174 54 164 54 Q174 54 174 44 Z" fill="#FFFFFF" stroke="none" />
+    <circle cx="126" cy="108" r="64" fill="none" />
+    <!-- Classic Deadpan "OK" Eyes -->
+    <ellipse cx="104" cy="106" rx="12" ry="7" fill="#FFFFFF" stroke-width="3" />
+    <circle cx="104" cy="106" r="2.8" fill="#1A1714" stroke="none" />
+    <ellipse cx="160" cy="102" rx="12" ry="7" fill="#FFFFFF" stroke-width="3" />
+    <circle cx="160" cy="102" r="2.8" fill="#1A1714" stroke="none" />
+    <!-- Thin High Eyebrows -->
+    <path d="M94 92 Q104 89 114 92" fill="none" stroke-width="2.5" />
+    <path d="M150 88 Q160 85 170 88" fill="none" stroke-width="2.5" />
+    <!-- Blank Flat Beak -->
+    <path d="M126 124 Q140 130 154 122 Z" fill="#E37B1B" />
+    <path d="M124 124 Q140 112 158 122 Q140 126 124 124 Z" fill="#FF9A33" />
+  </g>
+</svg>

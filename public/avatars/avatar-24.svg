@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <clipPath id="clip-24"><circle cx="128" cy="128" r="120" /></clipPath>
+    <pattern id="tanjiroCheck" width="24" height="24" patternUnits="userSpaceOnUse">
+      <rect width="24" height="24" fill="#1C2124" />
+      <rect width="12" height="12" fill="#22A875" />
+      <rect x="12" y="12" width="12" height="12" fill="#22A875" />
+    </pattern>
+  </defs>
+  <circle cx="128" cy="128" r="120" fill="#D5F2E3" />
+  <g clip-path="url(#clip-24)" stroke="#24181A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Body / Checkered Haori over Black Uniform -->
+    <path d="M52 246 C52 190 84 164 128 164 C172 164 204 190 208 246 Z" fill="url(#tanjiroCheck)" />
+    <!-- Black Demon Slayer Inner Uniform -->
+    <path d="M104 164 L112 246 L148 246 L154 164 Z" fill="#1C2124" />
+    <circle cx="130" cy="192" r="4" fill="#D9D9D9" stroke-width="2" />
+    <circle cx="130" cy="216" r="4" fill="#D9D9D9" stroke-width="2" />
+    <!-- Hanafuda Earrings -->
+    <rect x="66" y="138" width="14" height="26" rx="2" fill="#FFFFFF" stroke-width="3" />
+    <circle cx="73" cy="147" r="4" fill="#E32B2B" stroke="none" />
+    <path d="M69 158 L77 158" stroke="#22A875" stroke-width="2.5" />
+    <rect x="176" y="134" width="14" height="26" rx="2" fill="#FFFFFF" stroke-width="3" />
+    <circle cx="183" cy="143" r="4" fill="#E32B2B" stroke="none" />
+    <path d="M179 154 L187 154" stroke="#22A875" stroke-width="2.5" />
+    <!-- Front Arm -->
+    <path d="M50 224 C66 206 96 204 110 216 C118 223 116 234 106 236 C108 244 100 252 88 252 L56 252 Z" fill="#E8D3C5" />
+    <!-- Head -->
+    <circle cx="126" cy="112" r="62" fill="#E8D3C5" />
+    <path d="M78 74 A62 62 0 0 0 98 164 A60 60 0 0 1 78 74 Z" fill="#D1B8A7" stroke="none" />
+    <circle cx="126" cy="112" r="62" fill="none" />
+    <!-- Forehead Scar -->
+    <path d="M84 68 L94 74 L88 82 L100 84 L94 92 L80 86 Z" fill="#8C2332" stroke="none" />
+    <!-- Spiky Burgundy Hair -->
+    <path d="M64 98 L54 78 L72 76 L68 50 L94 60 L108 36 L124 54 L144 36 L156 56 L180 46 L178 72 L196 74 L184 94 C166 76 144 74 132 82 L120 72 L104 82 L90 74 C78 80 70 88 64 98 Z" fill="#4A1922" />
+    <!-- Warm Burgundy Eyes -->
+    <circle cx="106" cy="110" r="14" fill="#FFFFFF" />
+    <circle cx="108" cy="110" r="8" fill="#8C2332" stroke="#3D0E14" stroke-width="2" />
+    <circle cx="111" cy="107" r="2.5" fill="#FFFFFF" stroke="none" />
+    <circle cx="160" cy="104" r="13.5" fill="#FFFFFF" />
+    <circle cx="161" cy="104" r="7.5" fill="#8C2332" stroke="#3D0E14" stroke-width="2" />
+    <circle cx="164" cy="101" r="2.5" fill="#FFFFFF" stroke="none" />
+    <!-- Eyebrows -->
+    <path d="M90 92 Q104 88 116 94" fill="none" stroke-width="4" />
+    <path d="M148 88 Q160 84 172 88" fill="none" stroke-width="4" />
+    <!-- Cere & Kind Beak -->
+    <circle cx="136" cy="110" r="8" fill="#FFFFFF" stroke="none" />
+    <path d="M124 124 Q140 138 156 122 Z" fill="#EB8223" />
+    <path d="M122 124 Q138 104 164 122 Q142 128 122 124 Z" fill="#FF9A33" />
+  </g>
+</svg>

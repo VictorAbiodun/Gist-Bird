@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <clipPath id="clip-12"><circle cx="128" cy="128" r="120" /></clipPath>
+  </defs>
+  <circle cx="128" cy="128" r="120" fill="#FCEFD9" />
+  <g clip-path="url(#clip-12)" stroke="#333659" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Body / Red Hoodie -->
+    <path d="M52 246 C52 190 84 164 128 164 C172 164 204 190 208 246 Z" fill="#E32B2B" />
+    <!-- White Stripe -->
+    <path d="M58 196 Q128 210 198 196 L202 212 Q128 226 54 212 Z" fill="#FFFFFF" stroke="none" />
+    <path d="M52 246 C52 190 84 164 128 164 C172 164 204 190 208 246 Z" fill="none" />
+    <!-- Collar -->
+    <path d="M84 168 C102 152 150 152 168 170 C150 182 104 182 84 168 Z" fill="#C41F1F" />
+    <!-- Yellow Strap & Bag -->
+    <path d="M170 168 L180 176 L140 228 L130 220 Z" fill="#E3B319" />
+    <path d="M84 218 L136 218 C146 218 150 228 146 244 L140 256 L82 256 Z" fill="#F9C823" />
+    <!-- Shy Hands Pressed Together -->
+    <path d="M62 232 C76 208 102 204 116 184 C122 174 134 176 134 188 C134 204 124 224 106 238 C88 248 68 244 62 232 Z" fill="#B4C2FA" />
+    <path d="M192 232 C178 208 154 204 140 184 C134 174 124 176 126 188 C128 204 138 224 156 238 C174 248 188 244 192 232 Z" fill="#B4C2FA" />
+    <!-- Head -->
+    <circle cx="126" cy="108" r="64" fill="#B4C2FA" />
+    <path d="M76 70 A64 64 0 0 0 96 162 A62 62 0 0 1 76 70 Z" fill="#9BA8E0" stroke="none" />
+    <circle cx="126" cy="108" r="64" fill="none" />
+    <!-- Soft Worried Eyebrows -->
+    <path d="M92 94 Q104 94 112 84" fill="none" stroke="#4D5482" stroke-width="4.5" />
+    <path d="M176 86 Q164 86 156 76" fill="none" stroke="#4D5482" stroke-width="4.5" />
+    <!-- Shiny Cute Eyes -->
+    <path d="M96 114 C96 100 118 100 118 114 Z" fill="#2A1F2D" />
+    <circle cx="111" cy="107" r="3" fill="#FFFFFF" stroke="none" />
+    <path d="M92 116 Q107 112 122 115" fill="none" stroke-width="3.5" />
+    <path d="M158 108 C158 94 180 94 180 108 Z" fill="#2A1F2D" />
+    <circle cx="173" cy="101" r="3" fill="#FFFFFF" stroke="none" />
+    <path d="M154 110 Q169 106 184 109" fill="none" stroke-width="3.5" />
+    <!-- Pink Blush Cheeks -->
+    <ellipse cx="96" cy="130" rx="14" ry="8" fill="#FA8E8E" stroke="none" opacity="0.85" />
+    <ellipse cx="176" cy="122" rx="13" ry="8" fill="#FA8E8E" stroke="none" opacity="0.85" />
+    <!-- Cere & Gentle Smiling Beak -->
+    <circle cx="138" cy="108" r="9" fill="#FFFFFF" stroke="none" />
+    <path d="M124 122 Q138 138 156 122 Z" fill="#EB8223" />
+    <path d="M122 122 Q138 100 164 122 Q140 128 122 122 Z" fill="#FF9A33" />
+  </g>
+</svg>

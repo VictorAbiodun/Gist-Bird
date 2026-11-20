@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <clipPath id="clip-11"><circle cx="128" cy="128" r="120" /></clipPath>
+  </defs>
+  <circle cx="128" cy="128" r="120" fill="#FBCAC8" />
+  <g clip-path="url(#clip-11)" stroke="#38281E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Body / Dark Green Hoodie -->
+    <path d="M52 246 C52 190 84 164 128 164 C172 164 204 190 208 246 Z" fill="#1C5E3C" />
+    <!-- White Stripe -->
+    <path d="M58 196 Q128 210 198 196 L202 212 Q128 226 54 212 Z" fill="#FFFFFF" stroke="none" />
+    <path d="M52 246 C52 190 84 164 128 164 C172 164 204 190 208 246 Z" fill="none" />
+    <!-- Collar -->
+    <path d="M84 168 C102 152 150 152 168 170 C150 182 104 182 84 168 Z" fill="#14472D" />
+    <!-- Orange Strap & Bag -->
+    <path d="M170 168 L180 176 L140 228 L130 220 Z" fill="#E07616" />
+    <path d="M84 218 L136 218 C146 218 150 228 146 244 L140 256 L82 256 Z" fill="#F2851E" />
+    <!-- Crossed Arms -->
+    <path d="M148 216 C168 202 192 204 198 222 C202 234 184 244 156 238 L130 230 Z" fill="#9C8672" />
+    <path d="M72 222 C86 196 122 192 152 204 C162 208 162 218 152 222 L114 236 C92 242 74 236 72 222 Z" fill="#9C8672" />
+    <path d="M92 216 C98 210 106 212 106 218 C110 214 118 216 116 224" fill="none" stroke-width="3.5" />
+    <!-- Head -->
+    <circle cx="126" cy="108" r="64" fill="#9C8672" />
+    <path d="M76 70 A64 64 0 0 0 96 162 A62 62 0 0 1 76 70 Z" fill="#85705E" stroke="none" />
+    <circle cx="126" cy="108" r="64" fill="none" />
+    <!-- Grumpy Half-Lidded Eyes -->
+    <path d="M90 100 L122 98 C124 114 114 122 104 120 C94 118 88 110 90 100 Z" fill="#FFFFFF" />
+    <circle cx="107" cy="104" r="6.5" fill="#2E1E16" stroke="none" />
+    <circle cx="110" cy="102" r="2" fill="#FFFFFF" stroke="none" />
+    <path d="M150 94 L182 92 C184 108 174 116 164 114 C154 112 148 104 150 94 Z" fill="#FFFFFF" />
+    <circle cx="166" cy="98" r="6.5" fill="#2E1E16" stroke="none" />
+    <circle cx="169" cy="96" r="2" fill="#FFFFFF" stroke="none" />
+    <!-- Furrowed Brows -->
+    <path d="M104 86 Q116 92 126 90" fill="none" stroke-width="4.5" />
+    <path d="M168 78 Q158 86 148 88" fill="none" stroke-width="4.5" />
+    <!-- Cere & Frowning Beak -->
+    <circle cx="138" cy="104" r="9" fill="#FFFFFF" stroke="none" />
+    <path d="M128 124 Q142 134 156 122 Z" fill="#E37B1B" />
+    <path d="M126 126 C132 104 156 104 164 124 C150 116 136 116 126 126 Z" fill="#FF9A33" />
+  </g>
+</svg>

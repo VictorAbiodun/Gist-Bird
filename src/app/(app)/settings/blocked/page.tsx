@@ -11,7 +11,7 @@ export default async function Blocked() {
         {list.length === 0 && <p className="text-muted">You have not blocked anyone.</p>}
         {list.map((b) => (
           <Card key={b.id} className="flex items-center gap-3 p-3.5">
-            <Avatar name={b.name} scarf={b.scarf} /><p className="flex-1 font-bold">{b.name}</p>
+            <Avatar name={b.name} scarf={b.scarf} avatar={b.avatar} /><p className="flex-1 font-bold">{b.name}</p>
             <form action={unblockUser.bind(null, b.id)}><Button variant="outline" className="min-h-[44px]">Unblock</Button></form>
           </Card>
         ))}

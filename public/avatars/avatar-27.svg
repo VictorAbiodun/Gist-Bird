@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <clipPath id="clip-27"><circle cx="128" cy="128" r="120" /></clipPath>
+  </defs>
+  <circle cx="128" cy="128" r="120" fill="#E3C8C8" />
+  <g clip-path="url(#clip-27)" stroke="#1A171C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Body / Akatsuki Black Cloak -->
+    <path d="M50 246 C50 186 82 162 128 162 C174 162 206 186 210 246 Z" fill="#1A1A22" />
+    <!-- Red Cloud Emblem -->
+    <path d="M150 218 C144 218 142 208 150 206 C152 198 164 198 166 206 C174 206 176 216 168 218 Z" fill="#C9222B" stroke="#FFFFFF" stroke-width="2" />
+    <!-- High Akatsuki Collar with Red Lining -->
+    <path d="M78 170 L88 140 L168 140 L178 170 C156 184 100 184 78 170 Z" fill="#1A1A22" />
+    <path d="M90 144 L166 144 L162 154 L94 154 Z" fill="#C9222B" stroke="none" />
+    <!-- Front Arm -->
+    <path d="M50 224 C66 206 96 204 110 216 C118 223 116 234 106 236 C108 244 100 252 88 252 L56 252 Z" fill="#E6E1DC" />
+    <!-- Head -->
+    <circle cx="126" cy="110" r="60" fill="#E6E1DC" />
+    <path d="M80 72 A60 60 0 0 0 100 162 A58 58 0 0 1 80 72 Z" fill="#CFC8C2" stroke="none" />
+    <circle cx="126" cy="110" r="60" fill="none" />
+    <!-- Dark Hair Framing Face -->
+    <path d="M66 96 C62 118 66 142 74 154 L84 146 C78 132 76 112 78 96 Z" fill="#1E1E26" />
+    <path d="M186 92 C190 114 186 138 178 150 L168 142 C174 128 176 108 174 92 Z" fill="#1E1E26" />
+    <path d="M64 86 C72 40 176 38 186 84 C156 70 96 72 64 86 Z" fill="#1E1E26" />
+    <!-- Scratched Rogue Headband -->
+    <path d="M64 82 Q126 68 186 78 L186 92 Q126 82 64 96 Z" fill="#1E2738" />
+    <rect x="104" y="70" width="48" height="18" rx="4" transform="rotate(-4 128 79)" fill="#BAC4CE" />
+    <line x1="108" y1="80" x2="148" y2="78" stroke="#1A171C" stroke-width="3" />
+    <!-- Sharingan Red Eyes -->
+    <circle cx="106" cy="108" r="13" fill="#FFFFFF" />
+    <circle cx="107" cy="108" r="8" fill="#D91E2A" stroke="#4A0A0E" stroke-width="2" />
+    <circle cx="107" cy="108" r="2.5" fill="#1A171C" stroke="none" />
+    <circle cx="103" cy="105" r="1.5" fill="#1A171C" stroke="none" />
+    <circle cx="111" cy="106" r="1.5" fill="#1A171C" stroke="none" />
+    <circle cx="107" cy="113" r="1.5" fill="#1A171C" stroke="none" />
+    <circle cx="158" cy="102" r="12.5" fill="#FFFFFF" />
+    <circle cx="159" cy="102" r="7.5" fill="#D91E2A" stroke="#4A0A0E" stroke-width="2" />
+    <circle cx="159" cy="102" r="2.5" fill="#1A171C" stroke="none" />
+    <circle cx="155" cy="99" r="1.5" fill="#1A171C" stroke="none" />
+    <circle cx="163" cy="100" r="1.5" fill="#1A171C" stroke="none" />
+    <circle cx="159" cy="107" r="1.5" fill="#1A171C" stroke="none" />
+    <!-- Signature Stress Lines Under Eyes -->
+    <path d="M104 123 L100 136" fill="none" stroke="#5E5654" stroke-width="2.5" />
+    <path d="M156 118 L158 131" fill="none" stroke="#5E5654" stroke-width="2.5" />
+    <!-- Calm Stoic Beak -->
+    <path d="M124 124 Q138 132 152 122 Z" fill="#E37B1B" />
+    <path d="M122 124 Q138 108 160 122 Q140 126 122 124 Z" fill="#FF9A33" />
+  </g>
+</svg>

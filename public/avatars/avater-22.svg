@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <clipPath id="clip-22"><circle cx="128" cy="128" r="120" /></clipPath>
+  </defs>
+  <circle cx="128" cy="128" r="120" fill="#C7ECFA" />
+  <g clip-path="url(#clip-22)" stroke="#2E1C14" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Straw Hat Back Brim -->
+    <ellipse cx="126" cy="78" rx="94" ry="26" transform="rotate(-7 126 78)" fill="#E3B339" />
+    <!-- Body / Red Open Vest & Yellow Sash -->
+    <path d="M52 246 C52 190 84 164 128 164 C172 164 204 190 208 246 Z" fill="#D92626" />
+    <!-- Open Chest -->
+    <path d="M108 166 L118 246 L146 246 L152 166 Z" fill="#F2C89B" />
+    <!-- Gold Buttons -->
+    <circle cx="102" cy="196" r="4.5" fill="#F5C525" stroke-width="2.5" />
+    <circle cx="106" cy="218" r="4.5" fill="#F5C525" stroke-width="2.5" />
+    <!-- Yellow Waist Sash -->
+    <path d="M56 232 Q128 240 204 232 L208 250 Q128 258 52 250 Z" fill="#F5C525" />
+    <!-- Front Arm -->
+    <path d="M50 224 C66 206 96 204 110 216 C118 223 116 234 106 236 C108 244 100 252 88 252 L56 252 Z" fill="#F2C89B" />
+    <!-- Head -->
+    <circle cx="126" cy="116" r="60" fill="#F2C89B" />
+    <path d="M80 78 A60 60 0 0 0 100 166 A58 58 0 0 1 80 78 Z" fill="#DBA979" stroke="none" />
+    <circle cx="126" cy="116" r="60" fill="none" />
+    <!-- Messy Black Hair Under Hat -->
+    <path d="M68 92 L78 106 L86 90 L102 104 L112 86 L128 98 L142 84 L156 96 L168 84 L182 96 L184 78 C154 68 96 72 68 92 Z" fill="#1E1E24" />
+    <!-- Straw Hat Dome & Red Ribbon -->
+    <path d="M72 78 C74 36 172 30 178 72 Z" fill="#F2C649" />
+    <path d="M72 78 Q126 64 178 72 L177 58 Q126 50 74 64 Z" fill="#D92626" />
+    <!-- Big Confident Eyes -->
+    <circle cx="106" cy="114" r="14" fill="#FFFFFF" />
+    <circle cx="109" cy="114" r="6.5" fill="#1E1E24" stroke="none" />
+    <circle cx="111" cy="111" r="2" fill="#FFFFFF" stroke="none" />
+    <circle cx="158" cy="108" r="13.5" fill="#FFFFFF" />
+    <circle cx="160" cy="108" r="6" fill="#1E1E24" stroke="none" />
+    <circle cx="162" cy="105" r="2" fill="#FFFFFF" stroke="none" />
+    <!-- Scar Under Left Eye -->
+    <path d="M98 134 Q108 138 118 134" fill="none" stroke="#8C2626" stroke-width="3" />
+    <line x1="104" y1="132" x2="103" y2="139" stroke="#8C2626" stroke-width="2.5" />
+    <line x1="112" y1="133" x2="112" y2="140" stroke="#8C2626" stroke-width="2.5" />
+    <!-- Wide Laughing Beak -->
+    <path d="M120 128 C128 152 154 156 164 126 Z" fill="#FF8C24" />
+    <path d="M126 130 C132 144 150 146 158 130 Z" fill="#FFFFFF" stroke="none" />
+    <path d="M118 128 Q138 108 168 126 Q144 134 118 128 Z" fill="#FF9A33" />
+  </g>
+</svg>

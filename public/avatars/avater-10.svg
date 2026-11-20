@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <clipPath id="clip-10"><circle cx="128" cy="128" r="120" /></clipPath>
+  </defs>
+  <circle cx="128" cy="128" r="120" fill="#FAF2BE" />
+  <g clip-path="url(#clip-10)" stroke="#3D1F16" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Left Cheering Hand -->
+    <path d="M44 176 L26 146 C22 140 27 134 32 139 L39 148 L32 128 C29 121 36 118 40 125 L47 142 L44 122 C43 115 50 114 52 121 L56 140 L59 128 C61 122 68 124 66 131 L62 156 Z" fill="#F25630" />
+    <!-- Right Cheering Hand -->
+    <path d="M196 164 L202 142 C197 136 195 129 200 126 C204 124 209 129 211 135 L216 116 C218 110 225 111 225 118 L224 132 L231 118 C234 112 240 115 238 122 L232 138 L239 128 C243 123 248 127 245 134 L234 162 L224 176 Z" fill="#F25630" />
+    <!-- Body / Green Hoodie -->
+    <path d="M40 180 L64 164 L82 178 C96 168 112 164 128 164 C162 164 184 176 194 188 L204 164 L232 180 C218 208 202 222 190 222 L190 254 L66 254 L66 218 C54 214 44 198 40 180 Z" fill="#188C4B" />
+    <!-- White Stripes -->
+    <path d="M47 176 L58 169 L76 208 L64 214 Z" fill="#FFFFFF" stroke="none" />
+    <path d="M84 198 Q134 212 190 202 L190 217 Q134 228 84 213 Z" fill="#FFFFFF" stroke="none" />
+    <path d="M40 180 L64 164 L82 178 C96 168 112 164 128 164 C162 164 184 176 194 188 L204 164 L232 180 C218 208 202 222 190 222 L190 254 L66 254 L66 218 C54 214 44 198 40 180 Z" fill="none" />
+    <!-- Blue Strap & Bag -->
+    <path d="M172 172 L182 180 L142 228 L132 220 Z" fill="#2388DB" />
+    <path d="M72 218 L138 218 C148 218 152 228 148 244 L142 256 L70 256 Z" fill="#2E9BF0" />
+    <!-- Head with Tuft -->
+    <path d="M108 46 C110 36 116 36 119 42 C122 30 130 30 132 42 A64 64 0 1 1 108 46 Z" fill="#F25630" />
+    <!-- Happy Eyebrows & Closed Eyes -->
+    <path d="M90 78 Q100 72 110 75" fill="none" stroke="#9E2D14" stroke-width="3.5" />
+    <path d="M150 72 Q160 69 168 74" fill="none" stroke="#9E2D14" stroke-width="3.5" />
+    <path d="M90 108 C94 94 112 94 117 107" fill="none" stroke-width="5.5" />
+    <path d="M154 102 C158 88 174 88 179 100" fill="none" stroke-width="5.5" />
+    <!-- Cere & Open Laughing Beak -->
+    <circle cx="138" cy="104" r="9" fill="#FFFFFF" stroke="none" />
+    <path d="M122 116 C130 140 152 154 162 116 Z" fill="#FF8C24" />
+    <path d="M127 118 C133 136 149 146 157 118 Z" fill="#6E1E19" stroke="none" />
+    <path d="M134 132 Q144 130 149 140 Q140 144 134 132 Z" fill="#E35959" stroke="none" />
+    <path d="M120 116 Q139 96 172 114 Q146 124 120 116 Z" fill="#FF9A33" />
+  </g>
+</svg>

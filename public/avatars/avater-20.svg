@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <clipPath id="clip-20"><circle cx="128" cy="128" r="120" /></clipPath>
+    <radialGradient id="sixEyesGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#B8F6FF" />
+      <stop offset="55%" stop-color="#38D4FF" />
+      <stop offset="100%" stop-color="#0077CC" />
+    </radialGradient>
+  </defs>
+  <circle cx="128" cy="128" r="120" fill="#CBE6FF" />
+  <g clip-path="url(#clip-20)" stroke="#1B1E28" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Subtle Limitless Energy Rings -->
+    <circle cx="128" cy="112" r="88" fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.55" />
+    <circle cx="196" cy="64" r="10" fill="#38D4FF" stroke="none" opacity="0.4" />
+    <circle cx="54" cy="78" r="7" fill="#A855F7" stroke="none" opacity="0.35" />
+    <!-- Body / Jujutsu Tech High-Collar Uniform -->
+    <path d="M50 246 C50 188 82 162 128 162 C174 162 206 188 210 246 Z" fill="#1F2433" />
+    <!-- High Collar -->
+    <path d="M84 166 L94 146 L162 146 L172 166 C152 178 104 178 84 166 Z" fill="#171B26" />
+    <!-- Signature Gold Button -->
+    <circle cx="152" cy="166" r="6" fill="#F2C037" stroke-width="2.5" />
+    <!-- Front Arm -->
+    <path d="M50 224 C66 206 96 204 110 216 C118 223 116 234 106 236 C108 244 100 252 88 252 L56 252 Z" fill="#E6EDF5" />
+    <!-- Head -->
+    <circle cx="126" cy="112" r="62" fill="#E6EDF5" />
+    <path d="M78 74 A62 62 0 0 0 98 164 A60 60 0 0 1 78 74 Z" fill="#CFD9E6" stroke="none" />
+    <circle cx="126" cy="112" r="62" fill="none" />
+    <!-- Glowing Six Eyes (Right Eye Revealed) -->
+    <circle cx="160" cy="102" r="15" fill="#FFFFFF" />
+    <circle cx="160" cy="102" r="10" fill="url(#sixEyesGlow)" stroke="#0A4C8A" stroke-width="2" />
+    <circle cx="160" cy="102" r="4" fill="#FFFFFF" stroke="none" />
+    <circle cx="164" cy="98" r="2.2" fill="#FFFFFF" stroke="none" />
+    <!-- White Eyelashes -->
+    <path d="M146 92 Q160 84 174 92" fill="none" stroke="#FFFFFF" stroke-width="4" />
+    <!-- Black Blindfold (Pulled Up Slightly on Right Side) -->
+    <path d="M62 94 C88 86 138 78 186 72 L188 94 C156 90 132 106 122 122 C102 128 76 124 62 116 Z" fill="#1B1E28" />
+    <!-- Subtle Blindfold Fold Lines -->
+    <path d="M72 106 Q104 102 134 94" fill="none" stroke="#343A4D" stroke-width="2.5" />
+    <!-- Spiky White Gojo Hair -->
+    <path d="M64 94 L54 72 L72 74 L68 48 L92 60 L102 32 L118 52 L134 26 L146 50 L166 34 L168 58 L190 48 L182 74 L198 76 L184 92 C164 76 92 78 64 94 Z" fill="#FFFFFF" />
+    <path d="M92 60 L102 44 L112 62 M134 38 L142 58 M166 44 L164 64" fill="none" stroke="#D2DEEC" stroke-width="3" />
+    <!-- Cocky Grinning Beak -->
+    <path d="M122 124 C130 144 152 148 162 122 Z" fill="#FF8C24" />
+    <path d="M128 126 C134 138 148 140 156 126 Z" fill="#6E1E19" stroke="none" />
+    <path d="M120 124 Q138 106 168 122 Q144 128 120 124 Z" fill="#FF9A33" />
+  </g>
+</svg>

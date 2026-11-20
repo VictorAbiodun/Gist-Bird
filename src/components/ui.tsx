@@ -53,8 +53,21 @@ export function Field({ label, hint, error, children }: { label: string; hint?: 
 export const inputCls = (error?: boolean) =>
   `w-full rounded-input border-[1.5px] bg-surface px-4 text-body text-ink placeholder:text-muted focus:border-primary focus:outline-none ${error ? 'border-danger border-2' : 'border-line'}`;
 
-export function Avatar({ name, scarf, size = 44 }: { name: string; scarf: Scarf; size?: number }) {
-  const bg = SCARF_HEX[scarf];
+export function Avatar({ name, scarf, avatar, size = 44 }: { name: string; scarf?: Scarf; avatar?: string | null; size?: number }) {
+  if (avatar) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={avatar}
+        alt={name}
+        width={size}
+        height={size}
+        className="inline-block shrink-0 rounded-full object-cover border-[1.5px] border-line bg-surface"
+        style={{ width: size, height: size }}
+      />
+    );
+  }
+  const bg = scarf ? SCARF_HEX[scarf] : '#0A7D3E';
   const dark = scarf === 'lemon';
   return (
     <span aria-hidden className="inline-flex shrink-0 items-center justify-center rounded-full font-display font-bold" style={{ width: size, height: size, background: bg, color: dark ? '#0E2A1B' : '#fff', fontSize: size * 0.42 }}>

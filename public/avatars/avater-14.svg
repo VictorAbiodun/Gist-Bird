@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <clipPath id="clip-14"><circle cx="128" cy="128" r="120" /></clipPath>
+  </defs>
+  <circle cx="128" cy="128" r="120" fill="#FCEFA8" />
+  <g clip-path="url(#clip-14)" stroke="#243624" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Body / Maroon Hoodie -->
+    <path d="M52 246 C52 190 84 164 128 164 C172 164 204 190 208 246 Z" fill="#7D1D33" />
+    <!-- White Stripe -->
+    <path d="M58 196 Q128 210 198 196 L202 212 Q128 226 54 212 Z" fill="#FFFFFF" stroke="none" />
+    <path d="M52 246 C52 190 84 164 128 164 C172 164 204 190 208 246 Z" fill="none" />
+    <!-- Collar -->
+    <path d="M84 168 C102 152 150 152 168 170 C150 182 104 182 84 168 Z" fill="#631527" />
+    <!-- Yellow Strap & Bag -->
+    <path d="M170 168 L180 176 L140 228 L130 220 Z" fill="#E3B319" />
+    <path d="M84 218 L136 218 C146 218 150 228 146 244 L140 256 L82 256 Z" fill="#F9C823" />
+    <!-- Left Arm -->
+    <path d="M50 224 C66 206 96 204 110 216 C118 223 116 234 106 236 C108 244 100 252 88 252 L56 252 Z" fill="#78B876" />
+    <!-- Head -->
+    <circle cx="124" cy="108" r="64" fill="#78B876" />
+    <path d="M74 70 A64 64 0 0 0 94 162 A62 62 0 0 1 74 70 Z" fill="#629E60" stroke="none" />
+    <circle cx="124" cy="108" r="64" fill="none" />
+    <!-- Eyes Behind Glasses -->
+    <circle cx="108" cy="106" r="16" fill="#FFFFFF" />
+    <circle cx="111" cy="106" r="7" fill="#3D593C" stroke="none" />
+    <circle cx="113" cy="103" r="2.2" fill="#FFFFFF" stroke="none" />
+    <circle cx="164" cy="98" r="15" fill="#FFFFFF" />
+    <circle cx="163" cy="99" r="6.5" fill="#3D593C" stroke="none" />
+    <circle cx="165" cy="96" r="2.2" fill="#FFFFFF" stroke="none" />
+    <!-- Thick Rectangular Glasses -->
+    <g stroke="#261E19" stroke-width="7" fill="none">
+      <path d="M54 122 L82 110" />
+      <rect x="82" y="84" width="52" height="44" rx="10" transform="rotate(-7 108 106)" />
+      <path d="M134 100 L146 98" />
+      <rect x="146" y="76" width="50" height="44" rx="10" transform="rotate(-7 171 98)" />
+    </g>
+    <!-- Cere & Beak -->
+    <circle cx="140" cy="108" r="8" fill="#FFFFFF" stroke="none" />
+    <path d="M130 124 Q144 138 158 124 Z" fill="#EB8223" />
+    <path d="M128 124 Q144 104 168 124 Q146 128 128 124 Z" fill="#FF9A33" />
+    <!-- Open Book & Right Hand -->
+    <path d="M136 196 L172 206 L172 246 L134 236 Z" fill="#7E8040" />
+    <path d="M172 206 L196 186 L194 226 L172 246 Z" fill="#636630" />
+    <path d="M140 194 Q158 190 172 202 Q182 186 194 184 L172 206 Z" fill="#FFFFFF" />
+    <path d="M180 206 C192 200 206 206 204 222 C202 234 190 242 178 238 C174 230 176 214 180 206 Z" fill="#78B876" />
+  </g>
+</svg>

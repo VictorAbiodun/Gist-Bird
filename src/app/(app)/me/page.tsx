@@ -18,8 +18,18 @@ export default async function Me() {
       <Header title="Me" right={<Link href="/me/edit" aria-label="Edit profile" className="flex h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-line bg-surface"><Icon name="pen" size={22} /></Link>} />
       <div className="space-y-3 px-5 pt-2">
         <Card className="flex flex-col items-center gap-2.5 p-5">
-          <Avatar name={p.display_name} scarf={p.scarf} size={72} />
-          <h2 className="text-title">{p.display_name}</h2>
+          <Link href="/me/edit" className="relative group block" aria-label="Change profile picture">
+            <Avatar name={p.display_name} scarf={p.scarf} avatar={p.avatar} size={84} />
+            <span className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-white border-2 border-white shadow-sm transition-transform group-hover:scale-105 active:scale-95">
+              <Icon name="pen" size={14} />
+            </span>
+          </Link>
+          <div className="text-center">
+            <h2 className="text-title">{p.display_name}</h2>
+            <Link href="/me/edit" className="text-caption font-semibold text-primary hover:underline">
+              Change avatar or profile
+            </Link>
+          </div>
           <div className="flex flex-wrap justify-center gap-2">{p.interests.map((i) => <Chip key={i}>{i}</Chip>)}</div>
         </Card>
         <Row href="/me/edit" title="Favourite spot" sub={getSpot(p.favourite_spot)?.name ?? 'Not set'} />

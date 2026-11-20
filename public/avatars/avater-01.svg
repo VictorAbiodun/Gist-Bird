@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <clipPath id="clip-01"><circle cx="128" cy="128" r="120" /></clipPath>
+  </defs>
+  <circle cx="128" cy="128" r="120" fill="#D8EEFA" />
+  <g clip-path="url(#clip-01)" stroke="#23272D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Thumbs Up Hand (Back/Right) -->
+    <path d="M188 188 L206 164 C206 154 202 142 204 134 C206 127 214 127 217 134 L219 144 C228 144 236 150 237 161 C238 173 233 185 224 195 Z" fill="#92A1B3" />
+    <path d="M214 172 C216 178 221 182 227 183" fill="none" stroke-width="3" />
+    <!-- Body / Hoodie -->
+    <path d="M44 246 C44 192 78 164 126 164 C168 164 196 184 206 208 L226 192 L238 205 C224 224 206 234 192 234 L192 254 L60 254 Z" fill="#188C4B" />
+    <!-- White Stripe -->
+    <path d="M52 204 Q118 216 192 206 L192 221 Q118 232 47 218 Z" fill="#FFFFFF" stroke="none" />
+    <path d="M44 246 C44 192 78 164 126 164 C168 164 196 184 206 208 L226 192 L238 205 C224 224 206 234 192 234 L192 254 L60 254 Z" fill="none" />
+    <!-- Collar -->
+    <path d="M84 168 C102 152 152 152 172 172 C154 184 106 184 84 168 Z" fill="#13753E" />
+    <!-- Yellow Strap & Bag -->
+    <path d="M168 168 L178 176 L138 226 L128 218 Z" fill="#D4A617" />
+    <path d="M80 216 L134 216 C144 216 148 226 144 242 L138 256 L78 256 Z" fill="#F9C823" />
+    <!-- Front Arm / Hand -->
+    <path d="M47 224 C62 206 94 204 108 216 C116 223 114 234 104 236 C106 244 98 252 86 252 L54 252 Z" fill="#92A1B3" />
+    <!-- Head -->
+    <circle cx="122" cy="108" r="64" fill="#92A1B3" />
+    <path d="M74 68 A64 64 0 0 0 92 162 A62 62 0 0 1 74 68 Z" fill="#7D8C9E" stroke="none" />
+    <circle cx="122" cy="108" r="64" fill="none" />
+    <!-- Sunglasses -->
+    <g transform="rotate(-12 128 96)">
+      <path d="M56 96 L84 94" stroke-width="7" />
+      <path d="M82 82 L176 82 L173 108 C171 118 148 118 144 108 L138 94 L128 94 L122 108 C116 122 86 122 83 108 Z" fill="#23272D" />
+      <polygon points="100,86 107,86 101,112 94,112" fill="#525A65" stroke="none" />
+      <polygon points="111,86 115,86 109,112 105,112" fill="#525A65" stroke="none" />
+      <polygon points="152,86 158,86 153,110 147,110" fill="#525A65" stroke="none" />
+      <polygon points="162,86 166,86 161,110 157,110" fill="#525A65" stroke="none" />
+    </g>
+    <!-- Beak -->
+    <polygon points="144,86 192,98 150,120 138,104" fill="#FF8C24" />
+  </g>
+</svg>

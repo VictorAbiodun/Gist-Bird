@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <clipPath id="clip-25"><circle cx="128" cy="128" r="120" /></clipPath>
+  </defs>
+  <circle cx="128" cy="128" r="120" fill="#F2C9CE" />
+  <g clip-path="url(#clip-25)" stroke="#1C1418" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Body / White Kimono with Black Trim -->
+    <path d="M52 246 C52 190 84 164 128 164 C172 164 204 190 208 246 Z" fill="#F5F0EB" />
+    <path d="M88 166 L136 232 L172 168 L156 164 L132 204 L104 164 Z" fill="#1C1418" />
+    <!-- Black Obi Sash -->
+    <path d="M56 230 Q128 240 204 230 L208 248 Q128 256 52 248 Z" fill="#1C1418" />
+    <!-- Front Arm with Sukuna Wrist Bands -->
+    <path d="M50 224 C66 206 96 204 110 216 C118 223 116 234 106 236 C108 244 100 252 88 252 L56 252 Z" fill="#F2D7D5" />
+    <path d="M62 216 L76 244 M74 212 L88 244" stroke="#1C1418" stroke-width="4" />
+    <!-- Head -->
+    <circle cx="126" cy="112" r="62" fill="#F2D7D5" />
+    <path d="M78 74 A62 62 0 0 0 98 164 A60 60 0 0 1 78 74 Z" fill="#DBBCBA" stroke="none" />
+    <circle cx="126" cy="112" r="62" fill="none" />
+    <!-- Sukuna Facial Markings -->
+    <g fill="#1C1418" stroke="none">
+      <path d="M116 68 Q128 74 140 68 L138 74 Q128 78 118 74 Z" />
+      <rect x="74" y="102" width="12" height="5" rx="2" />
+      <rect x="76" y="112" width="10" height="4" rx="2" />
+      <rect x="172" y="96" width="12" height="5" rx="2" />
+      <rect x="174" y="106" width="10" height="4" rx="2" />
+      <path d="M118 150 Q128 156 138 150 L136 156 Q128 160 120 156 Z" />
+    </g>
+    <!-- Spiky Pink Hair -->
+    <path d="M66 90 L58 66 L78 70 L78 44 L102 58 L118 32 L134 52 L152 34 L160 58 L184 48 L180 74 L196 74 L184 88 C154 70 96 72 66 90 Z" fill="#F294A8" />
+    <!-- Menacing Crimson Eyes -->
+    <path d="M90 100 L120 108 C118 118 106 122 96 116 C90 112 88 106 90 100 Z" fill="#FFFFFF" />
+    <circle cx="107" cy="109" r="5.5" fill="#D91E36" stroke="none" />
+    <circle cx="107" cy="109" r="2.2" fill="#1C1418" stroke="none" />
+    <path d="M148 104 L176 94 C178 106 170 114 160 113 C152 112 148 108 148 104 Z" fill="#FFFFFF" />
+    <circle cx="162" cy="104" r="5.5" fill="#D91E36" stroke="none" />
+    <circle cx="162" cy="104" r="2.2" fill="#1C1418" stroke="none" />
+    <!-- Extra Lower Eyes -->
+    <path d="M98 126 Q108 131 116 126" fill="none" stroke="#1C1418" stroke-width="3.5" />
+    <path d="M154 120 Q164 125 172 118" fill="none" stroke="#1C1418" stroke-width="3.5" />
+    <!-- Sinister Grinning Beak -->
+    <path d="M122 126 C130 144 152 148 162 124 Z" fill="#FF8C24" />
+    <path d="M128 128 C134 138 148 140 156 128 Z" fill="#59161E" stroke="none" />
+    <path d="M120 126 Q138 108 166 124 Q144 130 120 126 Z" fill="#FF9A33" />
+  </g>
+</svg>

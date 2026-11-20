@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <clipPath id="clip-29"><circle cx="128" cy="128" r="120" /></clipPath>
+  </defs>
+  <circle cx="128" cy="128" r="120" fill="#D5E3DB" />
+  <g clip-path="url(#clip-29)" stroke="#1D2126" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Body / Survey Corps Green Cloak -->
+    <path d="M48 246 C48 186 82 162 128 162 C174 162 208 186 212 246 Z" fill="#2A5E42" />
+    <!-- Brown Jacket Underneath -->
+    <path d="M98 166 L108 246 L148 246 L158 166 Z" fill="#8C6239" />
+    <!-- Signature White Cravat -->
+    <path d="M108 164 L148 164 L144 218 L128 232 L112 218 Z" fill="#FFFFFF" />
+    <path d="M114 176 L142 176 M116 190 L140 190" stroke="#CBD2DB" stroke-width="2.5" />
+    <!-- Front Arm -->
+    <path d="M50 224 C66 206 96 204 110 216 C118 223 116 234 106 236 C108 244 100 252 88 252 L56 252 Z" fill="#DCE2E8" />
+    <!-- Head -->
+    <circle cx="126" cy="112" r="62" fill="#DCE2E8" />
+    <path d="M78 74 A62 62 0 0 0 98 164 A60 60 0 0 1 78 74 Z" fill="#C4CDD6" stroke="none" />
+    <circle cx="126" cy="112" r="62" fill="none" />
+    <!-- Signature Undercut Black Hair (Center Part) -->
+    <path d="M64 102 C62 56 96 42 126 42 C158 42 190 56 188 98 L178 106 C172 86 154 76 130 74 L126 94 L118 76 C96 80 78 90 72 108 Z" fill="#1D2126" />
+    <!-- Deadpan Half-Lidded Grey Eyes -->
+    <path d="M90 106 L120 105 C120 116 112 120 104 119 C96 118 90 113 90 106 Z" fill="#FFFFFF" />
+    <circle cx="106" cy="110" r="5" fill="#4A5568" stroke="none" />
+    <circle cx="106" cy="110" r="2" fill="#1D2126" stroke="none" />
+    <path d="M148 102 L178 101 C178 112 170 116 162 115 C154 114 148 109 148 102 Z" fill="#FFFFFF" />
+    <circle cx="163" cy="106" r="5" fill="#4A5568" stroke="none" />
+    <circle cx="163" cy="106" r="2" fill="#1D2126" stroke="none" />
+    <!-- Flat Eyebrows -->
+    <line x1="90" y1="96" x2="118" y2="96" stroke-width="4" />
+    <line x1="148" y1="92" x2="176" y2="92" stroke-width="4" />
+    <!-- Unimpressed Beak -->
+    <path d="M124 126 Q138 132 154 124 Z" fill="#E37B1B" />
+    <path d="M122 126 Q138 112 158 124 Q140 128 122 126 Z" fill="#FF9A33" />
+  </g>
+</svg>

@@ -17,7 +17,7 @@ export default async function Inbox() {
               <Link href={`/paper/${p.id}`}>
                 <Card className="space-y-2.5">
                   <div className="flex items-center gap-2.5">
-                    <Avatar name={p.from_name} scarf={p.from_scarf} />
+                    <Avatar name={p.from_name} scarf={p.from_scarf} avatar={p.from_avatar} />
                     <p className="flex-1 font-display text-heading font-bold">A paper from {p.from_name}</p>
                     <span className="text-label text-muted">{timeAgo(p.landed_at)}</span>
                   </div>

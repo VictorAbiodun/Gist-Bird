@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <clipPath id="clip-18"><circle cx="128" cy="128" r="120" /></clipPath>
+  </defs>
+  <circle cx="128" cy="128" r="120" fill="#E6E1C5" />
+  <g clip-path="url(#clip-18)" stroke="#241C18" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Back Locs Layer -->
+    <g fill="#2B211D">
+      <path d="M68 88 C52 108 46 138 52 164 C56 170 66 168 68 158 C68 136 72 114 82 96 Z" />
+      <path d="M180 86 C198 106 204 136 198 162 C194 168 184 166 182 156 C182 134 178 112 168 94 Z" />
+      <path d="M56 112 C42 132 38 156 44 178 C49 183 58 180 60 170 C60 150 64 130 70 116 Z" />
+      <path d="M192 110 C206 130 210 154 204 176 C199 181 190 178 188 168 C188 148 184 128 178 114 Z" />
+    </g>
+    <!-- Body / Olive-Black Hoodie -->
+    <path d="M52 246 C52 190 84 164 128 164 C172 164 204 190 208 246 Z" fill="#2A362C" />
+    <!-- White Stripe -->
+    <path d="M58 196 Q128 210 198 196 L202 212 Q128 226 54 212 Z" fill="#FFFFFF" stroke="none" />
+    <path d="M52 246 C52 190 84 164 128 164 C172 164 204 190 208 246 Z" fill="none" />
+    <!-- Collar -->
+    <path d="M84 168 C102 152 150 152 168 170 C150 182 104 182 84 168 Z" fill="#1E261F" />
+    <!-- Gold Strap & Bag -->
+    <path d="M170 168 L180 176 L140 228 L130 220 Z" fill="#D9A31E" />
+    <path d="M84 218 L136 218 C146 218 150 228 146 244 L140 256 L82 256 Z" fill="#F2BE2E" />
+    <!-- Front Arm -->
+    <path d="M50 224 C66 206 96 204 110 216 C118 223 116 234 106 236 C108 244 100 252 88 252 L56 252 Z" fill="#917765" />
+    <!-- Head -->
+    <circle cx="126" cy="112" r="62" fill="#917765" />
+    <path d="M78 74 A62 62 0 0 0 98 164 A60 60 0 0 1 78 74 Z" fill="#7A6252" stroke="none" />
+    <circle cx="126" cy="112" r="62" fill="none" />
+    <!-- Chill Half-Lidded Eyes -->
+    <path d="M90 106 L120 104 C121 118 112 125 103 123 C94 121 89 114 90 106 Z" fill="#FFFFFF" />
+    <circle cx="106" cy="111" r="6" fill="#241C18" stroke="none" />
+    <circle cx="108" cy="109" r="2" fill="#FFFFFF" stroke="none" />
+    <path d="M148 100 L178 98 C179 112 170 119 161 117 C152 115 147 108 148 100 Z" fill="#FFFFFF" />
+    <circle cx="163" cy="105" r="6" fill="#241C18" stroke="none" />
+    <circle cx="165" cy="103" r="2" fill="#FFFFFF" stroke="none" />
+    <!-- Cere & Chill Smirking Beak -->
+    <circle cx="136" cy="108" r="8.5" fill="#FFFFFF" stroke="none" />
+    <path d="M124 124 Q140 136 156 122 Z" fill="#E37B1B" />
+    <path d="M122 124 Q138 104 162 122 Q142 128 122 124 Z" fill="#FF9A33" />
+    <!-- Front Crown & Hanging Locs -->
+    <g fill="#2B211D">
+      <path d="M92 54 C74 60 62 84 60 114 C60 124 72 126 75 116 C78 96 86 76 102 66 Z" />
+      <path d="M114 48 C96 52 82 70 78 94 C77 103 89 105 92 96 C97 78 108 66 122 60 Z" />
+      <path d="M132 48 C148 52 162 66 168 90 C170 98 181 96 180 86 C176 62 158 46 134 44 Z" />
+      <path d="M150 52 C170 58 186 80 190 110 C191 120 180 122 176 112 C172 90 162 72 146 64 Z" />
+      <path d="M116 46 C122 36 138 36 144 48 C146 58 138 66 128 66 C118 66 112 56 116 46 Z" />
+    </g>
+    <!-- Gold Loc Cuffs -->
+    <rect x="61" y="96" width="13" height="7" rx="2" transform="rotate(10 67 99)" fill="#F5C525" stroke-width="2.5" />
+    <rect x="176" y="94" width="13" height="7" rx="2" transform="rotate(-12 182 97)" fill="#F5C525" stroke-width="2.5" />
+  </g>
+</svg>

@@ -12,7 +12,7 @@ export type Pose = keyof typeof MASCOT;
 export const HOME_BIRD = '/images/home-bird.jpg';
 
 /**
- * 20 student profile avatar badges
+ * 30 student profile avatar badges
  */
 export const AVATAR_LIST = [
   { id: 'cool-grey', name: 'Cool Grey', file: '/avatars/avatar-01.svg' },
@@ -35,5 +35,14 @@ export const AVATAR_LIST = [
   { id: 'scared-green', name: 'Scared Green', file: '/avatars/avatar-18.svg' },
   { id: 'singing-white', name: 'Singing White', file: '/avatars/avatar-19.svg' },
   { id: 'champion-gold', name: 'Champion Gold', file: '/avatars/avatar-20.svg' },
+  { id: 'adventurer-teal', name: 'Adventurer Teal', file: '/avatars/avatar-21.svg' },
+  { id: 'cheeky-violet', name: 'Cheeky Violet', file: '/avatars/avatar-22.svg' },
+  { id: 'wondering-blue', name: 'Wondering Blue', file: '/avatars/avatar-23.svg' },
+  { id: 'party-lime', name: 'Party Lime', file: '/avatars/avatar-24.svg' },
+  { id: 'dreamy-indigo', name: 'Dreamy Indigo', file: '/avatars/avatar-25.svg' },
+  { id: 'grinning-magenta', name: 'Grinning Magenta', file: '/avatars/avatar-26.svg' },
+  { id: 'radiant-amber', name: 'Radiant Amber', file: '/avatars/avatar-27.svg' },
+  { id: 'serene-mint', name: 'Serene Mint', file: '/avatars/avatar-28.svg' },
+  { id: 'joyful-sky', name: 'Joyful Sky', file: '/avatars/avatar-29.svg' },
+  { id: 'royal-crown', name: 'Royal Crown', file: '/avatars/avatar-30.svg' },
 ] as const;
-

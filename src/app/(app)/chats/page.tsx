@@ -15,7 +15,7 @@ export default async function Chats() {
             <li key={c.id}>
               <Link href={`/chat/${c.id}`}>
                 <Card className="flex items-center gap-3 p-3.5">
-                  <Avatar name={c.other_name} scarf={c.other_scarf} size={48} />
+                  <Avatar name={c.other_name} scarf={c.other_scarf} avatar={c.other_avatar} size={48} />
                   <div className="min-w-0 flex-1"><p className="font-display text-heading font-bold">{c.other_name}</p><p className="truncate text-label text-muted">{c.last ?? 'Say hi!'}</p></div>
                   <span className="text-caption text-muted">{timeAgo(c.last_at)}</span>
                 </Card>

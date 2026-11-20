@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <clipPath id="clip-26"><circle cx="128" cy="128" r="120" /></clipPath>
+  </defs>
+  <circle cx="128" cy="128" r="120" fill="#CFEBD2" />
+  <g clip-path="url(#clip-26)" stroke="#182B1E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Three Katana Hilts Peeking Behind Right -->
+    <g transform="rotate(28 190 190)">
+      <rect x="184" y="138" width="10" height="44" rx="2" fill="#FFFFFF" stroke-width="3" />
+      <rect x="196" y="144" width="10" height="44" rx="2" fill="#B82538" stroke-width="3" />
+      <rect x="208" y="150" width="10" height="44" rx="2" fill="#2A2D34" stroke-width="3" />
+    </g>
+    <!-- Body / Dark Green Coat & Red Sash -->
+    <path d="M52 246 C52 190 84 164 128 164 C172 164 204 190 208 246 Z" fill="#1F5938" />
+    <path d="M98 166 L128 212 L156 166 Z" fill="#D9C4A9" />
+    <!-- Red Sash -->
+    <path d="M56 226 Q128 238 204 226 L208 244 Q128 254 52 244 Z" fill="#B82525" />
+    <!-- Front Arm -->
+    <path d="M50 224 C66 206 96 204 110 216 C118 223 116 234 106 236 C108 244 100 252 88 252 L56 252 Z" fill="#D9C4A9" />
+    <!-- Three Gold Drop Earrings -->
+    <g fill="#F5C525" stroke="#8C670A" stroke-width="2">
+      <rect x="64" y="134" width="5" height="14" rx="2.5" />
+      <rect x="70" y="136" width="5" height="14" rx="2.5" />
+      <rect x="76" y="138" width="5" height="14" rx="2.5" />
+    </g>
+    <!-- Head -->
+    <circle cx="126" cy="112" r="62" fill="#D9C4A9" />
+    <path d="M78 74 A62 62 0 0 0 98 164 A60 60 0 0 1 78 74 Z" fill="#C2AB8E" stroke="none" />
+    <circle cx="126" cy="112" r="62" fill="none" />
+    <!-- Short Spiky Green Hair -->
+    <path d="M66 94 L62 72 L76 74 L76 50 L98 58 L112 36 L128 52 L144 38 L154 56 L176 48 L176 70 L190 74 L182 90 C154 72 96 74 66 94 Z" fill="#52B86A" />
+    <!-- Scarred Closed Left Eye -->
+    <path d="M92 108 Q106 114 118 108" fill="none" stroke-width="4.5" />
+    <path d="M104 88 L108 134" fill="none" stroke="#8C2B2B" stroke-width="3.5" />
+    <!-- Sharp Open Right Eye -->
+    <path d="M148 104 L176 96 C178 108 170 116 160 114 C152 112 148 108 148 104 Z" fill="#FFFFFF" />
+    <circle cx="162" cy="105" r="5.5" fill="#182B1E" stroke="none" />
+    <!-- Brow -->
+    <path d="M146 92 L174 84" fill="none" stroke="#2E6E3E" stroke-width="4.5" />
+    <!-- Stoic Smirking Beak -->
+    <path d="M124 126 Q140 136 156 124 Z" fill="#E37B1B" />
+    <path d="M122 126 Q138 108 164 124 Q142 128 122 126 Z" fill="#FF9A33" />
+  </g>
+</svg>

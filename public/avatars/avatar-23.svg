@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <clipPath id="clip-23"><circle cx="128" cy="128" r="120" /></clipPath>
+    <radialGradient id="ssjAura" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#FFF9C4" />
+      <stop offset="65%" stop-color="#FFE066" />
+      <stop offset="100%" stop-color="#F59F00" />
+    </radialGradient>
+  </defs>
+  <circle cx="128" cy="128" r="120" fill="url(#ssjAura)" />
+  <g clip-path="url(#clip-23)" stroke="#2E2212" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Aura Sparks -->
+    <g fill="#FFFFFF" stroke="none" opacity="0.75">
+      <polygon points="44,120 50,104 54,122" />
+      <polygon points="204,96 212,78 216,100" />
+      <polygon points="196,154 202,140 206,156" />
+    </g>
+    <!-- Body / Orange Gi & Blue Undershirt -->
+    <path d="M52 246 C52 190 84 164 128 164 C172 164 204 190 208 246 Z" fill="#F26A1B" />
+    <path d="M94 166 L128 214 L162 166 Z" fill="#1B56B5" />
+    <!-- Blue Sash -->
+    <path d="M56 226 Q128 238 204 226 L208 244 Q128 254 52 244 Z" fill="#1B56B5" />
+    <!-- Front Arm -->
+    <path d="M50 224 C66 206 96 204 110 216 C118 223 116 234 106 236 C108 244 100 252 88 252 L56 252 Z" fill="#F5C996" />
+    <!-- Head -->
+    <circle cx="126" cy="116" r="60" fill="#F5C996" />
+    <path d="M80 78 A60 60 0 0 0 100 166 A58 58 0 0 1 80 78 Z" fill="#DEAE7A" stroke="none" />
+    <circle cx="126" cy="116" r="60" fill="none" />
+    <!-- Spiky Golden SSJ Hair -->
+    <path d="M68 96 L46 66 L74 68 L64 32 L98 52 L116 14 L134 46 L160 18 L164 52 L196 36 L184 68 L206 68 L184 94 L162 80 L144 94 L132 76 L112 96 L96 80 L82 96 Z" fill="#FFE033" />
+    <!-- Fierce Teal SSJ Eyes -->
+    <path d="M90 106 L122 112 C120 124 106 128 96 122 C90 118 88 112 90 106 Z" fill="#FFFFFF" />
+    <circle cx="107" cy="115" r="6" fill="#00C4A7" stroke="#006B5B" stroke-width="2" />
+    <circle cx="107" cy="115" r="2.2" fill="#1A1A1A" stroke="none" />
+    <path d="M148 110 L178 100 C180 112 172 122 162 120 C154 118 148 115 148 110 Z" fill="#FFFFFF" />
+    <circle cx="163" cy="111" r="6" fill="#00C4A7" stroke="#006B5B" stroke-width="2" />
+    <circle cx="163" cy="111" r="2.2" fill="#1A1A1A" stroke="none" />
+    <!-- Golden Furrowed Brows -->
+    <path d="M86 98 L124 108 L122 101 L90 91 Z" fill="#E6B800" stroke-width="2.5" />
+    <path d="M180 92 L144 106 L146 99 L176 86 Z" fill="#E6B800" stroke-width="2.5" />
+    <!-- Determined Beak -->
+    <path d="M122 130 Q140 138 158 128 Z" fill="#E37B1B" />
+    <path d="M120 130 C126 110 152 110 164 130 C148 122 134 122 120 130 Z" fill="#FF9A33" />
+  </g>
+</svg>

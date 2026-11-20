@@ -11,6 +11,7 @@ const schema = z.object({
   displayName: z.string().trim().min(2, 'Use at least 2 characters.').max(24, 'Keep it to 24 characters.'),
   nameMode: z.enum(['real', 'alias']),
   scarf: z.enum(['green', 'lemon', 'coral', 'slate', 'ink']),
+  avatar: z.string().optional().default('/avatars/avatar-01.svg'),
   interests: z.array(z.string().max(30)).max(5),
   spot: z.string().nullable(),
   starter: z.string().trim().max(120).nullable(),
@@ -26,6 +27,7 @@ export async function saveProfile(input: ProfileInput): Promise<{ error?: string
   const { error } = await supabase.rpc('save_profile', {
     p_display_name: v.displayName, p_name_mode: v.nameMode, p_scarf: v.scarf,
     p_interests: v.interests, p_spot: v.spot, p_starter: v.starter,
+    p_avatar: v.avatar || '/avatars/avatar-01.svg',
   });
   if (error) return { error: friendlyError(error) };
   revalidatePath('/', 'layout');

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <clipPath id="clip-04"><circle cx="128" cy="128" r="120" /></clipPath>
+  </defs>
+  <circle cx="128" cy="128" r="120" fill="#DFD3F2" />
+  <g clip-path="url(#clip-04)" stroke="#263326" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Question Mark -->
+    <path d="M198 60 C198 48 216 48 216 59 C216 67 206 69 206 76" fill="none" stroke="#6E3B56" stroke-width="7" />
+    <circle cx="206" cy="87" r="4.5" fill="#6E3B56" stroke="none" />
+    <!-- Body / Navy Hoodie -->
+    <path d="M48 246 C48 190 82 164 126 164 C170 164 202 190 206 246 Z" fill="#23375E" />
+    <!-- White Stripe -->
+    <path d="M54 202 Q126 216 198 202 L202 218 Q126 232 50 218 Z" fill="#FFFFFF" stroke="none" />
+    <path d="M48 246 C48 190 82 164 126 164 C170 164 202 190 206 246 Z" fill="none" />
+    <!-- Orange Strap & Bag -->
+    <path d="M168 168 L178 176 L138 228 L128 220 Z" fill="#E8771E" />
+    <path d="M84 218 L136 218 C146 218 150 228 146 244 L140 256 L82 256 Z" fill="#F58628" />
+    <!-- Head -->
+    <circle cx="122" cy="106" r="64" fill="#77B274" />
+    <path d="M72 68 A64 64 0 0 0 92 160 A62 62 0 0 1 72 68 Z" fill="#639C60" stroke="none" />
+    <circle cx="122" cy="106" r="64" fill="none" />
+    <!-- Eyebrows -->
+    <path d="M88 83 Q98 83 108 75" fill="none" stroke-width="4.5" />
+    <path d="M148 72 Q158 68 168 74" fill="none" stroke-width="4.5" />
+    <!-- Thinking Eyes Looking Up -->
+    <circle cx="104" cy="104" r="15" fill="#FFFFFF" />
+    <circle cx="108" cy="99" r="7" fill="#1D2B1D" stroke="none" />
+    <circle cx="110" cy="96" r="2" fill="#FFFFFF" stroke="none" />
+    <circle cx="158" cy="96" r="14" fill="#FFFFFF" />
+    <circle cx="161" cy="91" r="6.5" fill="#1D2B1D" stroke="none" />
+    <circle cx="163" cy="88" r="2" fill="#FFFFFF" stroke="none" />
+    <!-- Cere & Closed Beak -->
+    <circle cx="136" cy="104" r="9" fill="#FFFFFF" stroke="none" />
+    <path d="M124 124 Q142 138 156 122 Z" fill="#EB8223" />
+    <path d="M122 124 Q138 102 162 124 Q142 120 122 124 Z" fill="#FF9A33" />
+    <!-- Thinking Hand on Chin -->
+    <path d="M84 234 L104 176 C98 168 96 158 102 154 C108 151 114 158 117 166 L142 152 C148 148 154 153 149 160 L132 178 C136 184 132 192 124 195 L114 236 Z" fill="#77B274" />
+  </g>
+</svg>

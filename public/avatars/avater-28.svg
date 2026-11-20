@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <clipPath id="clip-28"><circle cx="128" cy="128" r="120" /></clipPath>
+  </defs>
+  <circle cx="128" cy="128" r="120" fill="#FFE0C2" />
+  <g clip-path="url(#clip-28)" stroke="#1F191C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Body / Black Shinigami Shihakusho -->
+    <path d="M52 246 C52 190 84 164 128 164 C172 164 204 190 208 246 Z" fill="#1C1D24" />
+    <!-- White Inner Collar -->
+    <path d="M96 164 L128 214 L160 164 L148 164 L128 196 L108 164 Z" fill="#FFFFFF" />
+    <!-- Red Sword Strap Across Chest -->
+    <path d="M168 168 L180 176 L116 248 L104 240 Z" fill="#B8252E" />
+    <!-- Front Arm -->
+    <path d="M50 224 C66 206 96 204 110 216 C118 223 116 234 106 236 C108 244 100 252 88 252 L56 252 Z" fill="#F2D2B6" />
+    <!-- Head -->
+    <circle cx="126" cy="112" r="62" fill="#F2D2B6" />
+    <!-- Half Hollow Mask on Left Side of Face -->
+    <path d="M126 50 A62 62 0 0 0 126 174 L120 144 L130 124 L118 96 L130 74 Z" fill="#FFFFFF" />
+    <!-- Red Hollow Stripes on Mask -->
+    <g fill="#C9222B" stroke="none">
+      <path d="M74 86 L102 90 L98 96 L72 94 Z" />
+      <path d="M68 100 L96 102 L94 108 L68 107 Z" />
+      <path d="M72 126 L104 124 L106 130 L76 134 Z" />
+      <path d="M84 144 L112 138 L114 144 L88 150 Z" />
+    </g>
+    <circle cx="126" cy="112" r="62" fill="none" />
+    <!-- Hollow Eye (Black Sclera, Yellow Iris) -->
+    <path d="M88 104 L116 110 C114 120 102 122 92 116 Z" fill="#1C1D24" />
+    <circle cx="104" cy="112" r="4.5" fill="#FFD43B" stroke="none" />
+    <!-- Normal Sharp Right Eye -->
+    <path d="M148 104 L176 96 C178 108 170 116 160 114 C152 112 148 108 148 104 Z" fill="#FFFFFF" />
+    <circle cx="162" cy="105" r="5.5" fill="#8C4E1F" stroke="none" />
+    <circle cx="162" cy="105" r="2.2" fill="#1F191C" stroke="none" />
+    <!-- Spiky Orange Hair -->
+    <path d="M64 92 L52 68 L74 70 L70 42 L96 56 L112 28 L128 50 L148 28 L158 54 L184 42 L180 70 L198 72 L184 90 C156 72 96 74 64 92 Z" fill="#F27D16" />
+    <!-- Fierce Beak -->
+    <path d="M122 128 Q140 136 158 126 Z" fill="#E37B1B" />
+    <path d="M120 128 Q138 108 164 126 Q142 130 120 128 Z" fill="#FF9A33" />
+  </g>
+</svg>

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <clipPath id="clip-19"><circle cx="128" cy="128" r="120" /></clipPath>
+  </defs>
+  <circle cx="128" cy="128" r="120" fill="#E6D5DA" />
+  <g clip-path="url(#clip-19)" stroke="#1E2026" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Body / Black Hoodie -->
+    <path d="M52 246 C52 190 84 164 128 164 C172 164 204 190 208 246 Z" fill="#1E2026" />
+    <!-- Crimson Stripe -->
+    <path d="M58 196 Q128 210 198 196 L202 212 Q128 226 54 212 Z" fill="#C92A3E" stroke="none" />
+    <path d="M52 246 C52 190 84 164 128 164 C172 164 204 190 208 246 Z" fill="none" />
+    <!-- Collar & Silver Chain -->
+    <path d="M84 168 C102 152 150 152 168 170 C150 182 104 182 84 168 Z" fill="#13151A" />
+    <path d="M98 172 Q128 196 156 172" fill="none" stroke="#CBD2DB" stroke-width="5" stroke-dasharray="6 4" />
+    <!-- Dark Red Strap & Bag -->
+    <path d="M170 168 L180 176 L140 228 L130 220 Z" fill="#9E1F30" />
+    <path d="M84 218 L136 218 C146 218 150 228 146 244 L140 256 L82 256 Z" fill="#B82538" />
+    <!-- Front Arm with Sleeve Tattoos -->
+    <path d="M50 224 C66 206 96 204 110 216 C118 223 116 234 106 236 C108 244 100 252 88 252 L56 252 Z" fill="#D4DCE6" />
+    <g fill="none" stroke="#2D3748" stroke-width="2.5">
+      <path d="M62 224 L74 216 L70 228 L82 220" />
+      <circle cx="88" cy="232" r="5" />
+      <path d="M66 238 Q76 234 80 242" />
+    </g>
+    <!-- Head -->
+    <circle cx="126" cy="108" r="64" fill="#D4DCE6" />
+    <path d="M76 70 A64 64 0 0 0 96 162 A62 62 0 0 1 76 70 Z" fill="#BAC5D4" stroke="none" />
+    <circle cx="126" cy="108" r="64" fill="none" />
+    <!-- Face Tattoos -->
+    <g fill="#2D3748" stroke="none">
+      <!-- Tiny Cross on Forehead/Temple -->
+      <rect x="84" y="68" width="3" height="12" rx="1" />
+      <rect x="80" y="72" width="11" height="3" rx="1" />
+      <!-- Teardrop Under Left Eye -->
+      <path d="M98 122 C98 122 94 128 94 131 C94 133.5 96 135 98 135 C100 135 102 133.5 102 131 C102 128 98 122 98 122 Z" />
+      <!-- Small Lightning Bolt on Right Cheek -->
+      <polygon points="172,114 166,123 171,123 167,132 176,121 171,121" />
+      <!-- 3 Minimal Dots Near Brow -->
+      <circle cx="164" cy="68" r="2" />
+      <circle cx="170" cy="70" r="2" />
+      <circle cx="175" cy="73" r="2" />
+    </g>
+    <!-- Confident Eyes -->
+    <circle cx="106" cy="104" r="14" fill="#FFFFFF" />
+    <circle cx="109" cy="104" r="6.5" fill="#1E2026" stroke="none" />
+    <circle cx="111" cy="101" r="2" fill="#FFFFFF" stroke="none" />
+    <circle cx="160" cy="98" r="13.5" fill="#FFFFFF" />
+    <circle cx="162" cy="98" r="6" fill="#1E2026" stroke="none" />
+    <circle cx="164" cy="95" r="2" fill="#FFFFFF" stroke="none" />
+    <!-- Sharp Eyebrows (One with a Slit) -->
+    <path d="M88 86 L116 90" fill="none" stroke-width="5" />
+    <path d="M148 84 L162 80 M167 79 L174 78" fill="none" stroke-width="5" />
+    <!-- Cere & Smirking Beak -->
+    <circle cx="136" cy="106" r="8.5" fill="#FFFFFF" stroke="none" />
+    <path d="M124 122 Q140 134 156 120 Z" fill="#EB8223" />
+    <path d="M122 122 Q138 102 164 120 Q142 126 122 122 Z" fill="#FF9A33" />
+  </g>
+</svg>

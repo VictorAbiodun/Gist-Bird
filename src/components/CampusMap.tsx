@@ -1,6 +1,7 @@
 'use client';
 
 import { MAP_SIZE, SPOTS, getSpot, isPickable, arcControl, arcPoint } from '@/lib/campus';
+import { CampusBuildings } from './CampusBuildings';
 
 interface Props {
   /** Flight arc between two spot ids; the bird sits at progress t (0..1). */
@@ -70,6 +71,9 @@ export function CampusMap({ arc, selected, onSelect, className = '', label = 'Ca
 
       <text x="715" y="705" fontSize="12" fill="#5B6770" fontWeight="500">very long straight road</text>
       <text x="715" y="640" fontSize="12" fill="#5B6770" fontWeight="500">T-junction</text>
+
+      {/* 3D Campus Buildings */}
+      <CampusBuildings selected={selected} onSelect={onSelect} />
 
       {/* Flight Arc */}
       {a && b && c && (

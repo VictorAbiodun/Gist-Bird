@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import confetti from 'canvas-confetti';
 import { SPOTS, getSpot, arcControl, arcPoint } from '@/lib/campus';
+import { CampusBuildings } from './CampusBuildings';
 import { Icon } from './Icon';
 
 interface FlightSceneProps {
@@ -286,6 +287,22 @@ export function FlightScene({
             <text x="715" y="640" fontSize="12" fill="#5B6770" fontWeight="500">
               T-junction
             </text>
+
+            {/* 3D Campus Buildings */}
+            <CampusBuildings
+              fromSpot={fromSpot}
+              toSpot={toSpot}
+              isFlying={isFlying}
+              onSelect={(id) => {
+                if (isFlying) return;
+                if (!fromSpot || (fromSpot && toSpot)) {
+                  setFromSpot(id);
+                  setToSpot('');
+                } else {
+                  setToSpot(id);
+                }
+              }}
+            />
 
             {/* Flight Trail (Curved Bézier Arc) */}
             <path

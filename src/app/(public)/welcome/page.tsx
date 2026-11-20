@@ -11,7 +11,8 @@ export default function Welcome() {
         <p className="max-w-[18rem] text-heading text-muted">Say something real. Meet someone new.</p>
       </div>
       <div className="w-full space-y-3">
-        <LinkButton href="/email" className="w-full">Get started</LinkButton>
+        <LinkButton href="/login" className="w-full">Log in</LinkButton>
+        <LinkButton href="/email" variant="ghost" className="w-full">Create account</LinkButton>
         <p className="text-label text-muted">Verified students only · <Link href="/rules" className="font-semibold text-primary underline">Our rules</Link></p>
       </div>
     </main>

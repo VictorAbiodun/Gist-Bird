@@ -3,6 +3,7 @@ import '@fontsource-variable/bricolage-grotesque';
 import '@fontsource-variable/dm-sans';
 import './globals.css';
 import { OfflineBanner } from '@/components/OfflineBanner';
+import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://gist-bird.vercel.app'),
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
+        <ServiceWorkerRegister />
         <OfflineBanner />
         <div className="mx-auto min-h-dvh w-full max-w-[480px]">{children}</div>
       </body>

@@ -12,6 +12,7 @@ export default function Settings() {
     <main>
       <Header title="Settings" back="/me" />
       <div className="space-y-3 px-5 pt-2">
+        <Row href="/settings/password" title="Set or change password" />
         <Row href="/notifications" title="Notifications" />
         <Row href="/settings/blocked" title="Blocked people" />
         <Row href="/rules" title="Rules and privacy" />

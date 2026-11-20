@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { supabaseEnv } from '@/lib/supabase/env';
 
-const PUBLIC = ['/welcome', '/email', '/verify', '/setup', '/offline'];
+const PUBLIC = ['/welcome', '/email', '/verify', '/login', '/setup', '/offline'];
 
 export async function middleware(req: NextRequest) {
   const env = supabaseEnv();
@@ -11,12 +11,26 @@ export async function middleware(req: NextRequest) {
 
   let res = NextResponse.next({ request: req });
   const supabase = createServerClient(env.url, env.anon, {
+    cookieOptions: {
+      maxAge: 60 * 60 * 24 * 365, // 1 year persistent phone session
+      sameSite: 'lax',
+      path: '/',
+      secure: process.env.NODE_ENV === 'production',
+    },
     cookies: {
       getAll: () => req.cookies.getAll(),
       setAll: (list) => {
         list.forEach(({ name, value }) => req.cookies.set(name, value));
         res = NextResponse.next({ request: req });
-        list.forEach(({ name, value, options }) => res.cookies.set(name, value, options));
+        list.forEach(({ name, value, options }) =>
+          res.cookies.set(name, value, {
+            ...options,
+            maxAge: 60 * 60 * 24 * 365,
+            sameSite: 'lax',
+            path: '/',
+            secure: process.env.NODE_ENV === 'production',
+          })
+        );
       },
     },
   });
@@ -25,7 +39,7 @@ export async function middleware(req: NextRequest) {
   const isPublic = PUBLIC.some((p) => path === p || path.startsWith(p + '/'));
 
   if (!user && !isPublic && path !== '/') return NextResponse.redirect(new URL('/welcome', req.url));
-  if (user && (path === '/welcome' || path === '/email' || path === '/')) return NextResponse.redirect(new URL('/home', req.url));
+  if (user && (path === '/welcome' || path === '/email' || path === '/login' || path === '/')) return NextResponse.redirect(new URL('/home', req.url));
   return res;
 }
 

@@ -10,16 +10,16 @@ import { BirdAmbient } from './BirdAmbient';
 interface TreeSceneProps {
   children?: React.ReactNode;
   className?: string;
+  fullScreen?: boolean;
 }
 
-export function TreeScene({ children, className = '' }: TreeSceneProps) {
+export function TreeScene({ children, className = '', fullScreen = false }: TreeSceneProps) {
   return (
     <div
-      className={`relative mx-auto w-full max-w-[480px] overflow-hidden select-none rounded-[24px] bg-[#EAF7EE] shadow-sm ${className}`}
-      style={{
-        // Match the exact aspect ratio of the 1536 x 2752 illustration (0.558)
-        aspectRatio: '1536 / 2752',
-      }}
+      className={`relative mx-auto w-full max-w-[480px] overflow-hidden select-none ${
+        fullScreen ? 'min-h-[calc(100dvh-88px)]' : 'rounded-[24px] shadow-sm'
+      } bg-[#EAF7EE] ${className}`}
+      style={fullScreen ? undefined : { aspectRatio: '1536 / 2752' }}
     >
       {/* Base Layer: The Original 3D Storybook Illustration */}
       <Image
@@ -28,7 +28,7 @@ export function TreeScene({ children, className = '' }: TreeSceneProps) {
         fill
         priority
         sizes="(max-width: 480px) 100vw, 480px"
-        className="object-cover pointer-events-none"
+        className="object-cover pointer-events-none -z-0"
       />
 
       {/* Ambient Layer 1: Drifting Clouds across the sky */}
@@ -43,9 +43,9 @@ export function TreeScene({ children, className = '' }: TreeSceneProps) {
       {/* Ambient Layer 4: Subtle Character Life (Sunlight Glint on Sunglasses) */}
       <BirdAmbient />
 
-      {/* Interactive / Future Envelope Overlay Layer (Phase 2+) */}
+      {/* Interactive / UI Overlay Layer */}
       {children && (
-        <div className="absolute inset-0 z-10 pointer-events-auto">
+        <div className="relative z-10 flex min-h-[calc(100dvh-88px)] flex-col justify-between pointer-events-auto">
           {children}
         </div>
       )}

@@ -26,8 +26,8 @@ export function VerifyForm({ email }: { email: string }) {
   return (
     <form action={action} className="space-y-4" noValidate>
       <input type="hidden" name="email" value={email} />
-      <Field label="6-digit code" error={state.error}>
-        <input name="token" inputMode="numeric" autoComplete="one-time-code" maxLength={6} required placeholder="000000" className={`${inputCls(!!state.error)} h-[60px] text-center font-display text-title tracking-[0.5em]`} aria-invalid={!!state.error} />
+      <Field label="Verification code" error={state.error}>
+        <input name="token" inputMode="numeric" autoComplete="one-time-code" maxLength={8} required placeholder="000000" className={`${inputCls(!!state.error)} h-[60px] text-center font-display text-title tracking-[0.3em]`} aria-invalid={!!state.error} />
       </Field>
       {state.error && <Notice tone="err" title="That code didn't work">It may have expired. Try again, or go back and ask for a new one.</Notice>}
       <Submit>Verify</Submit>

@@ -3,12 +3,32 @@ import data from '@/data/campus.json';
 export type SpotKind = 'shared' | 'academic' | 'faculty' | 'gate' | 'junction';
 export interface Spot { id: string; name: string; kind: SpotKind; x: number; y: number }
 
-export const MAP_SIZE = { w: 560, h: 800 } as const;
+export const MAP_SIZE = { w: 900, h: 820 } as const;
 export const SPOTS: Spot[] = data.spots as Spot[];
 export const EDGES: [string, string][] = data.edges as [string, string][];
 
-const byId = new Map(SPOTS.map((s) => [s.id, s]));
+const ALIASES: Record<string, string> = {
+  park: 'peace_park',
+  cont: 'container',
+  health: 'health_centre',
+  grave: 'numbers_graveyard',
+  food: 'food_mart',
+  eng: 'engineering',
+  sap: 'sapetro',
+};
+
+const byId = new Map<string, Spot>();
+for (const s of SPOTS) {
+  byId.set(s.id, s);
+}
+// Also register aliases
+for (const [alias, target] of Object.entries(ALIASES)) {
+  const targetSpot = byId.get(target);
+  if (targetSpot) byId.set(alias, targetSpot);
+}
+
 export const getSpot = (id: string | null | undefined): Spot | undefined => (id ? byId.get(id) : undefined);
+
 /** Faculty buildings are pass-through only. They can't be picked as a favourite or starting spot. */
 export const isPickable = (s: Spot) => s.kind === 'shared' || s.kind === 'academic' || s.kind === 'gate';
 export const PICKABLE_SPOTS = SPOTS.filter(isPickable);
@@ -25,24 +45,26 @@ for (const [a, b] of EDGES) {
 
 /** Shortest path along campus roads (Dijkstra). Mirrors public.spot_distance in the database. */
 export function shortestPath(from: string, to: string): { ids: string[]; dist: number } | null {
-  if (!byId.has(from) || !byId.has(to)) return null;
-  const best = new Map<string, number>([[from, 0]]);
+  const normFrom = ALIASES[from] || from;
+  const normTo = ALIASES[to] || to;
+  if (!byId.has(normFrom) || !byId.has(normTo)) return null;
+  const best = new Map<string, number>([[normFrom, 0]]);
   const prev = new Map<string, string>();
-  const todo = new Set<string>([from]);
+  const todo = new Set<string>([normFrom]);
   while (todo.size) {
     let cur: string | null = null;
     for (const id of todo) if (cur === null || best.get(id)! < best.get(cur)!) cur = id;
     todo.delete(cur!);
-    if (cur === to) break;
+    if (cur === normTo) break;
     for (const { to: n, d } of adjacency.get(cur!) ?? []) {
       const nd = best.get(cur!)! + d;
       if (nd < (best.get(n) ?? Infinity)) { best.set(n, nd); prev.set(n, cur!); todo.add(n); }
     }
   }
-  if (!best.has(to)) return null;
-  const ids = [to];
-  while (ids[0] !== from) ids.unshift(prev.get(ids[0])!);
-  return { ids, dist: best.get(to)! };
+  if (!best.has(normTo)) return null;
+  const ids = [normTo];
+  while (ids[0] !== normFrom) ids.unshift(prev.get(ids[0])!);
+  return { ids, dist: best.get(normTo)! };
 }
 
 export interface FlightConfig { secondsPer100Units: number; min: number; max: number }
@@ -59,17 +81,24 @@ export function flightProgress(sentAt: string | Date, landsAt: string | Date, no
   return Math.min(1, Math.max(0, (now - s) / (l - s)));
 }
 
-/** Control point for the curved flight arc drawn on the map (matches the Figma design). */
+/** Control point for the curved flight arc drawn on the map (from draft). */
 export function arcControl(a: Spot, b: Spot): { x: number; y: number } {
+  const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
   const dx = b.x - a.x, dy = b.y - a.y;
-  let px = dy * 0.3, py = -dx * 0.3;
-  if (py > 0) { px = -px; py = -py; }
-  return { x: (a.x + b.x) / 2 + px, y: (a.y + b.y) / 2 + py };
+  const l = Math.hypot(dx, dy) || 1;
+  const k = Math.min(60, l * 0.18);
+  return { x: mx - (dy / l) * k, y: my + (dx / l) * k };
 }
 
-export function arcPoint(a: Spot, b: Spot, t: number): { x: number; y: number } {
-  const c = arcControl(a, b), u = 1 - t;
-  return { x: u * u * a.x + 2 * u * t * c.x + t * t * b.x, y: u * u * a.y + 2 * u * t * c.y + t * t * b.y };
+export function arcPoint(a: Spot, b: Spot, t: number): { x: number; y: number; angle: number } {
+  const c = arcControl(a, b);
+  const u = 1 - t;
+  const x = u * u * a.x + 2 * u * t * c.x + t * t * b.x;
+  const y = u * u * a.y + 2 * u * t * c.y + t * t * b.y;
+  const tx = 2 * u * (c.x - a.x) + 2 * t * (b.x - c.x);
+  const ty = 2 * u * (c.y - a.y) + 2 * t * (b.y - c.y);
+  const angle = (Math.atan2(ty, tx) * 180) / Math.PI;
+  return { x, y, angle };
 }
 
 /** The named landmark Chief Coo is closest to along the road path, for "resting at Chapel" copy. */
@@ -82,8 +111,37 @@ export function nearestLandmarkAlong(from: string, to: string, t: number): Spot 
   return real[i];
 }
 
-/** Where each label sits relative to its dot on the map: below, above, above (second row), left, right. */
+/** Draft map label positioning offsets and text anchors */
+export const LABEL_CONFIG: Record<string, { dx: number; dy: number; anchor: 'middle' | 'end' | 'start' }> = {
+  gate: { dx: 0, dy: 28, anchor: 'middle' },
+  mimis: { dx: 0, dy: -16, anchor: 'middle' },
+  nk: { dx: 0, dy: 28, anchor: 'middle' },
+  chapel: { dx: 0, dy: -16, anchor: 'middle' },
+  lr: { dx: -16, dy: 5, anchor: 'end' },
+  labs: { dx: -16, dy: 5, anchor: 'end' },
+  field: { dx: -16, dy: 5, anchor: 'end' },
+  peace_park: { dx: 0, dy: -16, anchor: 'middle' },
+  park: { dx: 0, dy: -16, anchor: 'middle' },
+  container: { dx: 16, dy: 5, anchor: 'start' },
+  cont: { dx: 16, dy: 5, anchor: 'start' },
+  manna: { dx: 16, dy: 5, anchor: 'start' },
+  health_centre: { dx: 16, dy: 5, anchor: 'start' },
+  health: { dx: 16, dy: 5, anchor: 'start' },
+  dp: { dx: 16, dy: 5, anchor: 'start' },
+  numbers_graveyard: { dx: 0, dy: -16, anchor: 'middle' },
+  grave: { dx: 0, dy: -16, anchor: 'middle' },
+  food_mart: { dx: 0, dy: 28, anchor: 'middle' },
+  food: { dx: 0, dy: 28, anchor: 'middle' },
+  bms: { dx: 0, dy: -16, anchor: 'middle' },
+  seap: { dx: 0, dy: 28, anchor: 'middle' },
+  engineering: { dx: 0, dy: -16, anchor: 'middle' },
+  eng: { dx: 0, dy: -16, anchor: 'middle' },
+  sapetro: { dx: 0, dy: 28, anchor: 'middle' },
+  sap: { dx: 0, dy: 28, anchor: 'middle' },
+};
+
+// Legacy position record compatibility
 export const LABEL_POS: Record<string, 'b' | 'a' | 'a2' | 'l' | 'r'> = {
-  gate: 'b', mimis: 'b', nk: 'b', chapel: 'b', lr: 'l', labs: 'l', field: 'l', peace_park: 'b', container: 'b',
-  manna: 'l', health_centre: 'l', dp: 'r', numbers_graveyard: 'a2', food_mart: 'b', bms: 'a', seap: 'b', engineering: 'a2', sapetro: 'b',
+  gate: 'b', mimis: 'a', nk: 'b', chapel: 'a', lr: 'l', labs: 'l', field: 'l', peace_park: 'a', container: 'r',
+  manna: 'r', health_centre: 'r', dp: 'r', numbers_graveyard: 'a', food_mart: 'b', bms: 'a', seap: 'b', engineering: 'a', sapetro: 'b',
 };

@@ -10,6 +10,7 @@ const PRECACHE_URLS = [
   '/mascot/curious.jpg',
   '/mascot/fly.jpg',
   '/images/home-bird.jpg',
+  '/assets/message-tree.jpg',
 ];
 
 self.addEventListener('install', (event) => {
@@ -39,7 +40,8 @@ self.addEventListener('fetch', (event) => {
     url.pathname.startsWith('/mascot/') ||
     url.pathname.startsWith('/avatars/') ||
     url.pathname.startsWith('/icons/') ||
-    url.pathname.startsWith('/images/')
+    url.pathname.startsWith('/images/') ||
+    url.pathname.startsWith('/assets/')
   ) {
     event.respondWith(
       caches.match(request).then((cached) => {

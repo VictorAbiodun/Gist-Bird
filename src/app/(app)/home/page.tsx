@@ -20,7 +20,14 @@ export default async function Home() {
           <Icon name="bell" size={22} />{unread > 0 && <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-coral" />}
         </Link>
       </header>
-      <div className="px-5"><Link href="/map" className="ml-auto flex w-fit items-center gap-2 rounded-full border-[1.5px] border-line bg-white/90 px-3.5 py-2.5 text-label font-bold"><Icon name="map" size={18} />See the map</Link></div>
+      <div className="flex items-center justify-between px-5">
+        <Link href="/tree" className="flex items-center gap-2 rounded-full border-[1.5px] border-line bg-white/90 px-3.5 py-2.5 text-label font-bold shadow-sm backdrop-blur transition-transform active:scale-95">
+          🌳 The Message Tree
+        </Link>
+        <Link href="/map" className="flex items-center gap-2 rounded-full border-[1.5px] border-line bg-white/90 px-3.5 py-2.5 text-label font-bold shadow-sm backdrop-blur transition-transform active:scale-95">
+          <Icon name="map" size={18} />See the map
+        </Link>
+      </div>
       <div className="absolute inset-x-0 bottom-0 space-y-3 px-5 pb-6">
         {flying && (
           <Link href={`/flight/${flying.id}`} className="block rounded-card border-[1.5px] border-line bg-surface p-3.5">

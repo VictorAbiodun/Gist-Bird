@@ -58,7 +58,7 @@ export async function requestCode(_: FormState, formData: FormData): Promise<For
     if (error) return { error: friendlyError(error, 'We could not send the code. Wait a moment and try again.') };
   }
 
-  redirect(\`/verify?email=\${encodeURIComponent(email)}\`);
+  redirect(`/verify?email=${encodeURIComponent(email)}`);
 }
 
 export async function verifyCode(_: FormState, formData: FormData): Promise<FormState> {

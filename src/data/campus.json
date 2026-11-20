@@ -1,0 +1,32 @@
+{
+  "note": "Map coordinates are on a 560x800 canvas and are NOT to scale. Confirm spots, order and spellings against the real campus.",
+  "spots": [
+    { "id": "gate", "name": "School gate", "kind": "gate", "x": 60, "y": 740 },
+    { "id": "mimis", "name": "Mimis", "kind": "shared", "x": 130, "y": 690 },
+    { "id": "nk", "name": "NK", "kind": "shared", "x": 205, "y": 650 },
+    { "id": "chapel", "name": "Chapel", "kind": "shared", "x": 262, "y": 590 },
+    { "id": "lr", "name": "LR", "kind": "academic", "x": 215, "y": 540 },
+    { "id": "labs", "name": "Labs", "kind": "academic", "x": 170, "y": 490 },
+    { "id": "field", "name": "Field", "kind": "shared", "x": 125, "y": 440 },
+    { "id": "peace_park", "name": "Peace Park", "kind": "shared", "x": 340, "y": 560 },
+    { "id": "container", "name": "Container", "kind": "shared", "x": 410, "y": 525 },
+    { "id": "manna", "name": "Manna", "kind": "shared", "x": 455, "y": 478 },
+    { "id": "health_centre", "name": "Health Centre", "kind": "shared", "x": 472, "y": 415 },
+    { "id": "junction", "name": "T-junction", "kind": "junction", "x": 472, "y": 250 },
+    { "id": "dp", "name": "DP", "kind": "shared", "x": 472, "y": 70 },
+    { "id": "numbers_graveyard", "name": "Numbers graveyard", "kind": "shared", "x": 420, "y": 250 },
+    { "id": "food_mart", "name": "Food Mart", "kind": "shared", "x": 360, "y": 250 },
+    { "id": "bms", "name": "BMS", "kind": "faculty", "x": 300, "y": 250 },
+    { "id": "seap", "name": "SEAP", "kind": "faculty", "x": 240, "y": 250 },
+    { "id": "engineering", "name": "Engineering", "kind": "faculty", "x": 180, "y": 250 },
+    { "id": "sapetro", "name": "Sapetro", "kind": "shared", "x": 115, "y": 250 }
+  ],
+  "edges": [
+    ["gate", "mimis"], ["mimis", "nk"], ["nk", "chapel"], ["chapel", "peace_park"],
+    ["peace_park", "container"], ["container", "manna"], ["manna", "health_centre"],
+    ["health_centre", "junction"], ["junction", "dp"],
+    ["chapel", "lr"], ["lr", "labs"], ["labs", "field"],
+    ["junction", "numbers_graveyard"], ["numbers_graveyard", "food_mart"], ["food_mart", "bms"],
+    ["bms", "seap"], ["seap", "engineering"], ["engineering", "sapetro"]
+  ]
+}

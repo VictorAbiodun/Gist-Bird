@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-tap-highlight-color: transparent; }
+  body { @apply bg-bg font-body text-body text-ink antialiased; }
+  h1, h2, h3 { @apply font-display font-bold; }
+  :focus-visible { outline: 3px solid #0A7D3E; outline-offset: 2px; border-radius: 8px; }
+  ::selection { background: #FFD23F; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

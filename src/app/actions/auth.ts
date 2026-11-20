@@ -49,7 +49,7 @@ export async function requestCode(_: FormState, formData: FormData): Promise<For
       if (sendResult.error) {
         return { error: friendlyError(sendResult.error.message, 'Could not send verification email.') };
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       return { error: friendlyError(e, 'We could not send the code. Wait a moment and try again.') };
     }
   } else {

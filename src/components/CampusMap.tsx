@@ -51,7 +51,7 @@ export function CampusMap({ arc, selected, onSelect, className = '', label = 'Ca
           </g>
         );
       })}
-      {bird && <image href="/mascot/fly.svg" x={bird.x - 36} y={bird.y - 50} width="72" height="86" style={{ transition: 'x 1s linear, y 1s linear' }} />}
+      {bird && <image href="/mascot/fly.jpg" x={bird.x - 36} y={bird.y - 50} width="72" height="86" style={{ transition: 'x 1s linear, y 1s linear' }} />}
     </svg>
   );
 }

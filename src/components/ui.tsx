@@ -83,7 +83,7 @@ export function Empty({ pose = 'curious', title, children, action }: { pose?: 'w
   return (
     <div className="flex flex-col items-center gap-3 px-8 py-12 text-center">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={`/mascot/${pose}.svg`} alt="" width={170} height={153} />
+      <img src={`/mascot/${pose}.jpg`} alt="" width={170} height={153} />
       <h2 className="text-title">{title}</h2>
       {children && <p className="text-muted">{children}</p>}
       {action && <div className="mt-2 w-full">{action}</div>}

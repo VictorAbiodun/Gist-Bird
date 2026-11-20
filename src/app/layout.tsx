@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: 'Gist Bird',
   description: 'Send a paper across campus. Chief Coo carries it.',
   manifest: '/manifest.webmanifest',
-  icons: { icon: '/icons/icon.svg' },
+  icons: { icon: '/icons/icon.svg', apple: '/icons/icon.svg' },
 };
 export const viewport: Viewport = { themeColor: '#0A7D3E', width: 'device-width', initialScale: 1, viewportFit: 'cover' };
 

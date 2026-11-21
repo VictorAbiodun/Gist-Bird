@@ -117,15 +117,13 @@ export function TreeMessageLeaves({
                 />
               )}
 
-              {/* The Envelope SVG */}
+              {/* The Envelope SVG (Closed for landed/unread, Open for opened) */}
               <Image
-                src="/assets/envelope.svg"
-                alt="Paper envelope"
+                src={isLanded ? '/assets/envelope.svg' : '/assets/envelope-open.svg'}
+                alt={isLanded ? 'Sealed envelope' : 'Open envelope'}
                 width={envelopeWidth}
-                height={envelopeHeight}
-                className={`relative drop-shadow-md transition-all ${
-                  !isLanded ? 'brightness-95 saturate-[0.85]' : ''
-                }`}
+                height={isLanded ? envelopeHeight : Math.round(envelopeWidth * (260 / 256))}
+                className="relative drop-shadow-md transition-all"
               />
 
               {/* Author Name Label — tucked underneath the envelope */}

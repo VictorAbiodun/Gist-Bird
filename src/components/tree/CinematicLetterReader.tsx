@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useTransition } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Avatar, Chip, timeAgo } from '@/components/ui';
 import { Icon } from '@/components/Icon';
@@ -157,8 +158,6 @@ export function CinematicLetterReader({
     stage === 'reading' ||
     stage === 'closing_sheet';
 
-  const isSheetOut = stage === 'sheet_emerging' || stage === 'closing_sheet';
-
   const isReading = stage === 'reading' || stage === 'kept_celebration';
 
   const isAtBranch = stage === 'approaching' || stage === 'returning_to_branch';
@@ -216,103 +215,45 @@ export function CinematicLetterReader({
               stiffness: 160,
             }}
           >
-            {/* The Envelope Physical Construct */}
-            <div className="relative w-[180px] h-[140px] flex items-center justify-center">
-              {/* Emerging Letter Sheet (slides up between envelope body and front flap) */}
-              <motion.div
-                className="absolute z-10 w-[140px] h-[95px] rounded-lg border border-[#E0D2B4] shadow-md flex flex-col justify-between p-2.5"
-                style={{
-                  background: 'linear-gradient(180deg, #FFFDF8 0%, #F5EEDC 100%)',
-                }}
-                initial={{ y: 0, opacity: 0 }}
-                animate={{
-                  y: isSheetOut ? -55 : 0,
-                  opacity: isSheetOut ? 1 : 0,
-                  scale: isSheetOut ? 1.05 : 0.95,
-                }}
-                transition={{
-                  type: 'spring',
-                  damping: 20,
-                  stiffness: 180,
-                }}
-              >
-                {/* Mini folded letter decoration */}
-                <div className="flex items-center justify-between border-b border-[#E8DEC8] pb-1">
-                  <span className="text-[9px] font-bold tracking-wider text-primary uppercase">
-                    From {envelope.fromName}
-                  </span>
-                  <span className="text-[10px]">🕊️</span>
-                </div>
-                <div className="space-y-1">
-                  <div className="h-1.5 w-full rounded-full bg-[#EFE5D0]" />
-                  <div className="h-1.5 w-4/5 rounded-full bg-[#EFE5D0]" />
-                  <div className="h-1.5 w-3/5 rounded-full bg-[#EFE5D0]" />
-                </div>
-              </motion.div>
-
-              {/* Envelope Body SVG (Back body + Front pocket + 3D Flap) */}
-              <div className="relative z-20 w-full h-full drop-shadow-2xl">
-                <svg viewBox="0 0 256 200" className="w-full h-full overflow-visible">
-                  <defs>
-                    <filter id="cinematicGlow" x="-20%" y="-20%" width="140%" height="140%">
-                      <feDropShadow dx="0" dy="6" stdDeviation="8" floodColor="#FFD86B" floodOpacity="0.45" />
-                    </filter>
-                    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#FFFDF2" />
-                      <stop offset="65%" stopColor="#FFF2BE" />
-                      <stop offset="100%" stopColor="#FCE08B" />
-                    </linearGradient>
-                    <linearGradient id="flapGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#FFFFFF" />
-                      <stop offset="100%" stopColor="#FFF6D1" />
-                    </linearGradient>
-                    <clipPath id="pocketClip">
-                      <rect x="28" y="34" width="200" height="132" rx="18" ry="18" />
-                    </clipPath>
-                  </defs>
-
-                  {/* Envelope Base Shadow & Back Wall */}
-                  <g filter="url(#cinematicGlow)">
-                    <rect x="28" y="34" width="200" height="132" rx="18" ry="18" fill="url(#bodyGrad)" />
-                    {/* Dark inner pocket lining revealed when flap opens */}
-                    <path d="M28 34 L128 106 L228 34 L228 166 L28 166 Z" fill="#E2BD68" opacity="0.4" />
-                  </g>
-
-                  {/* Front Pocket Fold (Letters slide behind this) */}
-                  <g clipPath="url(#pocketClip)">
-                    <path d="M24 168 L128 96 L232 168 Z" fill="#FDE496" opacity="0.85" />
-                    <path d="M28 164 L106 106 M228 164 L150 106" stroke="#F0C451" strokeWidth="4" strokeLinecap="round" opacity="0.8" />
-                    <path d="M26 42 L116 116 Q128 126 140 116 L230 42 Z" fill="#E6B23A" opacity="0.25" />
-                  </g>
-                  <rect x="28" y="34" width="200" height="132" rx="18" ry="18" fill="none" stroke="#F2C249" strokeWidth="5" />
-                </svg>
-
-                {/* The 3D Articulated Flap (Flips 180 degrees upward on open) */}
-                <motion.div
-                  className="absolute top-[24px] inset-x-0 h-[65px] origin-top"
-                  style={{
-                    transformStyle: 'preserve-3d',
-                  }}
-                  animate={{
-                    rotateX: isFlapOpen ? 180 : 0,
-                    zIndex: isFlapOpen ? 5 : 25,
-                  }}
-                  transition={{
-                    duration: 0.38,
-                    ease: [0.4, 0, 0.2, 1],
-                  }}
-                >
-                  <svg viewBox="0 0 256 90" className="w-full h-full overflow-visible">
-                    <path
-                      d="M24 6 L117 80 Q128 89 139 80 L232 6 Z"
-                      fill="url(#flapGrad)"
-                      stroke="#F2C249"
-                      strokeWidth="5"
-                      strokeLinejoin="round"
+            {/* The Envelope Physical Construct (Closed transitioning to Open) */}
+            <div className="relative w-[210px] h-[210px] flex items-center justify-center">
+              <AnimatePresence mode="wait">
+                {isFlapOpen ? (
+                  <motion.div
+                    key="open-env"
+                    initial={{ opacity: 0, scale: 0.92 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.92 }}
+                    transition={{ duration: 0.26 }}
+                    className="relative w-[190px] h-[193px]"
+                  >
+                    <Image
+                      src="/assets/envelope-open.svg"
+                      alt="Open envelope"
+                      fill
+                      priority
+                      className="object-contain drop-shadow-2xl"
                     />
-                  </svg>
-                </motion.div>
-              </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="closed-env"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.22 }}
+                    className="relative w-[190px] h-[148px]"
+                  >
+                    <Image
+                      src="/assets/envelope.svg"
+                      alt="Sealed envelope"
+                      fill
+                      priority
+                      className="object-contain drop-shadow-2xl"
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
         )}

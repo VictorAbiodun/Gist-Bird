@@ -108,7 +108,13 @@ export function MessageModal({
           {/* Top Banner Ribbon */}
           <div className="flex items-center justify-between border-b border-line pb-3">
             <div className="flex items-center gap-2">
-              <Image src="/assets/envelope.svg" alt="" width={28} height={22} className="shrink-0" />
+              <Image
+                src={isLanded ? '/assets/envelope.svg' : '/assets/envelope-open.svg'}
+                alt=""
+                width={28}
+                height={isLanded ? 22 : 28}
+                className="shrink-0"
+              />
               <span className="font-display text-caption font-bold tracking-wider uppercase text-primary">
                 {isLanded ? 'Unaccepted Paper · Sealed' : 'Unaccepted Paper · Opened'}
               </span>
@@ -169,7 +175,12 @@ export function MessageModal({
           {isLanded ? (
             <div className="mt-4 rounded-input border border-amber-200 bg-[#FFFDF5] p-4 text-center">
               <div className="mx-auto mb-2">
-                <Image src="/assets/envelope.svg" alt="Sealed envelope" width={64} height={50} />
+                <Image
+                  src={isLanded ? '/assets/envelope.svg' : '/assets/envelope-open.svg'}
+                  alt={isLanded ? 'Sealed envelope' : 'Open envelope'}
+                  width={64}
+                  height={isLanded ? 50 : 65}
+                />
               </div>
               <p className="font-display text-heading font-bold text-ink">
                 A paper is resting on your branch

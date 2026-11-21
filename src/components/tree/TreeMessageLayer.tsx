@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { TreeMessageLeaves } from './TreeMessageLeaves';
-import { MessageModal } from './MessageModal';
+import { CinematicLetterReader } from './CinematicLetterReader';
 import { inboxItemToEnvelope, type TreeEnvelope } from './treeEnvelope';
 import type { InboxItem } from '@/lib/types';
 import { Icon } from '@/components/Icon';
@@ -75,14 +75,9 @@ export function TreeMessageLayer({
         item.id === paperId ? { ...item, state: 'opened', body: updatedBody ?? item.body } : item
       )
     );
-    setActiveEnvelope((prev) =>
-      prev && prev.paperId === paperId
-        ? { ...prev, state: 'opened', body: updatedBody ?? prev.body }
-        : prev
-    );
   }
 
-  function handleRemove(paperId: string) {
+  function handleKeepSuccess(paperId: string) {
     setInboxItems((prev) => prev.filter((item) => item.id !== paperId));
     setActiveEnvelope(null);
   }
@@ -92,6 +87,7 @@ export function TreeMessageLayer({
       {/* Hanging Envelopes on the Tree Canopy */}
       <TreeMessageLeaves
         envelopes={envelopes}
+        activeEnvelopeId={activeEnvelope?.id}
         onSelectEnvelope={(env) => setActiveEnvelope(env)}
       />
 
@@ -130,12 +126,12 @@ export function TreeMessageLayer({
         </div>
       )}
 
-      {/* Read / Accept / Pass Envelope Modal */}
-      <MessageModal
+      {/* Cinematic Letter Reader Experience */}
+      <CinematicLetterReader
         envelope={activeEnvelope}
         onClose={() => setActiveEnvelope(null)}
         onOpenSuccess={handleOpenSuccess}
-        onRemove={handleRemove}
+        onKeepSuccess={handleKeepSuccess}
       />
     </>
   );

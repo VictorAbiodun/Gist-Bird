@@ -12,6 +12,7 @@ export default async function EditProfile() {
         nameMode: p.name_mode,
         scarf: p.scarf,
         avatar: p.avatar,
+        birdName: p.bird_name ?? 'Chief Coo',
         interests: p.interests,
         spot: p.favourite_spot,
         starter: p.starter_prompt ?? '',

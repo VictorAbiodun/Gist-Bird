@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import confetti from 'canvas-confetti';
 import { SPOTS, getSpot, arcControl, arcPoint } from '@/lib/campus';
+import { calculateFlightDuration } from '@/lib/bird';
 import { CampusBuildings } from './CampusBuildings';
 import { Icon } from './Icon';
 
@@ -14,6 +15,9 @@ interface FlightSceneProps {
   live?: boolean;
   onDelivered?: () => void;
   className?: string;
+  birdName?: string;
+  birdLevel?: number;
+  speedBoostPercent?: number;
 }
 
 export function FlightScene({
@@ -24,15 +28,17 @@ export function FlightScene({
   live = false,
   onDelivered,
   className = '',
+  birdName = 'Chief Coo',
+  birdLevel = 1,
+  speedBoostPercent = 0,
 }: FlightSceneProps) {
   const [viewMode, setViewMode] = useState<'3d' | '2d'>('3d');
   const [fromSpot, setFromSpot] = useState<string>(initialOrigin || 'gate');
   const [toSpot, setToSpot] = useState<string>(initialDest || 'chapel');
   const [progress, setProgress] = useState<number>(0);
   const [isFlying, setIsFlying] = useState<boolean>(false);
-  const [flightSpeed, setFlightSpeed] = useState<number>(1);
   const [wingPhase, setWingPhase] = useState<number>(0);
-  const [statusText, setStatusText] = useState<string>('Ready for flight');
+  const [statusText, setStatusText] = useState<string>(`${birdName} is ready`);
   const [delivered, setDelivered] = useState<boolean>(false);
 
   const reqRef = useRef<number | null>(null);
@@ -74,9 +80,8 @@ export function FlightScene({
     setProgress(0);
     startTimeRef.current = null;
 
-    // Calculate duration based on distance and speed (min 2.5s, max 8s at 1x)
-    const baseDuration = Math.max(2400, (distance / 120) * 1000);
-    const ms = (customDuration || baseDuration) / flightSpeed;
+    // Calculate duration adjusted by bird level/speed boost
+    const ms = customDuration || calculateFlightDuration(distance, speedBoostPercent);
     durationRef.current = ms;
 
     const animate = (timestamp: number) => {
@@ -88,11 +93,11 @@ export function FlightScene({
       setWingPhase(timestamp / 75);
 
       if (t < 0.2) {
-        setStatusText(`Chief Coo ascending from ${startSpot.name} 🛫`);
+        setStatusText(`${birdName} ascending from ${startSpot.name} 🛫`);
       } else if (t < 0.85) {
-        setStatusText(`Cruising at altitude carrying your letter 💌`);
+        setStatusText(`${birdName} cruising at altitude with your letter 💌`);
       } else if (t < 1) {
-        setStatusText(`Descending towards ${endSpot.name} 🛬`);
+        setStatusText(`${birdName} descending towards ${endSpot.name} 🛬`);
       }
 
       if (t < 1) {
@@ -100,14 +105,14 @@ export function FlightScene({
       } else {
         setIsFlying(false);
         setDelivered(true);
-        setStatusText(`Paper delivered to ${endSpot.name}! 🎉`);
+        setStatusText(`${birdName} delivered your paper to ${endSpot.name}! 🎉`);
         triggerConfetti();
         if (onDelivered) onDelivered();
       }
     };
 
     reqRef.current = requestAnimationFrame(animate);
-  }, [fromSpot, toSpot, distance, flightSpeed, startSpot.name, endSpot.name, triggerConfetti, onDelivered]);
+  }, [fromSpot, toSpot, distance, speedBoostPercent, birdName, startSpot.name, endSpot.name, triggerConfetti, onDelivered]);
 
   // Live progress handling when paper has actual timestamps
   useEffect(() => {
@@ -495,13 +500,20 @@ export function FlightScene({
       {/* Flight Progress HUD */}
       <div className="space-y-2 rounded-card border-[1.5px] border-line bg-surface p-4 shadow-sm">
         <div className="flex items-center justify-between text-body font-bold">
-          <p className="flex items-center gap-2">
-            <span className="text-xl">{delivered ? '💌' : '🪶'}</span>
-            <span>{statusText}</span>
+          <p className="flex items-center gap-2 min-w-0 flex-1">
+            <span className="text-xl">{delivered ? '💌' : '🕊️'}</span>
+            <span className="truncate text-[15px]">{statusText}</span>
           </p>
-          <span className="rounded-full bg-lemon px-2.5 py-0.5 text-label font-bold text-ink">
-            {Math.round(progress * 100)}%
-          </span>
+          <div className="flex items-center gap-1.5 shrink-0">
+            {speedBoostPercent > 0 && (
+              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary">
+                ⚡ +{speedBoostPercent}% speed
+              </span>
+            )}
+            <span className="rounded-full bg-lemon px-2.5 py-0.5 text-label font-bold text-ink">
+              {Math.round(progress * 100)}%
+            </span>
+          </div>
         </div>
 
         {/* Animated Progress Bar */}
@@ -518,7 +530,7 @@ export function FlightScene({
           />
         </div>
 
-        {/* Simulator Controls & Spot Selectors (matches user draft) */}
+        {/* Simulator Controls & Spot Selectors */}
         <div className="mt-4 border-t border-line/60 pt-3">
           <div className="flex flex-wrap items-end gap-2.5">
             <div className="flex-1 min-w-[130px]">
@@ -561,7 +573,7 @@ export function FlightScene({
               </select>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => startFlight()}
@@ -569,19 +581,8 @@ export function FlightScene({
                 className="inline-flex min-h-[42px] items-center gap-1.5 rounded-btn bg-primary px-4 text-label font-bold text-white transition active:scale-95 disabled:opacity-50"
               >
                 <Icon name="sent" size={16} />
-                {delivered ? 'Fly Again' : isFlying ? 'Flying…' : 'Send Bird'}
+                {delivered ? 'Fly Again' : isFlying ? 'Flying…' : `Send ${birdName}`}
               </button>
-
-              <select
-                value={flightSpeed}
-                onChange={(e) => setFlightSpeed(Number(e.target.value))}
-                className="rounded-input border-[1.5px] border-line bg-surface px-2.5 py-1.5 text-caption font-bold text-muted focus:border-primary"
-                title="Animation Speed"
-              >
-                <option value={1}>1x Speed</option>
-                <option value={2}>2x Speed</option>
-                <option value={4}>4x Turbo</option>
-              </select>
             </div>
           </div>
         </div>

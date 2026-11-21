@@ -11,11 +11,17 @@ export function FlightTracker({
   dest,
   sentAt,
   landsAt,
+  birdName = 'Chief Coo',
+  birdLevel = 1,
+  speedBoostPercent = 0,
 }: {
   origin: string;
   dest: string | null;
   sentAt: string;
   landsAt: string;
+  birdName?: string;
+  birdLevel?: number;
+  speedBoostPercent?: number;
 }) {
   const router = useRouter();
   const [delivered, setDelivered] = useState(false);
@@ -30,6 +36,9 @@ export function FlightTracker({
         sentAt={sentAt}
         landsAt={landsAt}
         live={true}
+        birdName={birdName}
+        birdLevel={birdLevel}
+        speedBoostPercent={speedBoostPercent}
         onDelivered={() => {
           setDelivered(true);
           setTimeout(() => router.refresh(), 2000);
@@ -38,7 +47,7 @@ export function FlightTracker({
 
       <Card className="space-y-2">
         <p className="font-display text-heading font-bold">
-          {delivered ? 'Paper Don Land! 💌' : 'Chief Coo dey carry your gist'}
+          {delivered ? 'Paper Don Land! 💌' : `${birdName} dey carry your gist`}
         </p>
         <p className="text-label text-muted">
           From {o?.name ?? 'Campus'} to {d?.name ?? 'Campus'}
@@ -62,7 +71,7 @@ export function FlightTracker({
       ) : (
         <div className="space-y-2 pt-2">
           <Notice title="No need to wait here">
-            Chief Coo knows the route. You can close the app — we will notify you the moment it lands!
+            {birdName} knows the route. You can close the app — we will notify you the moment it lands!
           </Notice>
           <LinkButton href="/home" variant="outline" className="w-full">
             Back home

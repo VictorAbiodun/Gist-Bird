@@ -11,6 +11,20 @@ export interface ChatRow { id: string; other_id: string; other_name: string; oth
 export interface ChatView { id: string; other_id: string; other_name: string; other_scarf: Scarf; other_avatar?: string; other_interests: string[]; other_starter: string | null; paper_body: string; blocked: boolean; me: string }
 export interface Message { id: number; chat_id: string; sender_id: string; body: string; created_at: string }
 export interface Notice { id: string; kind: string; title: string; body: string | null; data: Record<string, string>; read_at: string | null; created_at: string }
-export interface Profile { id: string; display_name: string; name_mode: 'real' | 'alias'; scarf: Scarf; avatar?: string; interests: string[]; favourite_spot: string | null; starter_prompt: string | null; status: 'active' | 'paused'; paused_until: string | null }
+export interface Profile {
+  id: string;
+  display_name: string;
+  name_mode: 'real' | 'alias';
+  scarf: Scarf;
+  avatar?: string;
+  bird_name?: string;
+  interests: string[];
+  favourite_spot: string | null;
+  starter_prompt: string | null;
+  status: 'active' | 'paused';
+  paused_until: string | null;
+  created_at?: string;
+  papers_used?: number;
+}
 export type Scarf = 'green' | 'lemon' | 'coral' | 'slate' | 'ink';
 export const SCARF_HEX: Record<Scarf, string> = { green: '#0A7D3E', lemon: '#FFD23F', coral: '#FF6B57', slate: '#7F90A3', ink: '#0E2A1B' };

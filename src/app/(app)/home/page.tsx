@@ -1,20 +1,32 @@
 import Link from 'next/link';
-import { getNotifications, getSent, papersLeft } from '@/lib/data';
+import { getInbox, getNotifications, getProfile, getSent, papersLeft } from '@/lib/data';
 import { Icon } from '@/components/Icon';
 import { LinkButton } from '@/components/ui';
 import { getSpot } from '@/lib/campus';
 import { TreeScene } from '@/components/tree/TreeScene';
 
 export default async function Home() {
-  const [left, notes, sent] = await Promise.all([papersLeft(), getNotifications(), getSent()]);
+  const [left, notes, sent, inbox, profile] = await Promise.all([
+    papersLeft(),
+    getNotifications(),
+    getSent(),
+    getInbox(),
+    getProfile(),
+  ]);
   const unread = notes.filter((n) => !n.read_at).length;
   const flying = sent.find((s) => s.state === 'flying');
 
   return (
     <main className="relative min-h-[calc(100dvh-88px)] overflow-hidden">
-      <TreeScene fullScreen>
-        {/* Top Header & Actions */}
-        <div>
+      <TreeScene
+        fullScreen
+        userId={profile?.id}
+        inboxPapers={inbox}
+        userDisplayName={profile?.display_name ?? 'You'}
+        userAvatar={profile?.avatar ?? '/avatars/avatar-01.svg'}
+      >
+        {/* Top Header & Actions — pointer-events-auto so links work */}
+        <div className="pointer-events-auto">
           <header className="flex items-center gap-2.5 px-5 pb-2 pt-[max(1.25rem,env(safe-area-inset-top))]">
             <span className="flex-1 font-display text-[26px] font-bold leading-8 text-primary drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">
               Gist Bird
@@ -43,8 +55,8 @@ export default async function Home() {
           </div>
         </div>
 
-        {/* Bottom CTA & Active Flights */}
-        <div className="space-y-3 px-5 pb-6">
+        {/* Bottom CTA & Active Flights — pointer-events-auto so buttons work */}
+        <div className="pointer-events-auto space-y-3 px-5 pb-6">
           {flying && (
             <Link
               href={`/flight/${flying.id}`}

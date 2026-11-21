@@ -1,10 +1,11 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getPaper } from '@/lib/data';
+import { getPaper, getProfile } from '@/lib/data';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { FlightTracker } from '@/components/FlightTracker';
 import { Header, Notice, LinkButton } from '@/components/ui';
 import { Mascot } from '@/components/Mascot';
+import { getBirdStats } from '@/lib/bird';
 
 export default async function Flight({ params }: { params: { id: string } }) {
   const p = await getPaper(params.id);
@@ -67,6 +68,9 @@ export default async function Flight({ params }: { params: { id: string } }) {
     );
   }
 
+  const profile = await getProfile();
+  const birdStats = getBirdStats(profile?.created_at, profile?.papers_used ?? 0, profile?.bird_name);
+
   return (
     <main>
       <Header title={state === 'flying' ? 'On its way' : 'Paper Delivery'} back="/home" />
@@ -84,6 +88,9 @@ export default async function Flight({ params }: { params: { id: string } }) {
           dest={dest}
           sentAt={sentAt}
           landsAt={landsAt}
+          birdName={birdStats.name}
+          birdLevel={birdStats.level}
+          speedBoostPercent={birdStats.speedBoostPercent}
         />
       </div>
     </main>

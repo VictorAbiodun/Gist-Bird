@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 200" width="256" height="200">
+  <defs>
+    
+    <filter id="envGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#FFD86B" flood-opacity="0.55" />
+    </filter>
+
+    
+    <linearGradient id="envBodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFDF2" />
+      <stop offset="65%" stop-color="#FFF2BE" />
+      <stop offset="100%" stop-color="#FCE08B" />
+    </linearGradient>
+
+    
+    <linearGradient id="envFlapGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#FFF6D1" />
+    </linearGradient>
+
+    
+    <clipPath id="envClip">
+      <rect x="28" y="34" width="200" height="132" rx="18" ry="18" />
+    </clipPath>
+  </defs>
+
+  <g filter="url(#envGlow)">
+    
+    <rect x="28" y="34" width="200" height="132" rx="18" ry="18" fill="url(#envBodyGrad)" />
+
+    
+    <g clip-path="url(#envClip)">
+      
+      <path d="M24 168 L128 96 L232 168 Z" fill="#FDE496" opacity="0.7" />
+      <path d="M28 164 L106 106 M228 164 L150 106" stroke="#F0C451" stroke-width="4" stroke-linecap="round" opacity="0.65" />
+
+      
+      <path d="M26 42 L116 116 Q128 126 140 116 L230 42 Z" fill="#E6B23A" opacity="0.28" />
+
+      
+      <path d="M24 32 L117 108 Q128 117 139 108 L232 32 Z" fill="url(#envFlapGrad)" stroke="#F2C249" stroke-width="5" stroke-linejoin="round" />
+    </g>
+
+    
+    <rect x="28" y="34" width="200" height="132" rx="18" ry="18" fill="none" stroke="#F2C249" stroke-width="6" />
+  </g>
+</svg>

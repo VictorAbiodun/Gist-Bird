@@ -22,6 +22,7 @@ export function ProfileWizard({ initial, mode = 'onboarding' }: { initial?: Part
     nameMode: initial?.nameMode ?? 'real',
     scarf: initial?.scarf ?? 'green',
     avatar: initial?.avatar ?? '/avatars/avatar-01.svg',
+    birdName: initial?.birdName ?? 'Chief Coo',
     interests: initial?.interests ?? [],
     spot: initial?.spot ?? null,
     starter: initial?.starter ?? '',
@@ -135,6 +136,22 @@ export function ProfileWizard({ initial, mode = 'onboarding' }: { initial?: Part
               <input value={v.displayName} maxLength={24} onChange={(e) => set('displayName', e.target.value)} className={`${inputCls()} h-[52px]`} autoComplete={v.nameMode === 'real' ? 'given-name' : 'off'} />
             </Field>
             {v.nameMode === 'alias' && <Button variant="outline" icon="refresh" onClick={() => set('displayName', randomAlias())}>Try another alias</Button>}
+
+            {/* Bird Naming */}
+            <Field label="Your messenger bird's name" hint="Default: Chief Coo. Your bird carries your papers!">
+              <div className="flex items-center gap-2">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-lemon text-lg shadow-sm">
+                  🕊️
+                </span>
+                <input
+                  value={v.birdName || 'Chief Coo'}
+                  maxLength={24}
+                  onChange={(e) => set('birdName', e.target.value)}
+                  placeholder="Chief Coo"
+                  className={`${inputCls()} h-[52px] flex-1`}
+                />
+              </div>
+            </Field>
             <fieldset>
               <legend className="mb-2 text-label font-semibold text-muted">Scarf colour</legend>
               <div className="flex gap-3">

@@ -12,6 +12,7 @@ const schema = z.object({
   nameMode: z.enum(['real', 'alias']),
   scarf: z.enum(['green', 'lemon', 'coral', 'slate', 'ink']),
   avatar: z.string().optional().default('/avatars/avatar-01.svg'),
+  birdName: z.string().trim().min(2, 'Bird name must have at least 2 characters.').max(24, 'Keep bird name to 24 characters.').optional().default('Chief Coo'),
   interests: z.array(z.string().max(30)).max(5),
   spot: z.string().nullable(),
   starter: z.string().trim().max(120).nullable(),
@@ -23,13 +24,30 @@ export async function saveProfile(input: ProfileInput): Promise<{ error?: string
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const v = parsed.data;
   if (v.spot && !PICKABLE_SPOTS.some((s) => s.id === v.spot)) return { error: 'Pick a shared spot.' };
+  
   const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'You are not signed in.' };
+
   const { error } = await supabase.rpc('save_profile', {
-    p_display_name: v.displayName, p_name_mode: v.nameMode, p_scarf: v.scarf,
-    p_interests: v.interests, p_spot: v.spot, p_starter: v.starter,
+    p_display_name: v.displayName,
+    p_name_mode: v.nameMode,
+    p_scarf: v.scarf,
+    p_interests: v.interests,
+    p_spot: v.spot,
+    p_starter: v.starter,
     p_avatar: v.avatar || '/avatars/avatar-01.svg',
   });
   if (error) return { error: friendlyError(error) };
+
+  // Persist bird name via admin client
+  if (v.birdName) {
+    await createAdminClient()
+      .from('profiles')
+      .update({ bird_name: v.birdName.trim() })
+      .eq('id', user.id);
+  }
+
   revalidatePath('/', 'layout');
   return {};
 }

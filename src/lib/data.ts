@@ -22,7 +22,7 @@ export async function getProfile(): Promise<Profile | null> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
   const { data } = await supabase.from('profiles')
-    .select('id, display_name, name_mode, scarf, avatar, interests, favourite_spot, starter_prompt, status, paused_until')
+    .select('id, display_name, name_mode, scarf, avatar, bird_name, interests, favourite_spot, starter_prompt, status, paused_until, created_at, papers_used')
     .eq('id', user.id).maybeSingle();
   return (data as Profile | null) ?? null;
 }

@@ -19,8 +19,6 @@ interface TreeMessageLayerProps {
 
 export function TreeMessageLayer({
   mode = 'full',
-  userDisplayName = 'You',
-  userAvatar = '/avatars/avatar-01.svg',
   userId,
   initialInbox = [],
 }: TreeMessageLayerProps) {
@@ -68,7 +66,7 @@ export function TreeMessageLayer({
 
   // Map each qualifying unaccepted inbox message into a natural hanging envelope
   const envelopes = useMemo(() => {
-    return inboxItems.map((item, idx) => inboxItemToEnvelope(item, idx, inboxItems.length));
+    return inboxItems.map((item, idx) => inboxItemToEnvelope(item, idx));
   }, [inboxItems]);
 
   function handleOpenSuccess(paperId: string, updatedBody: string | null) {

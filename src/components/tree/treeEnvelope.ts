@@ -51,7 +51,7 @@ export const CANOPY_BRANCH_POSITIONS = [
  * Uses natural canopy anchor points with subtle pseudo-random organic jitter.
  * If total envelopes exceed anchors, uses procedural phyllotaxis spiral distribution.
  */
-export function getBranchPosition(index: number, total: number): { x: number; y: number } {
+export function getBranchPosition(index: number): { x: number; y: number } {
   if (index < CANOPY_BRANCH_POSITIONS.length) {
     const base = CANOPY_BRANCH_POSITIONS[index];
     // Organic deterministic jitter based on index so envelopes don't look machine-aligned
@@ -80,8 +80,8 @@ export function getBranchPosition(index: number, total: number): { x: number; y:
 /**
  * Maps a real recipient InboxItem from Supabase into an interactive hanging TreeEnvelope.
  */
-export function inboxItemToEnvelope(item: InboxItem, index: number, total: number): TreeEnvelope {
-  const pos = getBranchPosition(index, total);
+export function inboxItemToEnvelope(item: InboxItem, index: number): TreeEnvelope {
+  const pos = getBranchPosition(index);
 
   // Independent swinging physics for organic natural sway
   const swayDuration = 2.8 + ((index * 0.73) % 1.8); // 2.8s - 4.6s distinct pendulum period

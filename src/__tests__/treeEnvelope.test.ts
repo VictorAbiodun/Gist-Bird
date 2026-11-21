@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { getBranchPosition, inboxItemToEnvelope, CANOPY_BRANCH_POSITIONS } from '../components/tree/treeEnvelope';
+import { getBranchPosition, inboxItemToEnvelope } from '../components/tree/treeEnvelope';
 import type { InboxItem } from '../lib/types';
 
 describe('Message Tree Envelopes', () => {
   it('returns empty array when user has zero unaccepted messages', () => {
     const inbox: InboxItem[] = [];
-    const envelopes = inbox.map((item, idx) => inboxItemToEnvelope(item, idx, inbox.length));
+    const envelopes = inbox.map((item, idx) => inboxItemToEnvelope(item, idx));
     expect(envelopes).toHaveLength(0);
   });
 
@@ -21,7 +21,7 @@ describe('Message Tree Envelopes', () => {
       spot: 'Peace Park',
     };
 
-    const env = inboxItemToEnvelope(single, 0, 1);
+    const env = inboxItemToEnvelope(single, 0);
     expect(env.id).toBe('paper-1');
     expect(env.paperId).toBe('paper-1');
     expect(env.state).toBe('landed');
@@ -49,7 +49,7 @@ describe('Message Tree Envelopes', () => {
       spot: 'Engineering Hub',
     }));
 
-    const envelopes = items.map((item, idx) => inboxItemToEnvelope(item, idx, items.length));
+    const envelopes = items.map((item, idx) => inboxItemToEnvelope(item, idx));
     expect(envelopes).toHaveLength(8);
 
     // Each envelope must have its own unique position and swing physics
@@ -75,7 +75,7 @@ describe('Message Tree Envelopes', () => {
 
   it('handles large message volumes without exceeding canopy boundaries', () => {
     for (let i = 0; i < 25; i++) {
-      const pos = getBranchPosition(i, 25);
+      const pos = getBranchPosition(i);
       expect(pos.x).toBeGreaterThanOrEqual(14);
       expect(pos.x).toBeLessThanOrEqual(86);
       expect(pos.y).toBeGreaterThanOrEqual(14);
@@ -105,8 +105,8 @@ describe('Message Tree Envelopes', () => {
       spot: null,
     };
 
-    const env1 = inboxItemToEnvelope(landedItem, 0, 2);
-    const env2 = inboxItemToEnvelope(openedItem, 1, 2);
+    const env1 = inboxItemToEnvelope(landedItem, 0);
+    const env2 = inboxItemToEnvelope(openedItem, 1);
 
     expect(env1.state).toBe('landed');
     expect(env2.state).toBe('opened');

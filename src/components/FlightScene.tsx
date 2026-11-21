@@ -505,6 +505,9 @@ export function FlightScene({
             <span className="truncate text-[15px]">{statusText}</span>
           </p>
           <div className="flex items-center gap-1.5 shrink-0">
+            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-800">
+              Lv. {birdLevel}
+            </span>
             {speedBoostPercent > 0 && (
               <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary">
                 ⚡ +{speedBoostPercent}% speed

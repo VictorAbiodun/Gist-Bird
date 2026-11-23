@@ -8,7 +8,7 @@ export default async function Chats() {
     <main>
       <Header title="Chats" />
       {chats.length === 0 ? (
-        <Empty pose="wave" title="No chats yet" action={<LinkButton href="/inbox" className="w-full">Check inbox</LinkButton>}>When someone accepts your paper, or you accept one, the chat starts here.</Empty>
+        <Empty pose="wave" title="No chats yet" action={<LinkButton href="/home" className="w-full">Check the tree</LinkButton>}>When someone accepts your paper, or you accept one from the tree, the chat starts here.</Empty>
       ) : (
         <ul className="space-y-3 px-5 pt-2">
           {chats.map((c) => (

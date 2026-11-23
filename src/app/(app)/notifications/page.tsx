@@ -5,7 +5,14 @@ import { MarkRead } from '@/components/MarkRead';
 
 export default async function Notifications() {
   const list = await getNotifications();
-  const href = (n: (typeof list)[number]) => n.data.chat_id ? `/chat/${n.data.chat_id}` : n.kind === 'paper_landed' && n.data.paper_id ? `/paper/${n.data.paper_id}` : n.data.paper_id ? `/flight/${n.data.paper_id}` : '/home';
+  const href = (n: (typeof list)[number]) =>
+    n.data.chat_id
+      ? `/chat/${n.data.chat_id}`
+      : n.kind === 'paper_landed'
+      ? '/home'
+      : n.data.paper_id
+      ? `/flight/${n.data.paper_id}`
+      : '/home';
   return (
     <main>
       <Header title="Notifications" back="/home" />

@@ -21,7 +21,7 @@ export async function reportUser(input: z.infer<typeof reportSchema>): Promise<{
     p_reason: v.reason, p_details: v.details ?? null,
     p_paper: v.paperId ?? null, p_chat: v.chatId ?? null, p_block: v.block,
   });
-  revalidatePath('/chats'); revalidatePath('/inbox');
+  revalidatePath('/chats'); revalidatePath('/home');
   return error ? { error: friendlyError(error) } : {};
 }
 

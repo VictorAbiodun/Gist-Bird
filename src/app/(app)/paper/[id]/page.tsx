@@ -11,7 +11,7 @@ export default async function PaperPage({ params }: { params: { id: string } }) 
   const opened = p.state === 'opened';
   return (
     <main className="flex min-h-dvh flex-col">
-      <Header back="/inbox" right={<Link href={`/report?paper=${p.id}`} aria-label="Report or block" className="flex h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-line bg-surface"><Icon name="flag" size={22} /></Link>} />
+      <Header back="/home" right={<Link href={`/report?paper=${p.id}`} aria-label="Report or block" className="flex h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-line bg-surface"><Icon name="flag" size={22} /></Link>} />
       <div className="flex-1 space-y-4 px-5 pt-2">
         <Card className="space-y-4 p-5">
           <div className="flex items-center gap-3"><Avatar name={p.from_name!} scarf={p.from_scarf!} avatar={p.from_avatar} size={48} /><div><p className="font-display text-title">{opened ? `From ${p.from_name}` : `A paper from ${p.from_name}`}</p><p className="text-label text-muted">{p.lands_at ? timeAgo(p.lands_at) : ''}</p></div></div>

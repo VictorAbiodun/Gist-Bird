@@ -1,13 +1,11 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { TreeMessageLeaves } from './TreeMessageLeaves';
 import { CinematicLetterReader } from './CinematicLetterReader';
 import { inboxItemToEnvelope, type TreeEnvelope } from './treeEnvelope';
 import type { InboxItem } from '@/lib/types';
-import { Icon } from '@/components/Icon';
 
 interface TreeMessageLayerProps {
   mode?: 'full' | 'compact';
@@ -111,17 +109,6 @@ export function TreeMessageLayer({
                 <span>Your branches are quiet — no unaccepted papers</span>
               </div>
             )}
-          </div>
-
-          {/* Bottom Actions for /tree page */}
-          <div className="pointer-events-auto pb-4">
-            <Link
-              href="/inbox"
-              className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full border border-white/80 bg-white/95 px-5 py-3 text-label font-bold text-ink shadow-lg backdrop-blur-md transition-all hover:bg-white active:scale-98"
-            >
-              <Icon name="inbox" size={18} />
-              <span>View Inbox List</span>
-            </Link>
           </div>
         </div>
       )}

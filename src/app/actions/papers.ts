@@ -20,18 +20,18 @@ export async function sendPaper(input: { body: string; origin: string }): Promis
 
 export async function openPaper(id: string) {
   await createClient().rpc('open_paper', { p_id: id });
-  revalidatePath('/inbox'); revalidatePath(`/paper/${id}`);
+  revalidatePath('/home'); revalidatePath(`/paper/${id}`);
 }
 
 export async function passPaper(id: string): Promise<{ error?: string }> {
   const { error } = await createClient().rpc('pass_paper', { p_id: id });
-  revalidatePath('/inbox');
+  revalidatePath('/home');
   return error ? { error: friendlyError(error) } : {};
 }
 
 export async function acceptPaper(id: string): Promise<{ chatId?: string; error?: string }> {
   const { data, error } = await createClient().rpc('accept_paper', { p_id: id });
   if (error) return { error: friendlyError(error) };
-  revalidatePath('/inbox'); revalidatePath('/chats');
+  revalidatePath('/home'); revalidatePath('/chats');
   return { chatId: data as string };
 }

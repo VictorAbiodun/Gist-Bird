@@ -162,7 +162,7 @@ export function ChatThread({
                 : 'border-line bg-surface-alt text-ink hover:bg-line'
             }`}
           >
-            <span>💌</span>
+            <Icon name="paper" size={16} />
             <span>Paper</span>
           </button>
           <Link

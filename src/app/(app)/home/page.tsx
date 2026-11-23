@@ -31,8 +31,9 @@ export default async function Home() {
             <span className="flex-1 font-display text-[26px] font-bold leading-8 text-primary drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">
               Gist Bird
             </span>
-            <span className="rounded-full bg-lemon px-3 py-2 text-label font-bold shadow-sm">
-              {left} {left === 1 ? 'paper' : 'papers'} left
+            <span className="flex items-center gap-1.5 rounded-full bg-lemon px-3 py-1.5 text-label font-bold shadow-sm">
+              <Icon name="paper" size={18} />
+              <span>{left} {left === 1 ? 'paper' : 'papers'} left</span>
             </span>
             <Link
               href="/notifications"
@@ -47,9 +48,9 @@ export default async function Home() {
           <div className="flex items-center justify-end px-5 pt-1">
             <Link
               href="/map"
-              className="flex items-center gap-2 rounded-full border-[1.5px] border-line bg-white/95 px-3.5 py-2.5 text-label font-bold shadow-sm backdrop-blur transition-transform active:scale-95"
+              className="flex items-center gap-2 rounded-full border-[1.5px] border-line bg-white/95 px-3.5 py-2 text-label font-bold shadow-sm backdrop-blur transition-transform active:scale-95"
             >
-              <Icon name="map" size={18} />
+              <Icon name="map" size={20} />
               See the map
             </Link>
           </div>
@@ -69,7 +70,7 @@ export default async function Home() {
               </p>
             </Link>
           )}
-          <LinkButton href="/write" icon="sent" className="min-h-[56px] w-full shadow-md">
+          <LinkButton href="/write" icon="paper" className="min-h-[56px] w-full shadow-md">
             Write a paper
           </LinkButton>
         </div>

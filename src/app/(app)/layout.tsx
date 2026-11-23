@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getInbox, getProfile } from '@/lib/data';
-import { TabBar } from '@/components/TabBar';
 import { Empty, LinkButton } from '@/components/ui';
+import { AppShell } from '@/components/AppShell';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,5 +19,5 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     );
   }
   const inbox = (await getInbox()).filter((i) => i.state === 'landed').length;
-  return (<><div className="pb-[88px]">{children}</div><TabBar inbox={inbox} /></>);
+  return <AppShell inbox={inbox}>{children}</AppShell>;
 }

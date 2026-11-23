@@ -3,11 +3,23 @@
 @tailwind utilities;
 
 @layer base {
-  html { -webkit-tap-highlight-color: transparent; }
-  body { @apply bg-bg font-body text-body text-ink antialiased; }
+  html {
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+  body {
+    @apply bg-bg font-body text-body text-ink antialiased;
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
   h1, h2, h3 { @apply font-display font-bold; }
   :focus-visible { outline: 3px solid #0A7D3E; outline-offset: 2px; border-radius: 8px; }
   ::selection { background: #FFD23F; }
+  button, a, nav, header {
+    -webkit-user-select: none;
+    user-select: none;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }

@@ -12,7 +12,15 @@ export const metadata: Metadata = {
   manifest: '/manifest.webmanifest',
   icons: { icon: '/icons/icon.svg', apple: '/icons/icon.svg' },
 };
-export const viewport: Viewport = { themeColor: '#0A7D3E', width: 'device-width', initialScale: 1, viewportFit: 'cover' };
+export const viewport: Viewport = {
+  themeColor: '#0A7D3E',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  interactiveWidget: 'resizes-content',
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -20,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ServiceWorkerRegister />
         <OfflineBanner />
-        <div className="mx-auto min-h-dvh w-full max-w-[480px]">{children}</div>
+        <div className="relative mx-auto flex min-h-dvh w-full max-w-[480px] flex-col overflow-x-hidden">{children}</div>
       </body>
     </html>
   );

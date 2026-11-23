@@ -27,7 +27,7 @@ describe('flight time', () => {
     expect(flightSeconds(1_000_000)).toBe(DEFAULT_FLIGHT.max);
   });
   it('scales with distance', () => {
-    expect(flightSeconds(400)).toBe(120);
+    expect(flightSeconds(300)).toBe(18);
   });
   it('reports progress between 0 and 1', () => {
     const s = '2026-01-01T00:00:00Z', l = '2026-01-01T00:01:00Z';

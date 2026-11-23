@@ -66,12 +66,12 @@ export function getBirdStats(
 export function calculateFlightDuration(
   distanceUnits: number,
   speedBoostPercent: number = 0,
-  minDurationMs: number = 3000,
-  maxDurationMs: number = 8000
+  minDurationMs: number = 15000,
+  maxDurationMs: number = 20000
 ): number {
-  // Base flight duration based on canvas pixel distance
-  const baseMs = Math.max(minDurationMs, Math.min(maxDurationMs, (distanceUnits / 110) * 1000));
-  // Speed boost reduces flight duration (capped at 30% reduction)
-  const reduction = Math.min(0.3, Math.max(0, speedBoostPercent / 100));
-  return Math.round(baseMs * (1 - reduction));
+  // Base flight duration based on canvas pixel distance scaled for dev 15-20s deliveries
+  const baseMs = Math.max(minDurationMs, Math.min(maxDurationMs, (distanceUnits / 110) * 1000 * 5));
+  // Speed boost reduces flight duration (capped at 20% reduction, but stays within bounds)
+  const reduction = Math.min(0.2, Math.max(0, speedBoostPercent / 100));
+  return Math.max(minDurationMs, Math.round(baseMs * (1 - reduction)));
 }

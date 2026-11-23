@@ -68,7 +68,7 @@ export function shortestPath(from: string, to: string): { ids: string[]; dist: n
 }
 
 export interface FlightConfig { secondsPer100Units: number; min: number; max: number }
-export const DEFAULT_FLIGHT: FlightConfig = { secondsPer100Units: 30, min: 20, max: 600 };
+export const DEFAULT_FLIGHT: FlightConfig = { secondsPer100Units: 6, min: 15, max: 20 };
 
 export function flightSeconds(distance: number, cfg: FlightConfig = DEFAULT_FLIGHT): number {
   return Math.max(cfg.min, Math.min(cfg.max, Math.round((distance / 100) * cfg.secondsPer100Units)));

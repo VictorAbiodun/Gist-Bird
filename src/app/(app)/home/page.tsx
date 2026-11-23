@@ -31,9 +31,9 @@ export default async function Home() {
             <span className="flex-1 font-display text-[26px] font-bold leading-8 text-primary drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">
               Gist Bird
             </span>
-            <span className="flex items-center gap-1.5 rounded-full bg-lemon px-3 py-1.5 text-label font-bold shadow-sm">
+            <span aria-label={`${left} ${left === 1 ? 'paper' : 'papers'} left`} className="flex items-center gap-1.5 rounded-full bg-lemon px-3 py-1.5 text-label font-bold shadow-sm">
               <Icon name="paper" size={18} />
-              <span>{left} {left === 1 ? 'paper' : 'papers'} left</span>
+              <span>{left}</span>
             </span>
             <Link
               href="/notifications"

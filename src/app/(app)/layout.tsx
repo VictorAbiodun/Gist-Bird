@@ -19,5 +19,5 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     );
   }
   const inbox = (await getInbox()).filter((i) => i.state === 'landed').length;
-  return <AppShell inbox={inbox}>{children}</AppShell>;
+  return <AppShell inbox={inbox} userId={profile.id}>{children}</AppShell>;
 }

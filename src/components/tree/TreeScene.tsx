@@ -18,6 +18,7 @@ interface TreeSceneProps {
   userDisplayName?: string;
   userAvatar?: string;
   userId?: string;
+  userUniversity?: string;
   inboxPapers?: InboxItem[];
 }
 
@@ -30,6 +31,7 @@ export function TreeScene({
   userDisplayName = 'You',
   userAvatar = '/avatars/avatar-01.svg',
   userId,
+  userUniversity,
   inboxPapers,
 }: TreeSceneProps) {
   return (
@@ -81,6 +83,7 @@ export function TreeScene({
           userDisplayName={userDisplayName}
           userAvatar={userAvatar}
           userId={userId}
+          userUniversity={userUniversity}
           initialInbox={inboxPapers}
         />
       )}

@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Avatar, Notice } from './ui';
 import { STARTERS, CONTACT_UNLOCK_MESSAGES } from '@/lib/copy';
 import { CONTACT_NOTICE, hasContactInfo } from '@/lib/contentFilter';
-import { sendMessage } from '@/app/actions/chat';
+import { sendMessage, markChatRead } from '@/app/actions/chat';
 import { Icon } from './Icon';
 import BirdTypingAnimation from './BirdTypingAnimation';
 import { formatMessageTime, formatDateDivider } from '@/lib/date';
@@ -23,6 +23,7 @@ interface ChatThreadProps {
   otherAvatar?: string | null;
   paperBody: string;
   blocked?: boolean;
+  initialOtherLastReadAt?: string | null;
 }
 
 export function ChatThread({
@@ -35,6 +36,7 @@ export function ChatThread({
   otherAvatar,
   paperBody,
   blocked: isBlocked = false,
+  initialOtherLastReadAt = null,
 }: ChatThreadProps) {
   const [messages, setMessages] = useState<Message[]>(initial);
   const [text, setText] = useState('');
@@ -42,6 +44,7 @@ export function ChatThread({
   const [showPaper, setShowPaper] = useState(false);
   const [viewportHeight, setViewportHeight] = useState<number | null>(null);
   const [otherTyping, setOtherTyping] = useState(false);
+  const [otherLastReadAt, setOtherLastReadAt] = useState<string | null>(initialOtherLastReadAt);
   const [pending, start] = useTransition();
 
   const bottom = useRef<HTMLDivElement>(null);
@@ -75,9 +78,19 @@ export function ChatThread({
     };
   }, []);
 
-  // Real-time message subscription + live typing broadcast
+  // Real-time message subscription + live typing broadcast & read receipts
   useEffect(() => {
     const supabase = createClient();
+
+    const dispatchRead = () => {
+      markChatRead(chatId).catch(() => {});
+      ch.send({
+        type: 'broadcast',
+        event: 'read_receipt',
+        payload: { readerId: me, readAt: new Date().toISOString() },
+      }).catch(() => {});
+    };
+
     const ch = supabase
       .channel(`chat:${chatId}`)
       .on(
@@ -85,7 +98,10 @@ export function ChatThread({
         { event: 'INSERT', schema: 'public', table: 'messages', filter: `chat_id=eq.${chatId}` },
         (p) => {
           const msg = p.new as Message;
-          if (msg.sender_id !== me) setOtherTyping(false);
+          if (msg.sender_id !== me) {
+            setOtherTyping(false);
+            dispatchRead();
+          }
           setMessages((m) => (m.some((x) => x.id === msg.id) ? m : [...m, msg]));
         }
       )
@@ -98,7 +114,15 @@ export function ChatThread({
           clearOtherTypingTimerRef.current = setTimeout(() => setOtherTyping(false), 3500);
         }
       })
-      .subscribe();
+      .on('broadcast', { event: 'read_receipt' }, ({ payload }) => {
+        if (!payload || payload.readerId === me || !payload.readAt) return;
+        setOtherLastReadAt(payload.readAt);
+      })
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          dispatchRead();
+        }
+      });
 
     channelRef.current = ch;
     return () => {
@@ -335,28 +359,38 @@ export function ChatThread({
                               <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
                             </svg>
                           ) : (
-                            <svg
-                              className="h-3 w-3 text-white/95"
-                              viewBox="0 0 16 15"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                              aria-label="Sent"
-                            >
-                              <path
-                                d="M14.5 4L6.5 12L2 7.5"
-                                stroke="currentColor"
-                                strokeWidth="1.6"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M10.5 4L5.5 9"
-                                stroke="currentColor"
-                                strokeWidth="1.6"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
+                            (() => {
+                              const isRead =
+                                Boolean(otherLastReadAt) &&
+                                new Date(m.created_at).getTime() <=
+                                  new Date(otherLastReadAt!).getTime() + 1000;
+                              return (
+                                <svg
+                                  className={`h-3 w-3 ${
+                                    isRead ? 'text-[#34B7F1]' : 'text-white/80'
+                                  } transition-colors duration-300`}
+                                  viewBox="0 0 16 15"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  aria-label={isRead ? 'Read' : 'Delivered'}
+                                >
+                                  <path
+                                    d="M14.5 4L6.5 12L2 7.5"
+                                    stroke="currentColor"
+                                    strokeWidth="1.6"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                  <path
+                                    d="M10.5 4L5.5 9"
+                                    stroke="currentColor"
+                                    strokeWidth="1.6"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                              );
+                            })()
                           ))}
                       </div>
                     </div>

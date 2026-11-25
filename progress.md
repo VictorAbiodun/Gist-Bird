@@ -37,4 +37,11 @@
 - **Optimistic saves & client cache**: Instant UI updates with offline guard for profile changes and daily rewards; Service Worker stale-while-revalidate navigation across tabs.
 - **Auto-submitting OTP**: Seamless 6-digit email confirmation code verification.
 - **Bird-themed typing indicator**: Native looping animated SVG (`BirdTypingAnimation.tsx` & `/icons/bird-typing.svg`) showing a pigeon pecking at seeds in real-time when the chat partner types via Supabase Realtime broadcast.
+- **WhatsApp message timestamps & date dividers**: Day separator pills ("Today", "Yesterday", weekday), formatted 12-hour timestamps docked at bottom-right, and haptic feedback on send.
+
+### Phase 8: Campus Tree Filtering & WhatsApp Blue Read Receipts
+- **Living Tree Campus Filter**: Segmented switch on `/home` tree allowing students to toggle between `🌍 All Campuses` and `🏫 My Campus` (e.g. "RUN" or "UNILAG") with live counts and empty-state guidance.
+- **Enriched Inbox & Letter Crest**: Author's university metadata attached to unaccepted papers; `CinematicLetterReader` displays the author's official university name and local NARR crest logo.
+- **Blue Read Receipts**: Double checkmark turns WhatsApp Blue (`#34B7F1`) when the other person opens the chat window or views incoming messages, powered by Realtime broadcast + database receipt synchronization.
+
 

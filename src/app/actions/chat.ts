@@ -92,3 +92,28 @@ export async function sendMessage(input: {
 
   return {};
 }
+
+export async function markChatRead(chatId: string): Promise<{ success: boolean }> {
+  try {
+    const client = createClient();
+    const {
+      data: { user },
+    } = await client.auth.getUser();
+    if (!user) return { success: false };
+
+    const admin = createAdminClient();
+    await admin
+      .from('notifications')
+      .update({ read_at: new Date().toISOString() })
+      .eq('user_id', user.id)
+      .eq('kind', 'new_message')
+      .filter('data->>chat_id', 'eq', chatId)
+      .is('read_at', null);
+
+    return { success: true };
+  } catch (err) {
+    console.warn('markChatRead error:', err);
+    return { success: false };
+  }
+}
+

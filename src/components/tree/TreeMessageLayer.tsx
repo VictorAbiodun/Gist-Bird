@@ -1,11 +1,14 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { TreeMessageLeaves } from './TreeMessageLeaves';
 import { CinematicLetterReader } from './CinematicLetterReader';
 import { inboxItemToEnvelope, type TreeEnvelope } from './treeEnvelope';
+import { normalizeUniText, findUniversity } from '@/lib/universities';
+import { UniversityLogo } from '@/components/UniversityLogo';
 import type { InboxItem } from '@/lib/types';
 
 interface TreeMessageLayerProps {
@@ -13,17 +16,21 @@ interface TreeMessageLayerProps {
   userDisplayName?: string;
   userAvatar?: string;
   userId?: string;
+  userUniversity?: string;
   initialInbox?: InboxItem[];
 }
 
 export function TreeMessageLayer({
   mode = 'full',
   userId,
+  userUniversity,
   initialInbox = [],
 }: TreeMessageLayerProps) {
   const router = useRouter();
   const [inboxItems, setInboxItems] = useState<InboxItem[]>(initialInbox);
   const [activeEnvelope, setActiveEnvelope] = useState<TreeEnvelope | null>(null);
+  const [campusFilter, setCampusFilter] = useState<'all' | 'campus'>('all');
+  const [showPrompt, setShowPrompt] = useState(false);
 
   // Sync with server-provided initial inbox
   useEffect(() => {
@@ -64,10 +71,27 @@ export function TreeMessageLayer({
     };
   }, [userId]);
 
+  const campusMatchCount = useMemo(() => {
+    if (!userUniversity) return 0;
+    const userNorm = normalizeUniText(userUniversity);
+    return inboxItems.filter(
+      (item) => item.from_university && normalizeUniText(item.from_university) === userNorm
+    ).length;
+  }, [inboxItems, userUniversity]);
+
+  const filteredInbox = useMemo(() => {
+    if (campusFilter === 'all' || !userUniversity) return inboxItems;
+    const userNorm = normalizeUniText(userUniversity);
+    return inboxItems.filter((item) => {
+      if (!item.from_university) return false;
+      return normalizeUniText(item.from_university) === userNorm;
+    });
+  }, [inboxItems, campusFilter, userUniversity]);
+
   // Map each qualifying unaccepted inbox message into a natural hanging envelope
   const envelopes = useMemo(() => {
-    return inboxItems.map((item, idx) => inboxItemToEnvelope(item, idx));
-  }, [inboxItems]);
+    return filteredInbox.map((item, idx) => inboxItemToEnvelope(item, idx));
+  }, [filteredInbox]);
 
   function handleOpenSuccess(paperId: string, updatedBody: string | null) {
     setInboxItems((prev) =>
@@ -85,6 +109,104 @@ export function TreeMessageLayer({
 
   return (
     <>
+      {/* ── Campus Filter Floating Segmented Toggle ── */}
+      <div className="pointer-events-auto absolute top-20 left-5 z-[35] flex items-center gap-1 rounded-full border-[1.5px] border-line/80 bg-white/95 p-1 shadow-sm backdrop-blur-md">
+        <button
+          type="button"
+          onClick={() => setCampusFilter('all')}
+          className={`rounded-full px-2.5 py-1 text-[11px] font-bold transition active:scale-95 ${
+            campusFilter === 'all'
+              ? 'bg-primary text-on-primary shadow-xs'
+              : 'text-muted hover:text-ink'
+          }`}
+        >
+          🌍 All ({inboxItems.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            if (!userUniversity) {
+              setShowPrompt(true);
+            } else {
+              setCampusFilter('campus');
+            }
+          }}
+          className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold transition active:scale-95 ${
+            campusFilter === 'campus'
+              ? 'bg-primary text-on-primary shadow-xs'
+              : 'text-muted hover:text-ink'
+          }`}
+        >
+          {userUniversity && <UniversityLogo university={userUniversity} size={14} className="shrink-0" />}
+          <span className="truncate max-w-[95px]">
+            {userUniversity
+              ? findUniversity(userUniversity)?.shortName || 'My Campus'
+              : 'My Campus'}
+          </span>
+          {userUniversity && (
+            <span
+              className={`text-[10px] ${
+                campusFilter === 'campus' ? 'text-white/90' : 'text-muted'
+              }`}
+            >
+              ({campusMatchCount})
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* When filtering to campus but no letters match */}
+      {campusFilter === 'campus' && campusMatchCount === 0 && (
+        <div className="pointer-events-auto absolute top-36 inset-x-6 z-[35] mx-auto max-w-[340px] rounded-2xl border border-line bg-white/95 p-4 text-center shadow-lg backdrop-blur-md">
+          <p className="font-display text-[14px] font-bold text-ink">
+            No papers from {userUniversity} yet
+          </p>
+          <p className="mt-1 text-[12px] leading-relaxed text-muted">
+            Chief Coo hasn&rsquo;t found letters from your campus right now. Check back soon or switch to All Campuses.
+          </p>
+          <button
+            type="button"
+            onClick={() => setCampusFilter('all')}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-[12px] font-bold text-on-primary shadow-xs active:scale-95 transition"
+          >
+            <span>Show All Campuses</span>
+            <span className="rounded-full bg-white/20 px-1.5 py-0.2 text-[10px]">
+              {inboxItems.length}
+            </span>
+          </button>
+        </div>
+      )}
+
+      {/* Prompt modal when user has not set their university yet */}
+      {showPrompt && (
+        <div className="pointer-events-auto fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
+          <div className="w-full max-w-[340px] rounded-2xl border border-line bg-surface p-5 shadow-2xl">
+            <div className="text-center">
+              <span className="text-3xl">🏫</span>
+              <h3 className="mt-2 font-display text-[17px] font-bold text-ink">Set your Campus</h3>
+              <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
+                Pick your Nigerian university in your profile to filter letters exclusively to your peers!
+              </p>
+            </div>
+            <div className="mt-5 flex flex-col gap-2">
+              <Link
+                href="/me/edit"
+                className="inline-flex min-h-[44px] items-center justify-center rounded-btn bg-primary px-4 text-[13px] font-bold text-on-primary transition active:scale-95"
+              >
+                Choose My University
+              </Link>
+              <button
+                type="button"
+                onClick={() => setShowPrompt(false)}
+                className="inline-flex min-h-[40px] items-center justify-center rounded-btn border border-line bg-surface text-[13px] font-bold text-muted transition hover:text-ink"
+              >
+                Maybe Later
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hanging Envelopes on the Tree Canopy */}
       <TreeMessageLeaves
         envelopes={envelopes}
@@ -126,3 +248,4 @@ export function TreeMessageLayer({
     </>
   );
 }
+

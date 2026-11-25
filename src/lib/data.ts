@@ -10,7 +10,65 @@ async function rpc<T>(name: string, args?: Record<string, unknown>, fallback?: T
   return (data ?? fallback) as T;
 }
 
-export const getInbox = () => rpc<InboxItem[]>('get_inbox', undefined, []);
+export const getInbox = async (): Promise<InboxItem[]> => {
+  const items = await rpc<InboxItem[]>('get_inbox', undefined, []);
+  if (!items || items.length === 0) return items ?? [];
+
+  try {
+    const admin = createAdminClient();
+    const paperIds = items.map((i) => i.id);
+    const { data: papersData } = await admin
+      .from('papers')
+      .select('id, author_id')
+      .in('id', paperIds);
+
+    if (papersData && papersData.length > 0) {
+      const authorIds = Array.from(new Set(papersData.map((p) => p.author_id)));
+      const { data: usersData } = await admin.auth.admin.listUsers({ perPage: 1000 });
+      const uniMap = new Map<string, string>();
+      for (const u of usersData?.users || []) {
+        if (authorIds.includes(u.id) && u.user_metadata?.university) {
+          uniMap.set(u.id, String(u.user_metadata.university));
+        }
+      }
+      const paperAuthorMap = new Map(papersData.map((p) => [p.id, p.author_id]));
+      return items.map((item) => {
+        const authorId = paperAuthorMap.get(item.id);
+        const uni = authorId ? uniMap.get(authorId) : undefined;
+        return {
+          ...item,
+          from_university: uni,
+        };
+      });
+    }
+  } catch (err) {
+    console.warn('Could not enrich inbox with universities:', err);
+  }
+
+  return items;
+};
+
+export async function getChatReadReceipt(chatId: string, otherId: string): Promise<string | null> {
+  try {
+    const admin = createAdminClient();
+    const { data } = await admin
+      .from('notifications')
+      .select('read_at')
+      .eq('user_id', otherId)
+      .eq('kind', 'new_message')
+      .filter('data->>chat_id', 'eq', chatId)
+      .not('read_at', 'is', null)
+      .order('read_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    return data?.read_at ?? null;
+  } catch (err) {
+    console.warn('Failed to fetch chat read receipt:', err);
+    return null;
+  }
+}
+
 export const getSent = () => rpc<SentItem[]>('get_sent', undefined, []);
 export const getPaper = (id: string) => rpc<PaperView | null>('get_paper', { p_id: id }, null);
 export const getChats = async (): Promise<ChatRow[]> => {

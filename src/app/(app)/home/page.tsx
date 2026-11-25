@@ -22,6 +22,7 @@ export default async function Home() {
       <TreeScene
         fullScreen
         userId={profile?.id}
+        userUniversity={profile?.university}
         inboxPapers={inbox}
         userDisplayName={profile?.display_name ?? 'You'}
         userAvatar={profile?.avatar ?? '/avatars/avatar-01.svg'}

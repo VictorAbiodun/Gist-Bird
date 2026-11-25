@@ -70,7 +70,7 @@ export const NIGERIAN_UNIVERSITIES: NigerianUniversity[] = (
   };
 });
 
-function normalizeUniText(str: string): string {
+export function normalizeUniText(str: string): string {
   return str
     .toLowerCase()
     .replace(/['’.,-]/g, ' ')

@@ -9,6 +9,7 @@ export interface TreeEnvelope {
   fromName: string;
   fromScarf: Scarf;
   fromAvatar?: string;
+  fromUniversity?: string;
   interests: string[];
   spot: string | null;
   x: number; // Percentage across tree canopy (horizontal)
@@ -98,6 +99,7 @@ export function inboxItemToEnvelope(item: InboxItem, index: number): TreeEnvelop
     fromName: item.from_name || 'Anonymous',
     fromScarf: item.from_scarf || 'coral',
     fromAvatar: item.from_avatar,
+    fromUniversity: item.from_university,
     interests: item.interests || [],
     spot: item.spot,
     x: pos.x,

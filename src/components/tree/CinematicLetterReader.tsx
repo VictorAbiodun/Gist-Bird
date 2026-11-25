@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Avatar, Chip, timeAgo } from '@/components/ui';
 import { Icon } from '@/components/Icon';
+import { UniversityLogo } from '@/components/UniversityLogo';
 import { acceptPaper, openPaper } from '@/app/actions/papers';
 import { createClient } from '@/lib/supabase/client';
 import type { TreeEnvelope } from './treeEnvelope';
@@ -331,6 +332,12 @@ export function CinematicLetterReader({
                   >
                     From {envelope.fromName}
                   </h3>
+                  {envelope.fromUniversity && (
+                    <div className="mt-0.5 flex items-center gap-1.5 text-[12px] font-semibold text-primary">
+                      <UniversityLogo university={envelope.fromUniversity} size={15} />
+                      <span className="truncate">{envelope.fromUniversity}</span>
+                    </div>
+                  )}
                   <p className="flex items-center gap-1.5 text-caption font-medium text-muted mt-0.5">
                     {envelope.spot && (
                       <>

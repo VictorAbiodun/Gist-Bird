@@ -1,6 +1,6 @@
 import type { PaperState } from './copy';
 
-export interface InboxItem { id: string; state: 'landed' | 'opened'; landed_at: string; body: string | null; from_name: string; from_scarf: Scarf; from_avatar?: string; interests: string[]; spot: string | null }
+export interface InboxItem { id: string; state: 'landed' | 'opened'; landed_at: string; body: string | null; from_name: string; from_scarf: Scarf; from_avatar?: string; from_university?: string; interests: string[]; spot: string | null }
 export interface SentItem { id: string; body: string; state: PaperState; sent_at: string; lands_at: string | null; origin: string; dest: string | null; chat_id: string | null }
 export interface PaperView {
   role: 'author' | 'recipient'; id: string; state: PaperState; body: string | null;

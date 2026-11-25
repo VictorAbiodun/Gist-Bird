@@ -1,17 +1,20 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
-import { Avatar, Notice } from './ui';
+import { Avatar, Notice, LinkButton } from './ui';
 import { STARTERS, CONTACT_UNLOCK_MESSAGES } from '@/lib/copy';
 import { CONTACT_NOTICE, hasContactInfo } from '@/lib/contentFilter';
-import { sendMessage, markChatRead, toggleMessageReaction } from '@/app/actions/chat';
+import { sendMessage, markChatRead, toggleMessageReaction, leaveChat } from '@/app/actions/chat';
 import { Icon } from './Icon';
 import BirdTypingAnimation from './BirdTypingAnimation';
 import { formatMessageTime, formatDateDivider } from '@/lib/date';
 import { CHAT_EMOJIS, getEmoji } from '@/lib/emojis';
+import { enqueueMessage, getQueuedMessages, removeQueuedMessage } from '@/lib/offlineQueue';
+import { playSendSound, playReceiveSound, isSoundMuted, setSoundMuted } from '@/lib/sounds';
 import type { Message, Scarf, MessageReactionsMap } from '@/lib/types';
 
 interface ChatThreadProps {
@@ -41,6 +44,7 @@ export function ChatThread({
   initialOtherLastReadAt = null,
   initialReactions = {},
 }: ChatThreadProps) {
+  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>(initial);
   const [text, setText] = useState('');
   const [error, setError] = useState<string>();
@@ -50,6 +54,12 @@ export function ChatThread({
   const [otherLastReadAt, setOtherLastReadAt] = useState<string | null>(initialOtherLastReadAt);
   const [reactions, setReactions] = useState<MessageReactionsMap>(initialReactions);
   const [activeReactionMenuMsgId, setActiveReactionMenuMsgId] = useState<number | null>(null);
+  const [isOffline, setIsOffline] = useState(false);
+  const [isSyncingQueue, setIsSyncingQueue] = useState(false);
+  const [soundMuted, setSoundMutedState] = useState(false);
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
+  const [chatEnded, setChatEnded] = useState(false);
   const [pending, start] = useTransition();
 
   const bottom = useRef<HTMLDivElement>(null);
@@ -83,6 +93,86 @@ export function ChatThread({
     };
   }, []);
 
+  const flushOfflineQueue = useCallback(async () => {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return;
+    const queued = getQueuedMessages(chatId);
+    if (queued.length === 0) return;
+
+    setIsSyncingQueue(true);
+    for (const item of queued) {
+      try {
+        const r = await sendMessage({ chatId, body: item.body });
+        if (!r.error) {
+          removeQueuedMessage(item.tempId);
+          playSendSound();
+        }
+      } catch {
+        // Stop flushing if network drops again
+        break;
+      }
+    }
+
+    try {
+      const { data } = await createClient()
+        .from('messages')
+        .select('*')
+        .eq('chat_id', chatId)
+        .order('id')
+        .limit(300);
+      const remaining = getQueuedMessages(chatId).map((q) => ({
+        id: q.tempId,
+        chat_id: q.chatId,
+        sender_id: me,
+        body: q.body,
+        created_at: q.createdAt,
+      }));
+      if (data) setMessages([...(data as Message[]), ...remaining]);
+    } catch {
+      // ignore
+    } finally {
+      setIsSyncingQueue(false);
+    }
+  }, [chatId, me]);
+
+  // Initialize sound preference, queued offline messages, and online/offline listeners
+  useEffect(() => {
+    setSoundMutedState(isSoundMuted());
+    setIsOffline(typeof navigator !== 'undefined' ? !navigator.onLine : false);
+
+    const queued = getQueuedMessages(chatId);
+    if (queued.length > 0) {
+      setMessages((prev) => {
+        const existingIds = new Set(prev.map((m) => m.id));
+        const toAdd = queued
+          .filter((q) => !existingIds.has(q.tempId))
+          .map((q) => ({
+            id: q.tempId,
+            chat_id: q.chatId,
+            sender_id: me,
+            body: q.body,
+            created_at: q.createdAt,
+          }));
+        return toAdd.length > 0 ? [...prev, ...toAdd] : prev;
+      });
+      if (typeof navigator !== 'undefined' && navigator.onLine) {
+        flushOfflineQueue();
+      }
+    }
+
+    const handleOnline = () => {
+      setIsOffline(false);
+      flushOfflineQueue();
+    };
+    const handleOffline = () => setIsOffline(true);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [chatId, me, flushOfflineQueue]);
+
   // Real-time message subscription + live typing broadcast & read receipts
   useEffect(() => {
     const supabase = createClient();
@@ -105,6 +195,7 @@ export function ChatThread({
           const msg = p.new as Message;
           if (msg.sender_id !== me) {
             setOtherTyping(false);
+            playReceiveSound();
             dispatchRead();
           }
           setMessages((m) => (m.some((x) => x.id === msg.id) ? m : [...m, msg]));
@@ -122,6 +213,10 @@ export function ChatThread({
       .on('broadcast', { event: 'read_receipt' }, ({ payload }) => {
         if (!payload || payload.readerId === me || !payload.readAt) return;
         setOtherLastReadAt(payload.readAt);
+      })
+      .on('broadcast', { event: 'chat_ended' }, ({ payload }) => {
+        if (!payload || payload.byUserId === me) return;
+        setChatEnded(true);
       })
       .on('broadcast', { event: 'reaction_broadcast' }, ({ payload }) => {
         if (!payload || !payload.messageId || !payload.emoji || !payload.userId) return;
@@ -255,21 +350,17 @@ export function ChatThread({
 
   function send(body = text) {
     const trimmed = body.trim();
-    if (!trimmed || (locked && hasContactInfo(trimmed))) return;
+    if (!trimmed || (locked && hasContactInfo(trimmed)) || chatEnded) return;
     setError(undefined);
 
-    if (typeof navigator !== 'undefined' && !navigator.onLine) {
-      setError("You're offline. Reconnect to send your message.");
-      return;
-    }
-
     const tempId = -Date.now();
+    const createdAt = new Date().toISOString();
     const optimisticMsg: Message = {
       id: tempId,
       chat_id: chatId,
       sender_id: me,
       body: trimmed,
-      created_at: new Date().toISOString(),
+      created_at: createdAt,
     };
 
     // Optimistically show message & clear input immediately
@@ -281,6 +372,12 @@ export function ChatThread({
     if (body === text) setText('');
     setTimeout(() => bottom.current?.scrollIntoView({ behavior: 'smooth' }), 30);
 
+    // If offline, store in local phone outbox queue for auto-send on reconnect
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      enqueueMessage({ tempId, chatId, body: trimmed, createdAt });
+      return;
+    }
+
     start(async () => {
       try {
         const r = await sendMessage({ chatId, body: trimmed });
@@ -290,20 +387,63 @@ export function ChatThread({
           setError(r.error);
           return;
         }
+        playSendSound();
         const { data } = await createClient()
           .from('messages')
           .select('*')
           .eq('chat_id', chatId)
           .order('id')
           .limit(300);
-        if (data) setMessages(data as Message[]);
+        const remaining = getQueuedMessages(chatId).map((q) => ({
+          id: q.tempId,
+          chat_id: q.chatId,
+          sender_id: me,
+          body: q.body,
+          created_at: q.createdAt,
+        }));
+        if (data) setMessages([...(data as Message[]), ...remaining]);
       } catch {
-        setMessages((m) => m.filter((x) => x.id !== tempId));
-        if (body === text) setText(trimmed);
-        setError('Could not send. Check your internet connection.');
+        // Network failure mid-flight: queue locally instead of dropping the message
+        enqueueMessage({ tempId, chatId, body: trimmed, createdAt });
       }
     });
   }
+
+  const toggleMute = () => {
+    const next = !soundMuted;
+    setSoundMutedState(next);
+    setSoundMuted(next);
+    if (!next) {
+      playSendSound();
+    }
+  };
+
+  const handleLeaveChat = async () => {
+    setIsLeaving(true);
+    try {
+      await channelRef.current
+        ?.send({
+          type: 'broadcast',
+          event: 'chat_ended',
+          payload: { byUserId: me },
+        })
+        .catch(() => {});
+
+      const res = await leaveChat(chatId);
+      if (res.error) {
+        setError(res.error);
+        setShowLeaveModal(false);
+        setIsLeaving(false);
+        return;
+      }
+      router.push('/chats');
+      router.refresh();
+    } catch {
+      setError('Could not leave chat. Please try again.');
+      setShowLeaveModal(false);
+      setIsLeaving(false);
+    }
+  };
 
   const handleInputFocus = () => {
     // When virtual keyboard opens on iOS/Android, ensure viewport lock and scroll to bottom
@@ -343,6 +483,17 @@ export function ChatThread({
         <div className="flex items-center gap-1.5">
           <button
             type="button"
+            onClick={toggleMute}
+            aria-label={soundMuted ? 'Unmute chat sounds' : 'Mute chat sounds'}
+            title={soundMuted ? 'Unmute sounds' : 'Mute sounds'}
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-surface text-muted hover:text-ink active:bg-surface-alt transition"
+          >
+            <span className="text-[14px]" aria-hidden>
+              {soundMuted ? '🔇' : '🔊'}
+            </span>
+          </button>
+          <button
+            type="button"
             onClick={() => setShowPaper((prev) => !prev)}
             aria-label={showPaper ? 'Hide paper' : 'View paper'}
             className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[12px] font-bold transition active:scale-95 ${
@@ -354,6 +505,19 @@ export function ChatThread({
             <Icon name="paper" size={16} />
             <span>Paper</span>
           </button>
+          <button
+            type="button"
+            onClick={() => setShowLeaveModal(true)}
+            aria-label="Fly away (leave chat)"
+            title="Fly away (leave chat)"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-surface text-muted hover:text-danger active:bg-surface-alt transition"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+          </button>
           <Link
             href={`/report?chat=${chatId}`}
             aria-label="Report or block"
@@ -363,6 +527,19 @@ export function ChatThread({
           </Link>
         </div>
       </header>
+
+      {/* ── Offline / Queue Sync Banner ── */}
+      {(isOffline || isSyncingQueue) && (
+        <div
+          className={`shrink-0 px-4 py-1.5 text-center text-[11.5px] font-semibold ${
+            isSyncingQueue ? 'bg-primary/15 text-primary' : 'bg-amber-100 text-amber-900'
+          }`}
+        >
+          {isSyncingQueue
+            ? 'Back online — sending queued messages…'
+            : 'You are offline — messages will queue and send automatically when reconnected'}
+        </div>
+      )}
 
       {/* ── Collapsible Original Paper Drawer ── */}
       {showPaper && (
@@ -381,10 +558,25 @@ export function ChatThread({
         </div>
       )}
 
-      {/* ── Blocked Notice ── */}
+      {/* ── Blocked / Chat Ended Notice ── */}
       {isBlocked ? (
         <div className="flex-1 p-5">
           <Notice title="You blocked this person">Unblock them in Settings to keep chatting.</Notice>
+        </div>
+      ) : chatEnded ? (
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
+          <span className="text-4xl">🕊️</span>
+          <div className="space-y-1">
+            <h2 className="font-display text-[18px] font-bold text-ink">
+              {otherName} flew away
+            </h2>
+            <p className="text-label text-muted">
+              This conversation has ended and the chat has been closed.
+            </p>
+          </div>
+          <LinkButton href="/chats" className="w-full max-w-[240px]">
+            Back to Chats
+          </LinkButton>
         </div>
       ) : (
         <>
@@ -667,6 +859,55 @@ export function ChatThread({
           </div>
         </>
       )}
+
+      {/* ── Fly Away (Leave Chat) Confirmation Modal ── */}
+      <AnimatePresence>
+        {showLeaveModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
+            onClick={() => !isLeaving && setShowLeaveModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.92, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.92, opacity: 0 }}
+              className="w-full max-w-[340px] rounded-2xl border border-line bg-surface p-5 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-center">
+                <span className="text-3xl">🕊️</span>
+                <h3 className="mt-2 font-display text-[17px] font-bold text-ink">
+                  Fly away from this chat?
+                </h3>
+                <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
+                  This will close the conversation and remove its messages for both of you. You can always meet new birds on the tree.
+                </p>
+              </div>
+              <div className="mt-5 flex flex-col gap-2">
+                <button
+                  type="button"
+                  disabled={isLeaving}
+                  onClick={handleLeaveChat}
+                  className="inline-flex min-h-[44px] items-center justify-center rounded-btn bg-danger px-4 text-[13px] font-bold text-on-primary transition active:scale-95 disabled:opacity-60"
+                >
+                  {isLeaving ? 'Flying away…' : 'Yes, Fly Away'}
+                </button>
+                <button
+                  type="button"
+                  disabled={isLeaving}
+                  onClick={() => setShowLeaveModal(false)}
+                  className="inline-flex min-h-[40px] items-center justify-center rounded-btn border border-line bg-surface text-[13px] font-bold text-muted transition hover:text-ink disabled:opacity-60"
+                >
+                  Stay in Chat
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

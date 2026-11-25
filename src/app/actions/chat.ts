@@ -1,6 +1,7 @@
 'use server';
 
 import { z } from 'zod';
+import { revalidatePath } from 'next/cache';
 import * as webpush from 'web-push';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -169,5 +170,43 @@ export async function toggleMessageReaction(input: {
     return { action: 'remove', error: 'Failed to update reaction' };
   }
 }
+
+export async function leaveChat(chatId: string): Promise<{ error?: string }> {
+  try {
+    const client = createClient();
+    const {
+      data: { user },
+    } = await client.auth.getUser();
+    if (!user) return { error: 'Not signed in.' };
+
+    const admin = createAdminClient();
+    const { data: chat } = await admin
+      .from('chats')
+      .select('id, user_a, user_b')
+      .eq('id', chatId)
+      .maybeSingle();
+
+    if (!chat) return { error: 'Chat not found.' };
+    if (chat.user_a !== user.id && chat.user_b !== user.id) {
+      return { error: 'You do not have permission to leave this chat.' };
+    }
+
+    // Clean up associated chat notifications/reactions and delete chat (cascades messages)
+    await admin
+      .from('notifications')
+      .delete()
+      .filter('data->>chat_id', 'eq', chatId);
+
+    const { error } = await admin.from('chats').delete().eq('id', chatId);
+    if (error) return { error: friendlyError(error) };
+
+    revalidatePath('/chats');
+    return {};
+  } catch (err) {
+    console.warn('leaveChat error:', err);
+    return { error: 'Could not leave chat. Please try again.' };
+  }
+}
+
 
 

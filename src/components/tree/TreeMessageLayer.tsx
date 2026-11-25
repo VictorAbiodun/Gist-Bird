@@ -9,6 +9,7 @@ import { CinematicLetterReader } from './CinematicLetterReader';
 import { inboxItemToEnvelope, type TreeEnvelope } from './treeEnvelope';
 import { normalizeUniText, findUniversity } from '@/lib/universities';
 import { UniversityLogo } from '@/components/UniversityLogo';
+import { playBirdLandSound } from '@/lib/sounds';
 import type { InboxItem } from '@/lib/types';
 
 interface TreeMessageLayerProps {
@@ -56,7 +57,10 @@ export function TreeMessageLayer({
           table: 'papers',
           filter: `recipient_id=eq.${userId}`,
         },
-        async () => {
+        async (payload) => {
+          if (payload.eventType === 'INSERT') {
+            playBirdLandSound();
+          }
           // Re-fetch only this authenticated user's current unaccepted inbox via RPC
           const { data, error } = await supabase.rpc('get_inbox');
           if (!error && data) {

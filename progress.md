@@ -50,5 +50,11 @@
 - **Docked Reaction Badges**: Displayed beneath message bubbles with aggregate count, primary highlight for personal reaction, and tap-to-toggle.
 - **Real-Time Synchronized**: Realtime broadcast across clients with database persistence via `toggleMessageReaction`.
 
+### Phase 10: Offline Queueing, Bird Sound Effects & Fly Away (Leave Chat)
+- **Offline Message Queue (`offlineQueue.ts`)**: Messages sent while offline or during patchy campus network drops queue safely in `localStorage` and flush sequentially as soon as connectivity returns.
+- **Synthesized Bird & Chat Sounds (`sounds.ts`)**: Zero-asset Web Audio API tones for sending, receiving (two-note bird chirp), and new paper landings on the tree, with a mute/unmute toggle in the chat header.
+- **Fly Away (`leaveChat`)**: Graceful unmatch/leave-chat confirmation modal that cleans up the conversation, notifies the other client via Realtime broadcast, and returns to `/chats`.
+
+
 
 

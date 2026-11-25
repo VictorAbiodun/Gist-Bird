@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="24" height="24">
+  <defs>
+    <linearGradient id="chestWoodGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#C97A36" />
+      <stop offset="100%" stop-color="#8C4B1B" />
+    </linearGradient>
+    <linearGradient id="chestGoldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFE46B" />
+      <stop offset="100%" stop-color="#E6A117" />
+    </linearGradient>
+  </defs>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    
+    <rect x="8" y="28" width="48" height="26" rx="5" fill="url(#chestWoodGrad)" stroke="#592C0E" stroke-width="3.2" />
+    
+    <path d="M8 28 C8 16 16 12 32 12 C48 12 56 16 56 28 Z" fill="url(#chestWoodGrad)" stroke="#592C0E" stroke-width="3.2" />
+    
+    <rect x="16" y="13" width="6" height="41" fill="url(#chestGoldGrad)" stroke="#592C0E" stroke-width="2.5" />
+    <rect x="42" y="13" width="6" height="41" fill="url(#chestGoldGrad)" stroke="#592C0E" stroke-width="2.5" />
+    
+    <line x1="8" y1="28" x2="56" y2="28" stroke="#592C0E" stroke-width="3.2" />
+    <rect x="27" y="24" width="10" height="12" rx="2.5" fill="url(#chestGoldGrad)" stroke="#592C0E" stroke-width="2.8" />
+    <circle cx="32" cy="30" r="1.8" fill="#592C0E" />
+  </g>
+</svg>

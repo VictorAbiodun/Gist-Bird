@@ -8,8 +8,8 @@ export type RewardIconType =
   | 'coin'
   | 'coins_stack'
   | 'chest'
-  | 'pearl'
-  | 'star'
+  | 'flower'
+  | 'bird_seed'
   | 'gold';
 
 export interface DailyRewardItem {
@@ -36,14 +36,14 @@ export const REWARD_DAYS: DailyRewardItem[] = [
   // Row 2 (Days 6-10)
   { day: 6, icon: 'paper', displayQty: 'x2', papers: 2, coins: 0, title: '2 Papers' },
   { day: 7, icon: 'whistle', displayQty: 'x1', papers: 1, coins: 2, title: '1 Paper + 2 Coins' },
-  { day: 8, icon: 'pearl', displayQty: 'x1', papers: 2, coins: 2, title: '2 Papers + 2 Coins' },
+  { day: 8, icon: 'flower', displayQty: 'x1', papers: 2, coins: 2, title: '2 Papers + 2 Coins' },
   { day: 9, icon: 'coin', displayQty: 'x4', papers: 1, coins: 4, title: '4 Coins + 1 Paper' },
   { day: 10, icon: 'chest', displayQty: 'x1', papers: 3, coins: 5, title: 'Chest: 3 Papers + 5 Coins' },
 
   // Row 3 (Days 11-15)
   { day: 11, icon: 'paper', displayQty: 'x2', papers: 2, coins: 0, title: '2 Papers' },
   { day: 12, icon: 'whistle', displayQty: 'x1', papers: 1, coins: 3, title: '1 Paper + 3 Coins' },
-  { day: 13, icon: 'star', displayQty: 'x1', papers: 2, coins: 3, title: '2 Papers + 3 Coins' },
+  { day: 13, icon: 'bird_seed', displayQty: 'x1', papers: 2, coins: 3, title: '2 Papers + 3 Coins' },
   { day: 14, icon: 'coin', displayQty: 'x6', papers: 1, coins: 6, title: '6 Coins + 1 Paper' },
   { day: 15, icon: 'chest', displayQty: 'x1', papers: 4, coins: 6, title: 'Chest: 4 Papers + 6 Coins' },
 

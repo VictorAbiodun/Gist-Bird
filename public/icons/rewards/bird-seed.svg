@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="24" height="24">
+  <defs>
+    <linearGradient id="seedsBagGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF5D6" />
+      <stop offset="100%" stop-color="#E6C27A" />
+    </linearGradient>
+  </defs>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M22 12 L42 12 L37 22 L27 22 Z" fill="#F2D492" stroke="#8C5E1F" stroke-width="3" />
+    
+    <path d="M25 22 L39 22 C48 26 52 36 50 47 C48.5 53 42 56 32 56 C22 56 15.5 53 14 47 C12 36 16 26 25 22 Z" fill="url(#seedsBagGrad)" stroke="#8C5E1F" stroke-width="3.2" />
+    
+    <rect x="23" y="19" width="18" height="5" rx="2" fill="#188C4B" stroke="#115E32" stroke-width="2" />
+    
+    <ellipse cx="26" cy="39" rx="4" ry="6.5" transform="rotate(-24 26 39)" fill="#593B1E" stroke="#3B2511" stroke-width="1.8" />
+    <ellipse cx="38" cy="39" rx="4" ry="6.5" transform="rotate(24 38 39)" fill="#593B1E" stroke="#3B2511" stroke-width="1.8" />
+    <ellipse cx="32" cy="43" rx="4.2" ry="7" fill="#D99B26" stroke="#8C5E1F" stroke-width="1.8" />
+  </g>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="24" height="24">
+  <defs>
+    <linearGradient id="flameOuterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF9F24" />
+      <stop offset="60%" stop-color="#F25629" />
+      <stop offset="100%" stop-color="#D42C22" />
+    </linearGradient>
+    <linearGradient id="flameInnerGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF4A3" />
+      <stop offset="100%" stop-color="#FFC42E" />
+    </linearGradient>
+  </defs>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M34 8 C34 8 49 20 49 36 C49 48 41 56 32 56 C22 56 14 48 14 37 C14 29 19 23 22 20 C22 25 25 27 25 27 C24 19 29 12 34 8 Z" fill="url(#flameOuterGrad)" stroke="#9E1F16" stroke-width="3.2" />
+    
+    <path d="M33 27 C33 27 41 34 41 42 C41 48 37 52 32 52 C27 52 23 48 23 42 C23 36 28 31 33 27 Z" fill="url(#flameInnerGrad)" stroke="none" />
+  </g>
+</svg>

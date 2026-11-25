@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="24" height="24">
+  <defs>
+    <linearGradient id="flowerPetalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF9EB5" />
+      <stop offset="100%" stop-color="#F25C7A" />
+    </linearGradient>
+  </defs>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M32 34 L32 56" fill="none" stroke="#188C4B" stroke-width="4" />
+    <path d="M32 48 C22 48 16 42 16 37 C23 37 29 41 32 48 Z" fill="#52B86A" stroke="#186E3B" stroke-width="2.5" />
+    <path d="M32 46 C42 46 48 40 48 35 C41 35 35 39 32 46 Z" fill="#52B86A" stroke="#186E3B" stroke-width="2.5" />
+    
+    <g fill="url(#flowerPetalGrad)" stroke="#A62B46" stroke-width="2.8">
+      <circle cx="32" cy="14" r="7.5" />
+      <circle cx="43" cy="22" r="7.5" />
+      <circle cx="39" cy="34" r="7.5" />
+      <circle cx="25" cy="34" r="7.5" />
+      <circle cx="21" cy="22" r="7.5" />
+    </g>
+    
+    <circle cx="32" cy="25" r="7" fill="#FFD43B" stroke="#C98212" stroke-width="2.8" />
+  </g>
+</svg>

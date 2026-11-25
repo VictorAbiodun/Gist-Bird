@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="24" height="24">
+  <defs>
+    <linearGradient id="goldbarTopGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF4A3" />
+      <stop offset="100%" stop-color="#FFD43B" />
+    </linearGradient>
+    <linearGradient id="goldbarFrontGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F5B81D" />
+      <stop offset="100%" stop-color="#D4880F" />
+    </linearGradient>
+  </defs>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    
+    <polygon points="18,22 46,22 52,32 12,32" fill="url(#goldbarTopGrad)" stroke="#9E620A" stroke-width="3.2" />
+    
+    <polygon points="12,32 52,32 56,48 8,48" fill="url(#goldbarFrontGrad)" stroke="#9E620A" stroke-width="3.2" />
+    
+    <line x1="18" y1="38" x2="46" y2="38" stroke="#FFE46B" stroke-width="2.5" opacity="0.8" />
+    
+    <path d="M51 11 Q51 16 56 16 Q51 16 51 21 Q51 16 46 16 Q51 16 51 11 Z" fill="#FFD43B" stroke="#C98212" stroke-width="1.5" />
+  </g>
+</svg>

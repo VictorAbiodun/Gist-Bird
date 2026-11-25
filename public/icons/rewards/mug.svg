@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="24" height="24">
+  <defs>
+    <linearGradient id="mugBodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFDF2" />
+      <stop offset="100%" stop-color="#F7E4B5" />
+    </linearGradient>
+  </defs>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M22 18 Q20 14 23 10" fill="none" stroke="#D9A84E" stroke-width="2.8" />
+    <path d="M31 16 Q29 12 32 8" fill="none" stroke="#D9A84E" stroke-width="2.8" />
+    
+    <path d="M44 28 L49 28 C54 28 57 31.5 57 36.5 C57 41.5 54 45 49 45 L44 45" fill="none" stroke="#B87A24" stroke-width="4.5" />
+    
+    <path d="M12 23 L45 23 L45 45 C45 51 40 55 34 55 L23 55 C17 55 12 51 12 45 Z" fill="url(#mugBodyGrad)" stroke="#B87A24" stroke-width="3.2" />
+    
+    <rect x="12" y="34" width="33" height="9" fill="#188C4B" stroke="#B87A24" stroke-width="2.5" />
+    
+    <ellipse cx="28.5" cy="23" rx="16.5" ry="3.5" fill="#7A4421" stroke="#B87A24" stroke-width="2.8" />
+  </g>
+</svg>

@@ -65,10 +65,8 @@ export function HomeRewardsBar({ rewardStatus, unreadNotifications }: HomeReward
           aria-label={`${coins} coins. Tap for daily rewards`}
           className="flex items-center gap-1.5 rounded-full border-[1.5px] border-line bg-surface/95 px-2.5 py-1.5 text-label font-bold shadow-sm backdrop-blur transition-transform active:scale-95"
         >
-          <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" aria-hidden="true">
-            <circle cx="12" cy="12" r="9.5" fill="#FFD23F" stroke="#D49415" strokeWidth="1.8" />
-            <circle cx="12" cy="12" r="6" fill="#FFE270" stroke="#E5A924" strokeWidth="1" />
-          </svg>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icons/rewards/coin.svg" alt="" className="h-[18px] w-[18px] object-contain" />
           <span>{coins}</span>
         </button>
 

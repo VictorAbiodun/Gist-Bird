@@ -1,0 +1,1487 @@
+[
+  {
+    "id": "abubakar-tafawa-balewa-university-bauchi",
+    "name": "Abubakar Tafawa Balewa University, Bauchi",
+    "shortName": "ATBU",
+    "ownership": "Federal",
+    "web": "http://www.atbu.edu.ng",
+    "year": "1988",
+    "logoUrl": "/crests/narr/ATBU.jpg"
+  },
+  {
+    "id": "ahmadu-bello-university-zaria",
+    "name": "Ahmadu Bello University, Zaria",
+    "shortName": "ABU",
+    "ownership": "Federal",
+    "web": "http://www.abu.edu.ng",
+    "year": "1962",
+    "logoUrl": "/crests/narr/ABU.jpg"
+  },
+  {
+    "id": "bayero-university-kano",
+    "name": "Bayero University, Kano",
+    "shortName": "BUK",
+    "ownership": "Federal",
+    "web": "http://www.buk.edu.ng",
+    "year": "1975",
+    "logoUrl": "/crests/narr/BUK.jpg"
+  },
+  {
+    "id": "federal-university-gashua-yobe",
+    "name": "Federal University Gashua, Yobe",
+    "shortName": "FUGA",
+    "ownership": "Federal",
+    "web": "http://www.fugashua.edu.ng",
+    "year": "2013",
+    "logoUrl": "/crests/narr/FUGA.jpg"
+  },
+  {
+    "id": "federal-university-of-petroleum-resources-effurun",
+    "name": "Federal University of Petroleum Resources, Effurun",
+    "shortName": "FUPRE",
+    "ownership": "Federal",
+    "web": "http://www.fupre.edu.ng",
+    "year": "2007",
+    "logoUrl": "/crests/narr/FUPRE.jpg"
+  },
+  {
+    "id": "federal-university-of-technology-akure",
+    "name": "Federal University of Technology, Akure",
+    "shortName": "FUTA",
+    "ownership": "Federal",
+    "web": "http://www.futa.edu.ng",
+    "year": "1981",
+    "logoUrl": "/crests/narr/FUTA.jpg"
+  },
+  {
+    "id": "federal-university-of-technology-minna",
+    "name": "Federal University of Technology, Minna",
+    "shortName": "FUTMINNA",
+    "ownership": "Federal",
+    "web": "http://www.futminna.edu.ng",
+    "year": "1982",
+    "logoUrl": "/crests/narr/FUTMINNA.jpg"
+  },
+  {
+    "id": "federal-university-of-technology-owerri",
+    "name": "Federal University of Technology, Owerri",
+    "shortName": "FUTO",
+    "ownership": "Federal",
+    "web": "http://www.futo.edu.ng",
+    "year": "1980",
+    "logoUrl": "/crests/narr/FUTO.jpg"
+  },
+  {
+    "id": "federal-university-dutse-jigawa-state",
+    "name": "Federal University, Dutse, Jigawa State",
+    "shortName": "FUD",
+    "ownership": "Federal",
+    "web": "http://www.fud.edu.ng/",
+    "year": "2011",
+    "logoUrl": "/crests/narr/FUD.jpg"
+  },
+  {
+    "id": "federal-university-dutsin-ma-katsina",
+    "name": "Federal University, Dutsin-Ma, Katsina",
+    "shortName": "FUDMA",
+    "ownership": "Federal",
+    "web": "http://www.fudutsinma.edu.ng",
+    "year": "2011",
+    "logoUrl": "/crests/narr/FUDMA.jpg"
+  },
+  {
+    "id": "federal-university-kashere-gombe-state",
+    "name": "Federal University, Kashere, Gombe State",
+    "shortName": "FUK",
+    "ownership": "Federal",
+    "web": "http://www.fukashere.edu.ng",
+    "year": "2011",
+    "logoUrl": "/crests/narr/FUK.jpg"
+  },
+  {
+    "id": "federal-university-lafia-nasarawa-state",
+    "name": "Federal University, Lafia, Nasarawa State",
+    "shortName": "FULAFIA",
+    "ownership": "Federal",
+    "web": "http://www.fulafia.edu.ng",
+    "year": "2011",
+    "logoUrl": "/crests/narr/FULAFIA.jpg"
+  },
+  {
+    "id": "federal-university-lokoja-kogi-state",
+    "name": "Federal University, Lokoja, Kogi State",
+    "shortName": "FUL",
+    "ownership": "Federal",
+    "web": "http://www.fulokoja.edu.ng",
+    "year": "2011",
+    "logoUrl": "/crests/narr/FUL.jpg"
+  },
+  {
+    "id": "alex-ekwueme-university-ndufu-alike-ebonyi-state",
+    "name": "Alex Ekwueme University, Ndufu-Alike, Ebonyi State",
+    "shortName": "FUNAI",
+    "ownership": "Federal",
+    "web": "http://www.funai.edu.ng",
+    "year": "2011",
+    "logoUrl": "/crests/narr/FUNAI.jpg"
+  },
+  {
+    "id": "federal-university-otuoke-bayelsa",
+    "name": "Federal University, Otuoke, Bayelsa",
+    "shortName": "FUO",
+    "ownership": "Federal",
+    "web": "http://www.fuotuoke.edu.ng/",
+    "year": "2011",
+    "logoUrl": "/crests/narr/FUO.jpg"
+  },
+  {
+    "id": "federal-university-oye-ekiti-ekiti-state",
+    "name": "Federal University, Oye-Ekiti, Ekiti State",
+    "shortName": "FUOYE",
+    "ownership": "Federal",
+    "web": "http://www.fuoye.edu.ng/",
+    "year": "2011",
+    "logoUrl": "/crests/narr/FUOYE.jpg"
+  },
+  {
+    "id": "federal-university-wukari-taraba-state",
+    "name": "Federal University, Wukari, Taraba State",
+    "shortName": "FUWUKARI",
+    "ownership": "Federal",
+    "web": "http://www.fuwukari.edu.ng/",
+    "year": "2011",
+    "logoUrl": "/crests/narr/FUWUKARI.jpg"
+  },
+  {
+    "id": "federal-university-birnin-kebbi",
+    "name": "Federal University, Birnin Kebbi",
+    "shortName": "FUBK",
+    "ownership": "Federal",
+    "web": "http://www.fubk.edu.ng",
+    "year": "2013",
+    "logoUrl": "/crests/narr/FUBK.jpg"
+  },
+  {
+    "id": "federal-university-gusau-zamfara",
+    "name": "Federal University, Gusau Zamfara",
+    "shortName": "FUGUS",
+    "ownership": "Federal",
+    "web": "http://www.fugusau.edu.ng",
+    "year": "2013",
+    "logoUrl": "/crests/narr/FUGUS.jpg"
+  },
+  {
+    "id": "michael-okpara-university-of-agricultural-umudike",
+    "name": "Michael Okpara University of Agricultural Umudike",
+    "shortName": "MOUAU",
+    "ownership": "Federal",
+    "web": "http://www.mouau.edu.ng",
+    "year": "1992",
+    "logoUrl": "/crests/narr/MOUAU.jpg"
+  },
+  {
+    "id": "modibbo-adama-university-of-technology-yola",
+    "name": "Modibbo Adama University of Technology, Yola",
+    "shortName": "MAUTECH",
+    "ownership": "Federal",
+    "web": "http://www.mautech.edu.ng",
+    "year": "1981",
+    "logoUrl": "/crests/narr/MAUTECH.jpg"
+  },
+  {
+    "id": "national-open-university-of-nigeria-lagos",
+    "name": "National Open University of Nigeria, Lagos",
+    "shortName": "NOUN",
+    "ownership": "Federal",
+    "web": "http://www.nou.edu.ng",
+    "year": "2002",
+    "logoUrl": "/crests/narr/NOUN.jpg"
+  },
+  {
+    "id": "nigeria-police-academy-wudil",
+    "name": "Nigeria Police Academy Wudil",
+    "shortName": "POLAC",
+    "ownership": "Federal",
+    "web": "http://polac.edu.ng/",
+    "year": "2013",
+    "logoUrl": "/crests/narr/POLAC.jpg"
+  },
+  {
+    "id": "nigerian-defence-academy-kaduna",
+    "name": "Nigerian Defence Academy Kaduna",
+    "shortName": "NDA",
+    "ownership": "Federal",
+    "web": "http://www.nda.edu.ng",
+    "year": "1985",
+    "logoUrl": "/crests/narr/NDA.jpg"
+  },
+  {
+    "id": "nnamdi-azikiwe-university-awka",
+    "name": "Nnamdi Azikiwe University, Awka",
+    "shortName": "UNIZIK",
+    "ownership": "Federal",
+    "web": "http://www.unizik.edu.ng",
+    "year": "1992",
+    "logoUrl": "/crests/narr/UNIZIK.jpg"
+  },
+  {
+    "id": "obafemi-awolowo-university-ile-ife",
+    "name": "Obafemi Awolowo University,Ile-Ife",
+    "shortName": "OAU",
+    "ownership": "Federal",
+    "web": "http://www.oauife.edu.ng",
+    "year": "1962",
+    "logoUrl": "/crests/narr/OAU.jpg"
+  },
+  {
+    "id": "university-of-abuja-gwagwalada",
+    "name": "University of Abuja, Gwagwalada",
+    "shortName": "UNIABUJA",
+    "ownership": "Federal",
+    "web": "http://www.uniabuja.edu.ng",
+    "year": "1988",
+    "logoUrl": "/crests/narr/UNIABUJA.jpg"
+  },
+  {
+    "id": "federal-university-of-agriculture-abeokuta",
+    "name": "Federal University of Agriculture, Abeokuta",
+    "shortName": "FUNAAB",
+    "ownership": "Federal",
+    "web": "http://www.unaab.edu.ng",
+    "year": "1988",
+    "logoUrl": "/crests/narr/FUNAAB.jpg"
+  },
+  {
+    "id": "university-of-agriculture-makurdi",
+    "name": "University of Agriculture, Makurdi",
+    "shortName": "UAM",
+    "ownership": "Federal",
+    "web": "http://www.uam.edu.ng",
+    "year": "1988",
+    "logoUrl": "/crests/narr/UAM.jpg"
+  },
+  {
+    "id": "university-of-benin",
+    "name": "University of Benin",
+    "shortName": "UNIBEN",
+    "ownership": "Federal",
+    "web": "http://www.uniben.edu.ng",
+    "year": "1970",
+    "logoUrl": "/crests/narr/UNIBEN.jpg"
+  },
+  {
+    "id": "university-of-calabar",
+    "name": "University of Calabar",
+    "shortName": "UNICAL",
+    "ownership": "Federal",
+    "web": "http://www.unical.edu.ng",
+    "year": "1975",
+    "logoUrl": "/crests/narr/UNICAL.jpg"
+  },
+  {
+    "id": "university-of-ibadan",
+    "name": "University of Ibadan",
+    "shortName": "UI",
+    "ownership": "Federal",
+    "web": "http://www.ui.edu.ng",
+    "year": "1948",
+    "logoUrl": "/crests/narr/UI.jpg"
+  },
+  {
+    "id": "university-of-ilorin",
+    "name": "University of Ilorin",
+    "shortName": "UIL",
+    "ownership": "Federal",
+    "web": "http://www.unilorin.edu.ng",
+    "year": "1975",
+    "logoUrl": "/crests/narr/UIL.jpg"
+  },
+  {
+    "id": "university-of-jos",
+    "name": "University of Jos",
+    "shortName": "UNIJOS",
+    "ownership": "Federal",
+    "web": "http://www.unijos.edu.ng",
+    "year": "1975",
+    "logoUrl": "/crests/narr/UNIJOS.jpg"
+  },
+  {
+    "id": "university-of-lagos",
+    "name": "University of Lagos",
+    "shortName": "UNILAG",
+    "ownership": "Federal",
+    "web": "http://www.unilag.edu.ng",
+    "year": "1962",
+    "logoUrl": "/crests/narr/UNILAG.jpg"
+  },
+  {
+    "id": "university-of-maiduguri",
+    "name": "University of Maiduguri",
+    "shortName": "UNIMAID",
+    "ownership": "Federal",
+    "web": "http://www.unimaid.edu.ng",
+    "year": "1975",
+    "logoUrl": "/crests/narr/UNIMAID.jpg"
+  },
+  {
+    "id": "university-of-nigeria-nsukka",
+    "name": "University of Nigeria, Nsukka",
+    "shortName": "UNN",
+    "ownership": "Federal",
+    "web": "http://www.unn.edu.ng",
+    "year": "1960",
+    "logoUrl": "/crests/narr/UNN.jpg"
+  },
+  {
+    "id": "university-of-port-harcourt",
+    "name": "University of Port-Harcourt",
+    "shortName": "UNIPORT",
+    "ownership": "Federal",
+    "web": "http://www.uniport.edu.ng",
+    "year": "1975",
+    "logoUrl": "/crests/narr/UNIPORT.jpg"
+  },
+  {
+    "id": "university-of-uyo",
+    "name": "University of Uyo",
+    "shortName": "UNIUYO",
+    "ownership": "Federal",
+    "web": "http://www.uniuyo.edu.ng",
+    "year": "1991",
+    "logoUrl": "/crests/narr/UNIUYO.jpg"
+  },
+  {
+    "id": "usumanu-danfodiyo-university",
+    "name": "Usumanu Danfodiyo University",
+    "shortName": "UDU",
+    "ownership": "Federal",
+    "web": "http://www.udusok.edu.ng",
+    "year": "1975",
+    "logoUrl": "/crests/narr/UDU.jpg"
+  },
+  {
+    "id": "nigerian-maritime-university-okerenkoko-delta-state",
+    "name": "Nigerian Maritime University Okerenkoko, Delta State",
+    "shortName": "NMU",
+    "ownership": "Federal",
+    "web": "",
+    "year": "2018",
+    "logoUrl": "/crests/narr/NMU.jpg"
+  },
+  {
+    "id": "air-force-institute-of-technology-kaduna",
+    "name": "Air Force Institute of Technology, Kaduna",
+    "shortName": "AFIT",
+    "ownership": "Federal",
+    "web": "https://afit.edu.ng",
+    "year": "2018",
+    "logoUrl": "/crests/narr/AFIT.jpg"
+  },
+  {
+    "id": "nigerian-army-university-biu",
+    "name": "Nigerian Army University Biu",
+    "shortName": "NAUB",
+    "ownership": "Federal",
+    "web": "https://naub.edu.ng/",
+    "year": "2018",
+    "logoUrl": "/crests/narr/NAUB.jpg"
+  },
+  {
+    "id": "abia-state-university-uturu",
+    "name": "Abia State University, Uturu",
+    "shortName": "ABSU",
+    "ownership": "State",
+    "web": "http://www.absu.edu.ng",
+    "year": "1981",
+    "logoUrl": "/crests/narr/ABSU.jpg"
+  },
+  {
+    "id": "adamawa-state-university-mubi",
+    "name": "Adamawa State University Mubi",
+    "shortName": "ADSU",
+    "ownership": "State",
+    "web": "http://www.adsu.edu.ng",
+    "year": "2002",
+    "logoUrl": "/crests/narr/ADSU.jpg"
+  },
+  {
+    "id": "adekunle-ajasin-university-akungba",
+    "name": "Adekunle Ajasin University, Akungba",
+    "shortName": "AAUA",
+    "ownership": "State",
+    "web": "http://www.aaua.edu.ng",
+    "year": "1999",
+    "logoUrl": "/crests/narr/AAUA.jpg"
+  },
+  {
+    "id": "akwa-ibom-state-university-ikot-akpaden",
+    "name": "Akwa Ibom State University, Ikot Akpaden",
+    "shortName": "AKSU",
+    "ownership": "State",
+    "web": "http://www.aksu.edu.ng",
+    "year": "2010",
+    "logoUrl": "/crests/narr/AKSU.jpg"
+  },
+  {
+    "id": "ambrose-alli-university-ekpoma",
+    "name": "Ambrose Alli University, Ekpoma",
+    "shortName": "AAU",
+    "ownership": "State",
+    "web": "http://www.aauekpoma.edu.ng",
+    "year": "1980",
+    "logoUrl": "/crests/narr/AAU.jpg"
+  },
+  {
+    "id": "chukwuemeka-odumegwu-ojukwu-university-uli",
+    "name": "Chukwuemeka Odumegwu Ojukwu University, Uli",
+    "shortName": "COOU",
+    "ownership": "State",
+    "web": "http://coou.edu.ng/",
+    "year": "2000",
+    "logoUrl": "/crests/narr/COOU.jpg"
+  },
+  {
+    "id": "bauchi-state-university-gadau",
+    "name": "Bauchi State University, Gadau",
+    "shortName": "BASUG",
+    "ownership": "State",
+    "web": "http://www.basug.edu.ng",
+    "year": "2011",
+    "logoUrl": "/crests/narr/BASUG.jpg"
+  },
+  {
+    "id": "benue-state-university-makurdi",
+    "name": "Benue State University, Makurdi",
+    "shortName": "BSU",
+    "ownership": "State",
+    "web": "http://www.bsum.edu.ng",
+    "year": "1992",
+    "logoUrl": "/crests/narr/BSU.jpg"
+  },
+  {
+    "id": "yobe-state-university-damaturu",
+    "name": "Yobe State University, Damaturu",
+    "shortName": "YSU",
+    "ownership": "State",
+    "web": "http://www.ysu.edu.ng",
+    "year": "2006",
+    "logoUrl": "/crests/narr/YSU.jpg"
+  },
+  {
+    "id": "cross-river-state-university-of-technology-calabar",
+    "name": "Cross River State University of Technology, Calabar",
+    "shortName": "CRUTECH",
+    "ownership": "State",
+    "web": "http://www.crutech.edu.ng",
+    "year": "2004",
+    "logoUrl": "/crests/narr/CRUTECH.jpg"
+  },
+  {
+    "id": "delta-state-university-abraka",
+    "name": "Delta State University Abraka",
+    "shortName": "DELSU",
+    "ownership": "State",
+    "web": "http://www.delsu.edu.ng",
+    "year": "1992",
+    "logoUrl": "/crests/narr/DELSU.jpg"
+  },
+  {
+    "id": "ebonyi-state-university-abakaliki",
+    "name": "Ebonyi State University, Abakaliki",
+    "shortName": "EBSU",
+    "ownership": "State",
+    "web": "http://www.ebsu.edu.ng",
+    "year": "2000",
+    "logoUrl": "/crests/narr/EBSU.jpg"
+  },
+  {
+    "id": "ekiti-state-university",
+    "name": "Ekiti State University",
+    "shortName": "EKSU",
+    "ownership": "State",
+    "web": "http://www.eksu.edu.ng",
+    "year": "1982",
+    "logoUrl": "/crests/narr/EKSU.jpg"
+  },
+  {
+    "id": "enugu-state-university-of-science-and-technology-enugu",
+    "name": "Enugu State University of Science and Technology, Enugu",
+    "shortName": "ESUT",
+    "ownership": "State",
+    "web": "http://www.esut.edu.ng",
+    "year": "1982",
+    "logoUrl": "/crests/narr/ESUT.jpg"
+  },
+  {
+    "id": "gombe-state-univeristy-gombe",
+    "name": "Gombe State Univeristy, Gombe",
+    "shortName": "GSU",
+    "ownership": "State",
+    "web": "http://www.gomsu.org",
+    "year": "2004",
+    "logoUrl": "/crests/narr/GSU.jpg"
+  },
+  {
+    "id": "ibrahim-badamasi-babangida-university-lapai",
+    "name": "Ibrahim Badamasi Babangida University, Lapai",
+    "shortName": "IBBU",
+    "ownership": "State",
+    "web": "http://www.ibbu.edu.ng",
+    "year": "2005",
+    "logoUrl": "/crests/narr/IBBU.jpg"
+  },
+  {
+    "id": "ignatius-ajuru-university-of-education-rumuolumeni",
+    "name": "Ignatius Ajuru University of Education,Rumuolumeni",
+    "shortName": "IAUE",
+    "ownership": "State",
+    "web": "http://www.iaue.edu.ng",
+    "year": "2010",
+    "logoUrl": "/crests/narr/IAUE.jpg"
+  },
+  {
+    "id": "imo-state-university-owerri",
+    "name": "Imo State University, Owerri",
+    "shortName": "IMSU",
+    "ownership": "State",
+    "web": "http://www.imsu.edu.ng",
+    "year": "1992",
+    "logoUrl": "/crests/narr/IMSU.jpg"
+  },
+  {
+    "id": "sule-lamido-university-kafin-hausa-jigawa",
+    "name": "Sule Lamido University, Kafin Hausa, Jigawa",
+    "shortName": "SLU",
+    "ownership": "State",
+    "web": "http://www.slu.edu.ng",
+    "year": "2013",
+    "logoUrl": "/crests/narr/SLU.jpg"
+  },
+  {
+    "id": "kaduna-state-university-kaduna",
+    "name": "Kaduna State University, Kaduna",
+    "shortName": "KASU",
+    "ownership": "State",
+    "web": "http://www.kasu.edu.ng",
+    "year": "2004",
+    "logoUrl": "/crests/narr/KASU.jpg"
+  },
+  {
+    "id": "kano-university-of-science-technology-wudil",
+    "name": "Kano University of Science & Technology, Wudil",
+    "shortName": "KUT",
+    "ownership": "State",
+    "web": "http://www.kustportal.edu.ng",
+    "year": "2000",
+    "logoUrl": "/crests/narr/KUT.jpg"
+  },
+  {
+    "id": "kebbi-state-university-of-science-and-technology-aliero",
+    "name": "Kebbi State University of Science and Technology, Aliero",
+    "shortName": "KSUSTA",
+    "ownership": "State",
+    "web": "http://www.ksusta.edu.ng",
+    "year": "2006",
+    "logoUrl": "/crests/narr/KSUSTA.jpg"
+  },
+  {
+    "id": "kogi-state-university-anyigba",
+    "name": "Kogi State University Anyigba",
+    "shortName": "KSU",
+    "ownership": "State",
+    "web": "http://www.ksu.edu.ng",
+    "year": "1999",
+    "logoUrl": "/crests/narr/KSU.jpg"
+  },
+  {
+    "id": "kwara-state-university-ilorin",
+    "name": "Kwara State University, Ilorin",
+    "shortName": "KWASU",
+    "ownership": "State",
+    "web": "http://www.kwasu.edu.ng",
+    "year": "2009",
+    "logoUrl": "/crests/narr/KWASU.jpg"
+  },
+  {
+    "id": "ladoke-akintola-university-of-technology-ogbomoso",
+    "name": "Ladoke Akintola University of Technology, Ogbomoso",
+    "shortName": "LAUTECH",
+    "ownership": "State",
+    "web": "http://www.lautech.edu.ng",
+    "year": "1990",
+    "logoUrl": "/crests/narr/LAUTECH.jpg"
+  },
+  {
+    "id": "ondo-state-university-of-science-and-technology-okitipupa",
+    "name": "Ondo State University of Science and Technology Okitipupa",
+    "shortName": "OSUSTECH",
+    "ownership": "State",
+    "web": "http://www.osustech.edu.ng",
+    "year": "2008",
+    "logoUrl": "/crests/narr/OSUSTECH.jpg"
+  },
+  {
+    "id": "river-state-university",
+    "name": "River State University",
+    "shortName": "RSU",
+    "ownership": "State",
+    "web": "http://www.rsu.edu.ng",
+    "year": "1979",
+    "logoUrl": "/crests/narr/RSU.jpg"
+  },
+  {
+    "id": "olabisi-onabanjo-university-ago-iwoye",
+    "name": "Olabisi Onabanjo University, Ago Iwoye",
+    "shortName": "OSU",
+    "ownership": "State",
+    "web": "http://www.oouagoiwoye.edu.ng",
+    "year": "1982",
+    "logoUrl": "/crests/narr/OSU.jpg"
+  },
+  {
+    "id": "lagos-state-university-ojo",
+    "name": "Lagos State University, Ojo",
+    "shortName": "LASU",
+    "ownership": "State",
+    "web": "http://www.lasu.edu.ng",
+    "year": "1983",
+    "logoUrl": "/crests/narr/LASU.jpg"
+  },
+  {
+    "id": "niger-delta-university-yenagoa",
+    "name": "Niger Delta University Yenagoa",
+    "shortName": "NDU",
+    "ownership": "State",
+    "web": "http://www.ndu.edu.ng",
+    "year": "2000",
+    "logoUrl": "/crests/narr/NDU.jpg"
+  },
+  {
+    "id": "nasarawa-state-university-keffi",
+    "name": "Nasarawa State University Keffi",
+    "shortName": "NSUK",
+    "ownership": "State",
+    "web": "http://www.nsuk.edu.ng",
+    "year": "2002",
+    "logoUrl": "/crests/narr/NSUK.jpg"
+  },
+  {
+    "id": "plateau-state-university-bokkos",
+    "name": "Plateau State University Bokkos",
+    "shortName": "PLASU",
+    "ownership": "State",
+    "web": "http://www.plasu.edu.ng",
+    "year": "2005",
+    "logoUrl": "/crests/narr/PLASU.jpg"
+  },
+  {
+    "id": "tai-solarin-university-of-education-ijebu-ode",
+    "name": "Tai Solarin University of Education Ijebu Ode",
+    "shortName": "TASUED",
+    "ownership": "State",
+    "web": "http://www.tasued.edu.ng",
+    "year": "2005",
+    "logoUrl": "/crests/narr/TASUED.jpg"
+  },
+  {
+    "id": "umar-musa-yar-adua-university-katsina",
+    "name": "Umar Musa Yar' Adua University Katsina",
+    "shortName": "UMYU",
+    "ownership": "State",
+    "web": "http://www.umyu.edu.ng",
+    "year": "2006",
+    "logoUrl": "/crests/narr/UMYU.jpg"
+  },
+  {
+    "id": "osun-state-university-osogbo",
+    "name": "Osun State University Osogbo",
+    "shortName": "UNIOSUN",
+    "ownership": "State",
+    "web": "http://www.uniosun.edu.ng",
+    "year": "2006",
+    "logoUrl": "/crests/narr/UNIOSUN.jpg"
+  },
+  {
+    "id": "taraba-state-university-jalingo",
+    "name": "Taraba State University, Jalingo",
+    "shortName": "TSU",
+    "ownership": "State",
+    "web": "http://www.tsuniversity.edu.ng",
+    "year": "2008",
+    "logoUrl": "/crests/narr/TSU.jpg"
+  },
+  {
+    "id": "sokoto-state-university",
+    "name": "Sokoto State University",
+    "shortName": "SSU",
+    "ownership": "State",
+    "web": "http://www.ssu.edu.ng",
+    "year": "2009",
+    "logoUrl": "/crests/narr/SSU.jpg"
+  },
+  {
+    "id": "yusuf-maitama-sule-university-kano",
+    "name": "Yusuf Maitama Sule University Kano",
+    "shortName": "YUMSUK",
+    "ownership": "State",
+    "web": "http://www.nwu.edu.ng",
+    "year": "2012",
+    "logoUrl": "/crests/narr/YUMSUK.jpg"
+  },
+  {
+    "id": "oyo-state-technical-university-ibadan",
+    "name": "Oyo State Technical University Ibadan",
+    "shortName": "TECH-U",
+    "ownership": "State",
+    "web": "https://tech-u.edu.ng/",
+    "year": "2012",
+    "logoUrl": "/crests/narr/TECH-U.jpg"
+  },
+  {
+    "id": "ondo-state-university-of-medical-sciences",
+    "name": "Ondo State University of Medical Sciences",
+    "shortName": "UNIMED",
+    "ownership": "State",
+    "web": "http://www.unimed.edu.ng",
+    "year": "2015",
+    "logoUrl": "/crests/narr/UNIMED.jpg"
+  },
+  {
+    "id": "edo-university-iyamo",
+    "name": "Edo University Iyamo",
+    "shortName": "EUI",
+    "ownership": "State",
+    "web": "http://www.edouniversity.edu.ng/",
+    "year": "2016",
+    "logoUrl": "/crests/narr/EUI.jpg"
+  },
+  {
+    "id": "eastern-palm-university-ogboko-imo-state",
+    "name": "Eastern Palm University Ogboko, Imo State",
+    "shortName": "EPU",
+    "ownership": "State",
+    "web": "https://www.epu.edu.ng/",
+    "year": "2016",
+    "logoUrl": "/crests/narr/EPU.jpg"
+  },
+  {
+    "id": "university-of-africa-toru-orua-bayelsa-state",
+    "name": "University of Africa Toru Orua, Bayelsa State",
+    "shortName": "UAT",
+    "ownership": "State",
+    "web": "https://www.uat.edu.ng/public/",
+    "year": "2016",
+    "logoUrl": "/crests/narr/UAT.jpg"
+  },
+  {
+    "id": "bornu-state-university-maiduguri",
+    "name": "Bornu State University, Maiduguri",
+    "shortName": "BSUMAID",
+    "ownership": "State",
+    "web": "https://www.bosu.edu.ng",
+    "year": "2016",
+    "logoUrl": "/crests/narr/BSUMAID.jpg"
+  },
+  {
+    "id": "moshood-abiola-university-of-science-and-technology-abeokuta",
+    "name": "Moshood Abiola University of Science and Technology Abeokuta",
+    "shortName": "MAUSTECH",
+    "ownership": "State",
+    "web": "https://www.mapoly.edu.ng",
+    "year": "2017",
+    "logoUrl": "/crests/narr/MAUSTECH.jpg"
+  },
+  {
+    "id": "gombe-state-university-of-science-and-technology",
+    "name": "Gombe State University of Science and Technology",
+    "shortName": "GSUST",
+    "ownership": "State",
+    "web": "https://www.gsu.edu.ng",
+    "year": "2017",
+    "logoUrl": "/crests/narr/GSUST.jpg"
+  },
+  {
+    "id": "zamfara-state-university",
+    "name": "Zamfara State University",
+    "shortName": "ZSU",
+    "ownership": "State",
+    "web": "",
+    "year": "2018",
+    "logoUrl": "/crests/narr/ZSU.jpg"
+  },
+  {
+    "id": "achievers-university-owo",
+    "name": "Achievers University, Owo",
+    "shortName": "AUO",
+    "ownership": "Private",
+    "web": "http://www.achievers.edu.ng",
+    "year": "2007",
+    "logoUrl": "/crests/narr/AUO.jpg"
+  },
+  {
+    "id": "adeleke-university-ede",
+    "name": "Adeleke University, Ede",
+    "shortName": "AUE",
+    "ownership": "Private",
+    "web": "http://www.adelekeuniversity.edu.ng",
+    "year": "2011",
+    "logoUrl": "/crests/narr/AUE.jpg"
+  },
+  {
+    "id": "afe-babalola-university-ado-ekiti-ekiti-state",
+    "name": "Afe Babalola University, Ado-Ekiti - Ekiti State",
+    "shortName": "ABUAD",
+    "ownership": "Private",
+    "web": "http://www.abuad.edu.ng",
+    "year": "2009",
+    "logoUrl": "/crests/narr/ABUAD.jpg"
+  },
+  {
+    "id": "african-university-of-science-technology-abuja",
+    "name": "African University of Science & Technology, Abuja",
+    "shortName": "AUST",
+    "ownership": "Private",
+    "web": "http://aust.edu.ng",
+    "year": "2007",
+    "logoUrl": "/crests/narr/AUST.jpg"
+  },
+  {
+    "id": "ajayi-crowther-university-ibadan",
+    "name": "Ajayi Crowther University, Ibadan",
+    "shortName": "ACU",
+    "ownership": "Private",
+    "web": "http://www.acu.edu.ng",
+    "year": "2005",
+    "logoUrl": "/crests/narr/ACU.jpg"
+  },
+  {
+    "id": "al-hikmah-university-ilorin",
+    "name": "Al-Hikmah University, Ilorin",
+    "shortName": "HUI",
+    "ownership": "Private",
+    "web": "https://www.alhikmah.edu.ng",
+    "year": "2005",
+    "logoUrl": "/crests/narr/HUI.jpg"
+  },
+  {
+    "id": "al-qalam-university-katsina",
+    "name": "Al-Qalam University, Katsina",
+    "shortName": "AUK",
+    "ownership": "Private",
+    "web": "http://www.auk.edu.ng",
+    "year": "2005",
+    "logoUrl": "/crests/narr/AUK.jpg"
+  },
+  {
+    "id": "american-university-of-nigeria-yola",
+    "name": "American University of Nigeria, Yola",
+    "shortName": "AUN",
+    "ownership": "Private",
+    "web": "http://www.aun.edu.ng",
+    "year": "2003",
+    "logoUrl": "/crests/narr/AUN.jpg"
+  },
+  {
+    "id": "augustine-university",
+    "name": "Augustine University",
+    "shortName": "AUI",
+    "ownership": "Private",
+    "web": "http://www.augustineuniversity.edu.ng/",
+    "year": "2015",
+    "logoUrl": "/crests/narr/AUI.jpg"
+  },
+  {
+    "id": "babcock-university-ilishan-remo",
+    "name": "Babcock University,Ilishan-Remo",
+    "shortName": "BABCOCK",
+    "ownership": "Private",
+    "web": "http://www.babcock.edu.ng",
+    "year": "1999",
+    "logoUrl": "/crests/narr/BABCOCK.jpg"
+  },
+  {
+    "id": "baze-university",
+    "name": "Baze University",
+    "shortName": "BAZE",
+    "ownership": "Private",
+    "web": "http://www.bazeuniversity.edu.ng",
+    "year": "2011",
+    "logoUrl": "/crests/narr/BAZE.jpg"
+  },
+  {
+    "id": "bells-university-of-technology-otta",
+    "name": "Bells University of Technology, Otta",
+    "shortName": "BUT",
+    "ownership": "Private",
+    "web": "http://www.bellsuniversity.org",
+    "year": "2005",
+    "logoUrl": "/crests/narr/BUT.jpg"
+  },
+  {
+    "id": "benson-idahosa-university-benin-city",
+    "name": "Benson Idahosa University, Benin City",
+    "shortName": "BIU",
+    "ownership": "Private",
+    "web": "http://www.idahosauniversity.com",
+    "year": "2002",
+    "logoUrl": "/crests/narr/BIU.jpg"
+  },
+  {
+    "id": "bingham-university-new-karu",
+    "name": "Bingham University, New Karu",
+    "shortName": "BHU",
+    "ownership": "Private",
+    "web": "http://www.binghamuni.edu.ng",
+    "year": "2005",
+    "logoUrl": "/crests/narr/BHU.jpg"
+  },
+  {
+    "id": "bowen-university-iwo",
+    "name": "Bowen University, Iwo",
+    "shortName": "BOWEN",
+    "ownership": "Private",
+    "web": "http://www.bowenuniversity-edu.org",
+    "year": "2001",
+    "logoUrl": "/crests/narr/BOWEN.jpg"
+  },
+  {
+    "id": "caleb-university-lagos",
+    "name": "Caleb University, Lagos",
+    "shortName": "CUL",
+    "ownership": "Private",
+    "web": "http://www.calebuniversity.edu.ng",
+    "year": "2007",
+    "logoUrl": "/crests/narr/CUL.jpg"
+  },
+  {
+    "id": "caritas-university-enugu",
+    "name": "Caritas University, Enugu",
+    "shortName": "CAU",
+    "ownership": "Private",
+    "web": "http://www.caritasuni.edu.ng/",
+    "year": "2005",
+    "logoUrl": "/crests/narr/CAU.jpg"
+  },
+  {
+    "id": "chrisland-university",
+    "name": "Chrisland University",
+    "shortName": "CHRISLAND",
+    "ownership": "Private",
+    "web": "http://www.chrislanduniversity.edu.ng",
+    "year": "2015",
+    "logoUrl": "/crests/narr/CHRISLAND.jpg"
+  },
+  {
+    "id": "covenant-university-ota",
+    "name": "Covenant University Ota",
+    "shortName": "CUOTA",
+    "ownership": "Private",
+    "web": "http://www.covenantuniversity.edu.ng/",
+    "year": "2002",
+    "logoUrl": "/crests/narr/CUOTA.jpg"
+  },
+  {
+    "id": "crawford-university-igbesa",
+    "name": "Crawford University Igbesa",
+    "shortName": "CUI",
+    "ownership": "Private",
+    "web": "http://www.crawforduniversity.edu.ng",
+    "year": "2005",
+    "logoUrl": "/crests/narr/CUI.jpg"
+  },
+  {
+    "id": "crescent-university",
+    "name": "Crescent University",
+    "shortName": "CUAB",
+    "ownership": "Private",
+    "web": "http://www.crescent-university.edu.ng",
+    "year": "2005",
+    "logoUrl": "/crests/narr/CUAB.jpg"
+  },
+  {
+    "id": "edwin-clark-university-kaigbodo",
+    "name": "Edwin Clark University, Kaigbodo",
+    "shortName": "ECU",
+    "ownership": "Private",
+    "web": "http://www.edwinclarkuniversity.edu.ng/",
+    "year": "2015",
+    "logoUrl": "/crests/narr/ECU.jpg"
+  },
+  {
+    "id": "elizade-university-ilara-mokin",
+    "name": "Elizade University, Ilara-Mokin",
+    "shortName": "EUI",
+    "ownership": "Private",
+    "web": "http://www.elizadeuniversity.edu.ng",
+    "year": "2012",
+    "logoUrl": "/crests/narr/EUI.jpg"
+  },
+  {
+    "id": "evangel-university-akaeze",
+    "name": "Evangel University, Akaeze",
+    "shortName": "EUA",
+    "ownership": "Private",
+    "web": "http://www.evangeluniversity.edu.ng",
+    "year": "2012",
+    "logoUrl": "/crests/narr/EUA.jpg"
+  },
+  {
+    "id": "fountain-unveristy-oshogbo",
+    "name": "Fountain Unveristy, Oshogbo",
+    "shortName": "FUO",
+    "ownership": "Private",
+    "web": "http://www.fountainuniversity.edu.ng",
+    "year": "2007",
+    "logoUrl": "/crests/narr/FUO.jpg"
+  },
+  {
+    "id": "godfrey-okoye-university-ugwuomu-nike-enugu-state",
+    "name": "Godfrey Okoye University, Ugwuomu-Nike - Enugu State",
+    "shortName": "GOU",
+    "ownership": "Private",
+    "web": "http://www.gouni.edu.ng",
+    "year": "2009",
+    "logoUrl": "/crests/narr/GOU.jpg"
+  },
+  {
+    "id": "gregory-university-uturu",
+    "name": "Gregory University, Uturu",
+    "shortName": "GUU",
+    "ownership": "Private",
+    "web": "http://www.gregoryuniversity.com",
+    "year": "2012",
+    "logoUrl": "/crests/narr/GUU.jpg"
+  },
+  {
+    "id": "hallmark-university-ijebi-itele-ogun",
+    "name": "Hallmark University, Ijebi Itele, Ogun",
+    "shortName": "HU",
+    "ownership": "Private",
+    "web": "http://www.hallmark.edu.ng",
+    "year": "2015",
+    "logoUrl": "/crests/narr/HU.jpg"
+  },
+  {
+    "id": "hezekiah-university-umudi",
+    "name": "Hezekiah University, Umudi",
+    "shortName": "UNIHEZ",
+    "ownership": "Private",
+    "web": "http://hezekiah.edu.ng/",
+    "year": "2015",
+    "logoUrl": "/crests/narr/UNIHEZ.jpg"
+  },
+  {
+    "id": "igbinedion-university-okada",
+    "name": "Igbinedion University Okada",
+    "shortName": "IUO",
+    "ownership": "Private",
+    "web": "http://www.iuokada.edu.ng",
+    "year": "1999",
+    "logoUrl": "/crests/narr/IUO.jpg"
+  },
+  {
+    "id": "joseph-ayo-babalola-university-ikeji-arakeji",
+    "name": "Joseph Ayo Babalola University, Ikeji-Arakeji",
+    "shortName": "JABU",
+    "ownership": "Private",
+    "web": "http://www.jabu.edu.ng",
+    "year": "2006",
+    "logoUrl": "/crests/narr/JABU.jpg"
+  },
+  {
+    "id": "kings-university-ode-omu",
+    "name": "Kings University, Ode Omu",
+    "shortName": "UNIKINGS",
+    "ownership": "Private",
+    "web": "http://www.kingsuniversity.edu.ng/",
+    "year": "2015",
+    "logoUrl": "/crests/narr/UNIKINGS.jpg"
+  },
+  {
+    "id": "kwararafa-university-wukari",
+    "name": "Kwararafa University, Wukari",
+    "shortName": "KWU",
+    "ownership": "Private",
+    "web": "http://www.wukarijubileeuniversity.org",
+    "year": "2005",
+    "logoUrl": "/crests/narr/KWU.jpg"
+  },
+  {
+    "id": "landmark-university-omu-aran",
+    "name": "Landmark University, Omu-Aran.",
+    "shortName": "LMU",
+    "ownership": "Private",
+    "web": "http://www.lmu.edu.ng",
+    "year": "2011",
+    "logoUrl": "/crests/narr/LMU.jpg"
+  },
+  {
+    "id": "lead-city-university-ibadan",
+    "name": "Lead City University, Ibadan",
+    "shortName": "LCU",
+    "ownership": "Private",
+    "web": "http://www.lcu.edu.ng",
+    "year": "2005",
+    "logoUrl": "/crests/narr/LCU.jpg"
+  },
+  {
+    "id": "madonna-university-okija",
+    "name": "Madonna University, Okija",
+    "shortName": "MUO",
+    "ownership": "Private",
+    "web": "http://www.madonnauniversity.edu.ng",
+    "year": "1999",
+    "logoUrl": "/crests/narr/MUO.jpg"
+  },
+  {
+    "id": "mcpherson-university-seriki-sotayo-ajebo",
+    "name": "Mcpherson University, Seriki Sotayo, Ajebo",
+    "shortName": "MCU",
+    "ownership": "Private",
+    "web": "http://www.mcu.edu.ng",
+    "year": "2012",
+    "logoUrl": "/crests/narr/MCU.jpg"
+  },
+  {
+    "id": "micheal-cecilia-ibru-university",
+    "name": "Micheal & Cecilia Ibru University",
+    "shortName": "MCIU",
+    "ownership": "Private",
+    "web": "http://mciu.edu.ng/",
+    "year": "2015",
+    "logoUrl": "/crests/narr/MCIU.jpg"
+  },
+  {
+    "id": "mountain-top-university",
+    "name": "Mountain Top University",
+    "shortName": "MTU",
+    "ownership": "Private",
+    "web": "http://www.mountaintopuniversity.org/",
+    "year": "2015",
+    "logoUrl": "/crests/narr/MTU.jpg"
+  },
+  {
+    "id": "nile-university-of-nigeria-abuja",
+    "name": "Nile University of Nigeria, Abuja",
+    "shortName": "NTNU",
+    "ownership": "Private",
+    "web": "http://www.ntnu.edu.ng",
+    "year": "2009",
+    "logoUrl": "/crests/narr/NTNU.jpg"
+  },
+  {
+    "id": "novena-university-ogume",
+    "name": "Novena University, Ogume",
+    "shortName": "NUO",
+    "ownership": "Private",
+    "web": "http://www.novenauniversity.edu.ng",
+    "year": "2005",
+    "logoUrl": "/crests/narr/NUO.jpg"
+  },
+  {
+    "id": "obong-university-obong-ntak",
+    "name": "Obong University, Obong Ntak",
+    "shortName": "OUO",
+    "ownership": "Private",
+    "web": "http://www.obonguniversity.net",
+    "year": "2007",
+    "logoUrl": "/crests/narr/OUO.jpg"
+  },
+  {
+    "id": "oduduwa-university-ipetumodu-osun-state",
+    "name": "Oduduwa University, Ipetumodu - Osun State",
+    "shortName": "OUI",
+    "ownership": "Private",
+    "web": "http://www.oduduwauniversity.edu.ng",
+    "year": "2009",
+    "logoUrl": "/crests/narr/OUI.jpg"
+  },
+  {
+    "id": "pan-atlantic-university-lagos",
+    "name": "Pan-Atlantic University, Lagos",
+    "shortName": "PAU",
+    "ownership": "Private",
+    "web": "http://www.pau.edu.ng",
+    "year": "2002",
+    "logoUrl": "/crests/narr/PAU.jpg"
+  },
+  {
+    "id": "paul-university-awka-anambra-state",
+    "name": "Paul University, Awka - Anambra State",
+    "shortName": "PUA",
+    "ownership": "Private",
+    "web": "http://www.pauluniversity.edu.ng",
+    "year": "2009",
+    "logoUrl": "/crests/narr/PUA.jpg"
+  },
+  {
+    "id": "redeemer-s-university-ede",
+    "name": "Redeemer's University, Ede",
+    "shortName": "RUN",
+    "ownership": "Private",
+    "web": "http://www.run.edu.ng",
+    "year": "2005",
+    "logoUrl": "/crests/narr/RUN.jpg"
+  },
+  {
+    "id": "renaissance-university-enugu",
+    "name": "Renaissance University, Enugu",
+    "shortName": "RNU",
+    "ownership": "Private",
+    "web": "http://www.renaissanceuniversityng.com",
+    "year": "2005",
+    "logoUrl": "/crests/narr/RNU.jpg"
+  },
+  {
+    "id": "rhema-university-obeama-asa-rivers-state",
+    "name": "Rhema University, Obeama-Asa - Rivers State",
+    "shortName": "RURivers",
+    "ownership": "Private",
+    "web": "http://www.rhemauniversity.edu.ng",
+    "year": "2009",
+    "logoUrl": "/crests/narr/RURivers.jpg"
+  },
+  {
+    "id": "ritman-university-ikot-ekpene-akwa-ibom",
+    "name": "Ritman University, Ikot Ekpene, Akwa Ibom",
+    "shortName": "RU",
+    "ownership": "Private",
+    "web": "http://www.ritmanuniversity.edu.ng",
+    "year": "2015",
+    "logoUrl": "/crests/narr/RU.jpg"
+  },
+  {
+    "id": "salem-university-lokoja",
+    "name": "Salem University, Lokoja",
+    "shortName": "SU",
+    "ownership": "Private",
+    "web": "http://www.salemuniversity.org",
+    "year": "2007",
+    "logoUrl": "/crests/narr/SU.jpg"
+  },
+  {
+    "id": "samuel-adegboyega-university-ogwa",
+    "name": "Samuel Adegboyega University, Ogwa.",
+    "shortName": "SAU",
+    "ownership": "Private",
+    "web": "http://www.sau.edu.ng",
+    "year": "2011",
+    "logoUrl": "/crests/narr/SAU.jpg"
+  },
+  {
+    "id": "southwestern-university-oku-owa",
+    "name": "Southwestern University, Oku Owa",
+    "shortName": "SUNOGWA",
+    "ownership": "Private",
+    "web": "http://www.southwesternuniversity.edu.ng",
+    "year": "2012",
+    "logoUrl": "/crests/narr/SUNOGWA.jpg"
+  },
+  {
+    "id": "summit-university",
+    "name": "Summit University",
+    "shortName": "SUNO",
+    "ownership": "Private",
+    "web": "http://www.summituniversity.edu.ng",
+    "year": "2015",
+    "logoUrl": "/crests/narr/SUNO.jpg"
+  },
+  {
+    "id": "tansian-university-umunya",
+    "name": "Tansian University, Umunya",
+    "shortName": "TANU",
+    "ownership": "Private",
+    "web": "http://tansianuniversity.edu.ng/",
+    "year": "2007",
+    "logoUrl": "/crests/narr/TANU.jpg"
+  },
+  {
+    "id": "university-of-mkar-mkar",
+    "name": "University of Mkar, Mkar",
+    "shortName": "NKST",
+    "ownership": "Private",
+    "web": "http://www.unimkar.edu.ng",
+    "year": "2005",
+    "logoUrl": "/crests/narr/NKST.jpg"
+  },
+  {
+    "id": "veritas-university-abuja",
+    "name": "Veritas University, Abuja",
+    "shortName": "VUNA",
+    "ownership": "Private",
+    "web": "http://www.veritas.edu.ng",
+    "year": "2007",
+    "logoUrl": "/crests/narr/VUNA.jpg"
+  },
+  {
+    "id": "wellspring-university-evbuobanosa-edo-state",
+    "name": "Wellspring University, Evbuobanosa - Edo State",
+    "shortName": "WU",
+    "ownership": "Private",
+    "web": "http://www.wellspringuniversity.net",
+    "year": "2009",
+    "logoUrl": "/crests/narr/WU.jpg"
+  },
+  {
+    "id": "wesley-university-of-science-technology-ondo",
+    "name": "Wesley University. of Science & Technology, Ondo",
+    "shortName": "WUSTO",
+    "ownership": "Private",
+    "web": "http://www.wusto.edu.ng",
+    "year": "2007",
+    "logoUrl": "/crests/narr/WUSTO.jpg"
+  },
+  {
+    "id": "western-delta-university-oghara-delta-state",
+    "name": "Western Delta University, Oghara Delta State",
+    "shortName": "WDU",
+    "ownership": "Private",
+    "web": "http://wdu.edu.ng",
+    "year": "2007",
+    "logoUrl": "/crests/narr/WDU.jpg"
+  },
+  {
+    "id": "christopher-university-mowe",
+    "name": "Christopher University Mowe",
+    "shortName": "CU",
+    "ownership": "Private",
+    "web": "http://www.christopheruniversity.edu.ng/",
+    "year": "2015",
+    "logoUrl": "/crests/narr/CU.jpg"
+  },
+  {
+    "id": "kola-daisi-university-ibadan-oyo-state",
+    "name": "Kola Daisi University Ibadan, Oyo State",
+    "shortName": "KDU",
+    "ownership": "Private",
+    "web": "http://www.koladaisiuniversity.edu.ng/",
+    "year": "2016",
+    "logoUrl": "/crests/narr/KDU.jpg"
+  },
+  {
+    "id": "anchor-university-ayobo-lagos-state",
+    "name": "Anchor University Ayobo Lagos State",
+    "shortName": "AUL",
+    "ownership": "Private",
+    "web": "http://www.aul.edu.ng/",
+    "year": "2016",
+    "logoUrl": "/crests/narr/AUL.jpg"
+  },
+  {
+    "id": "dominican-university-ibadan-oyo-state",
+    "name": "Dominican University Ibadan Oyo State",
+    "shortName": "DU",
+    "ownership": "Private",
+    "web": "http://www.dui.edu.ng/",
+    "year": "2016",
+    "logoUrl": "/crests/narr/DU.jpg"
+  },
+  {
+    "id": "legacy-university-okija-anambra-state",
+    "name": "Legacy University, Okija Anambra State",
+    "shortName": "LUO",
+    "ownership": "Private",
+    "web": "http://www.legacyuniversity.edu.ng/",
+    "year": "2016",
+    "logoUrl": "/crests/narr/LUO.jpg"
+  },
+  {
+    "id": "arthur-javis-university-akpoyubo-cross-river-state",
+    "name": "Arthur Javis University Akpoyubo Cross river State",
+    "shortName": "AJU",
+    "ownership": "Private",
+    "web": "http://www.arthurjarvisuniversity.edu.ng/",
+    "year": "2016",
+    "logoUrl": "/crests/narr/AJU.jpg"
+  },
+  {
+    "id": "crown-hill-university-eiyenkorin-kwara-state",
+    "name": "Crown Hill University Eiyenkorin, Kwara State",
+    "shortName": "CHU",
+    "ownership": "Private",
+    "web": "http://www.crownhilluniversity.edu.ng",
+    "year": "2016",
+    "logoUrl": "/crests/narr/CHU.jpg"
+  },
+  {
+    "id": "coal-city-university-enugu-state",
+    "name": "Coal City University Enugu State",
+    "shortName": "CCU",
+    "ownership": "Private",
+    "web": "http://www.portal.ccu.edu.ng",
+    "year": "2016",
+    "logoUrl": "/crests/narr/CCU.jpg"
+  },
+  {
+    "id": "clifford-university-owerrinta-abia-state",
+    "name": "Clifford University Owerrinta Abia State",
+    "shortName": "CLU",
+    "ownership": "Private",
+    "web": "http://www.clifforduni.edu.ng/",
+    "year": "2016",
+    "logoUrl": "/crests/narr/CLU.jpg"
+  },
+  {
+    "id": "admiralty-university-ibusa-delta-state",
+    "name": "Admiralty University, Ibusa Delta State",
+    "shortName": "ADUN",
+    "ownership": "Private",
+    "web": "http://www.adun.edu.ng",
+    "year": "2017",
+    "logoUrl": "/crests/narr/ADUN.jpg"
+  },
+  {
+    "id": "spiritan-university-nneochi-abia-state",
+    "name": "Spiritan University, Nneochi Abia State",
+    "shortName": "SUN",
+    "ownership": "Private",
+    "web": "http://www.spiritanuniversity.edu.ng",
+    "year": "2017",
+    "logoUrl": "/crests/narr/SUN.jpg"
+  },
+  {
+    "id": "precious-cornerstone-university-oyo",
+    "name": "Precious Cornerstone University, Oyo",
+    "shortName": "PCU",
+    "ownership": "Private",
+    "web": "http://www.pcu.edu.ng",
+    "year": "2017",
+    "logoUrl": "/crests/narr/PCU.jpg"
+  },
+  {
+    "id": "pamo-university-of-medical-sciences-portharcourt",
+    "name": "PAMO University of Medical Sciences, Portharcourt",
+    "shortName": "PUMS",
+    "ownership": "Private",
+    "web": "http://www.pums.edu.ng",
+    "year": "2017",
+    "logoUrl": "/crests/narr/PUMS.jpg"
+  },
+  {
+    "id": "atiba-university-oyo",
+    "name": "Atiba University Oyo",
+    "shortName": "OAU",
+    "ownership": "Private",
+    "web": "http://www.atibauniversity.edu.ng",
+    "year": "2017",
+    "logoUrl": "/crests/narr/OAU.jpg"
+  },
+  {
+    "id": "eko-university-of-medical-and-health-sciences-ijanikin-lagos",
+    "name": "Eko University of Medical and Health Sciences Ijanikin, Lagos",
+    "shortName": "EKOUNIVMED",
+    "ownership": "Private",
+    "web": "http://www.ekounivmed.edu.ng",
+    "year": "2017",
+    "logoUrl": "/crests/narr/EKOUNIVMED.jpg"
+  },
+  {
+    "id": "skyline-university-kano",
+    "name": "Skyline University, Kano",
+    "shortName": "SUK",
+    "ownership": "Private",
+    "web": "http://www.sun.edu.ng",
+    "year": "2018",
+    "logoUrl": "/crests/narr/SUK.jpg"
+  }
+]

@@ -1,12 +1,12 @@
-import rawUniversities from '@/data/nigerian-universities.json';
-import localCrests from '@/data/local-crests.json';
+import narrUniversities from '@/data/narr-universities.json';
 
 export interface NigerianUniversity {
   id: string;
   name: string;
   shortName: string;
-  motto?: string;
+  ownership?: string;
   web?: string;
+  year?: string;
   logoUrl?: string;
   colors: [string, string];
   monogram: string;
@@ -15,29 +15,19 @@ export interface NigerianUniversity {
 const COLOR_MAP: Record<string, [string, string]> = {
   RUN: ['#1B3B8B', '#F2C12E'],
   CU: ['#5B1F69', '#F4C430'],
-  BU: ['#0E3A75', '#E8B923'],
-  BUI: ['#0D4B82', '#FFFFFF'],
+  BABCOCK: ['#0E3A75', '#E8B923'],
   ABUAD: ['#124E37', '#D4AF37'],
   PAU: ['#0C2D57', '#D9A726'],
   NUN: ['#0B3D91', '#4DB8E8'],
-  NTNU: ['#0B3D91', '#4DB8E8'],
   AUN: ['#002868', '#BF0A30'],
   LMU: ['#1E5631', '#D4AF37'],
-  ACU: ['#4A235A', '#F4D03F'],
-  LCU: ['#1B4F72', '#2ECC71'],
-  BIU: ['#6C1D45', '#F4D03F'],
-  VUNA: ['#7B241C', '#F4D03F'],
-  EU: ['#0E6251', '#D4AC0D'],
-  JABU: ['#8E24AA', '#FDD835'],
-  MTU: ['#512DA8', '#FBC02D'],
-  HUI: ['#1B5E20', '#F9A825'],
   UNILAG: ['#7B1FA2', '#FBC02D'],
   UI: ['#1A237E', '#FFD54F'],
   OAU: ['#1B3B8B', '#F9A825'],
   UNN: ['#1B5E20', '#FFFFFF'],
   ABU: ['#00695C', '#FFD54F'],
   UNIBEN: ['#6A1B9A', '#FFD54F'],
-  UNILORIN: ['#0D47A1', '#FFD600'],
+  UIL: ['#0D47A1', '#FFD600'],
   FUTA: ['#4A148C', '#FFB300'],
   UNIPORT: ['#1565C0', '#FFCA28'],
   LASU: ['#1B5E20', '#FFD600'],
@@ -52,71 +42,38 @@ const PALETTE: Array<[string, string]> = [
   ['#004D40', '#FFB300'],
 ];
 
-function slugify(str: string): string {
-  return str
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
-}
-
-function isLikelyImageUrl(url?: string): boolean {
-  if (!url) return false;
-  const trimmed = url.trim();
-  // Skip 4icu.org (returns 404) and non-HTTPS URLs (blocked as mixed content on mobile)
-  if (!trimmed.startsWith('https://') || trimmed.includes('4icu.org')) return false;
-  return /^https:\/\/.+\.(png|jpe?g|webp|svg|gif)(\?.*)?$/i.test(trimmed);
-}
-
-function deriveMonogram(name: string, acronym?: string): string {
-  const clean = (acronym ?? '').trim();
-  if (clean && clean.length <= 5 && !clean.includes(' ')) {
-    return clean.toUpperCase();
-  }
-  const letters = name
-    .split(/\s+/)
-    .filter((w) => w.length > 2 && !['of', 'and', 'the', 'for'].includes(w.toLowerCase()))
-    .map((w) => w[0]?.toUpperCase() ?? '')
-    .join('');
-  return (letters || name.slice(0, 3)).slice(0, 3).toUpperCase();
-}
-
-interface RawUni {
+interface RawNarrUni {
+  id: string;
   name: string;
-  acronym?: string;
-  motto?: string;
+  shortName: string;
+  ownership?: string;
   web?: string;
-  logo?: string;
+  year?: string;
+  logoUrl?: string;
 }
 
-export const NIGERIAN_UNIVERSITIES: NigerianUniversity[] = (rawUniversities as RawUni[]).map(
-  (u, idx) => {
-    const monogram = deriveMonogram(u.name, u.acronym);
-    const shortName =
-      u.acronym && u.acronym.trim().length <= 12 && u.acronym.trim() !== 'Non Found'
-        ? u.acronym.trim()
-        : monogram;
-    const colors = COLOR_MAP[shortName.toUpperCase()] ?? PALETTE[idx % PALETTE.length];
-
-    const id = slugify(u.name);
-    const localLogo = (localCrests as Record<string, string>)[id];
-
-    return {
-      id,
-      name: u.name.trim(),
-      shortName,
-      motto: u.motto && u.motto !== 'Non Found' ? u.motto : undefined,
-      web: u.web,
-      logoUrl: localLogo ?? (isLikelyImageUrl(u.logo) ? u.logo!.trim() : undefined),
-      colors,
-      monogram,
-    };
-  }
-);
+export const NIGERIAN_UNIVERSITIES: NigerianUniversity[] = (
+  narrUniversities as RawNarrUni[]
+).map((u, idx) => {
+  const mono = (u.shortName || u.name.slice(0, 3)).slice(0, 4).toUpperCase();
+  const colors = COLOR_MAP[u.shortName.toUpperCase()] ?? PALETTE[idx % PALETTE.length];
+  return {
+    id: u.id,
+    name: u.name,
+    shortName: u.shortName,
+    ownership: u.ownership,
+    web: u.web,
+    year: u.year,
+    logoUrl: u.logoUrl,
+    colors,
+    monogram: mono,
+  };
+});
 
 function normalizeUniText(str: string): string {
   return str
     .toLowerCase()
-    .replace(/['’.,-]/g, '')
+    .replace(/['’.,-]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -125,10 +82,13 @@ export function findUniversity(nameOrId?: string | null): NigerianUniversity | u
   if (!nameOrId) return undefined;
   const raw = nameOrId.trim().toLowerCase();
   const norm = normalizeUniText(nameOrId);
+  const normNoApostrophe = nameOrId.toLowerCase().replace(/['’.,-]/g, '').replace(/\s+/g, ' ').trim();
+
   return (
     NIGERIAN_UNIVERSITIES.find((u) => u.id === raw) ||
     NIGERIAN_UNIVERSITIES.find((u) => normalizeUniText(u.name) === norm) ||
     NIGERIAN_UNIVERSITIES.find((u) => normalizeUniText(u.shortName) === norm) ||
+    NIGERIAN_UNIVERSITIES.find((u) => u.name.toLowerCase().replace(/['’.,-]/g, '').includes(normNoApostrophe)) ||
     NIGERIAN_UNIVERSITIES.find((u) => normalizeUniText(u.name).includes(norm))
   );
 }

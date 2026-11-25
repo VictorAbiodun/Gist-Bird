@@ -1,7 +1,7 @@
 import 'server-only';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getLagosDateString, INITIAL_FREE_PAPERS, type RewardStatus } from '@/lib/rewards';
+import { FINITE_ECONOMY_CUTOFF, getLagosDateString, INITIAL_FREE_PAPERS, type RewardStatus } from '@/lib/rewards';
 import type { ChatRow, ChatView, InboxItem, Notice, PaperView, Profile, SentItem } from '@/lib/types';
 
 async function rpc<T>(name: string, args?: Record<string, unknown>, fallback?: T): Promise<T> {
@@ -38,7 +38,11 @@ export async function getRewardStatus(): Promise<RewardStatus> {
 
   const admin = createAdminClient();
   const [{ count: sentCount }, { data: rewardRows }] = await Promise.all([
-    admin.from('papers').select('id', { count: 'exact', head: true }).eq('author_id', user.id),
+    admin
+      .from('papers')
+      .select('id', { count: 'exact', head: true })
+      .eq('author_id', user.id)
+      .gte('sent_at', FINITE_ECONOMY_CUTOFF),
     admin
       .from('notifications')
       .select('data, created_at')

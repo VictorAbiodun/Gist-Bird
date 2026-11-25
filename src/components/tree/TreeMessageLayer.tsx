@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { TreeMessageLeaves } from './TreeMessageLeaves';
 import { CinematicLetterReader } from './CinematicLetterReader';
@@ -20,6 +21,7 @@ export function TreeMessageLayer({
   userId,
   initialInbox = [],
 }: TreeMessageLayerProps) {
+  const router = useRouter();
   const [inboxItems, setInboxItems] = useState<InboxItem[]>(initialInbox);
   const [activeEnvelope, setActiveEnvelope] = useState<TreeEnvelope | null>(null);
 
@@ -78,6 +80,7 @@ export function TreeMessageLayer({
   function handleKeepSuccess(paperId: string) {
     setInboxItems((prev) => prev.filter((item) => item.id !== paperId));
     setActiveEnvelope(null);
+    router.refresh();
   }
 
   return (

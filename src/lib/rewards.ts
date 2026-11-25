@@ -1,4 +1,6 @@
 export const INITIAL_FREE_PAPERS = 5;
+/** Papers sent before this cutoff do not deduct from existing users' starter balance. */
+export const FINITE_ECONOMY_CUTOFF = '2026-11-25T09:30:00Z';
 
 export type RewardIconType =
   | 'paper'

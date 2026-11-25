@@ -2,6 +2,7 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { papersLeft } from '@/lib/data';
 import { friendlyError, errorCode } from '@/lib/errors';
 import { hasContactInfo } from '@/lib/contentFilter';
@@ -35,6 +36,53 @@ export async function passPaper(id: string): Promise<{ error?: string }> {
 export async function acceptPaper(id: string): Promise<{ chatId?: string; error?: string }> {
   const { data, error } = await createClient().rpc('accept_paper', { p_id: id });
   if (error) return { error: friendlyError(error) };
+
+  let finalChatId = data as string;
+
+  // Merge into existing chat if these two users already have a conversation
+  try {
+    const admin = createAdminClient();
+    const { data: newChat } = await admin
+      .from('chats')
+      .select('id, user_a, user_b')
+      .eq('id', finalChatId)
+      .maybeSingle();
+
+    if (newChat) {
+      const { data: existingChats } = await admin
+        .from('chats')
+        .select('id, created_at')
+        .or(
+          `and(user_a.eq.${newChat.user_a},user_b.eq.${newChat.user_b}),and(user_a.eq.${newChat.user_b},user_b.eq.${newChat.user_a})`
+        )
+        .order('created_at', { ascending: true });
+
+      const primary = existingChats?.[0];
+      if (primary && primary.id !== newChat.id) {
+        // Carry the newly accepted paper's message into their unified chat thread
+        const { data: paper } = await admin
+          .from('papers')
+          .select('author_id, body')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (paper?.body && paper?.author_id) {
+          await admin.from('messages').insert({
+            chat_id: primary.id,
+            sender_id: paper.author_id,
+            body: `💌 ${paper.body}`,
+          });
+        }
+
+        await admin.from('messages').update({ chat_id: primary.id }).eq('chat_id', newChat.id);
+        await admin.from('chats').delete().eq('id', newChat.id);
+        finalChatId = primary.id;
+      }
+    }
+  } catch (mergeErr) {
+    console.warn('Chat merge check skipped:', mergeErr);
+  }
+
   revalidatePath('/home'); revalidatePath('/chats');
-  return { chatId: data as string };
+  return { chatId: finalChatId };
 }

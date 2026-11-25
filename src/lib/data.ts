@@ -13,7 +13,15 @@ async function rpc<T>(name: string, args?: Record<string, unknown>, fallback?: T
 export const getInbox = () => rpc<InboxItem[]>('get_inbox', undefined, []);
 export const getSent = () => rpc<SentItem[]>('get_sent', undefined, []);
 export const getPaper = (id: string) => rpc<PaperView | null>('get_paper', { p_id: id }, null);
-export const getChats = () => rpc<ChatRow[]>('get_chats', undefined, []);
+export const getChats = async (): Promise<ChatRow[]> => {
+  const rows = await rpc<ChatRow[]>('get_chats', undefined, []);
+  const seen = new Set<string>();
+  return rows.filter((c) => {
+    if (seen.has(c.other_id)) return false;
+    seen.add(c.other_id);
+    return true;
+  });
+};
 export const getChat = (id: string) => rpc<ChatView | null>('get_chat', { p_id: id }, null);
 export const getNotifications = async (): Promise<Notice[]> => {
   const list = await rpc<Notice[]>('get_notifications', undefined, []);

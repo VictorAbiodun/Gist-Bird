@@ -96,40 +96,60 @@ export function DailyRewardModal({ open, onClose, status, onClaimed }: DailyRewa
   const handleClaim = () => {
     if (!localStatus.canClaimToday || pending) return;
     setError(undefined);
+
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setError("You're offline. Connect to the internet to claim your reward.");
+      return;
+    }
+
+    const prevStatus = localStatus;
+    const updatedStreak = localStatus.streak + 1;
+    const dayIndex = ((updatedStreak - 1) % 20) + 1;
+    const optimisticReward = REWARD_DAYS[dayIndex - 1];
+    const nextPapers = localStatus.papersLeft + optimisticReward.papers;
+    const nextCoins = localStatus.coins + optimisticReward.coins;
+
+    // Optimistic immediate confirmation + confetti
+    setClaimedReward(optimisticReward);
+    setLocalStatus((prev) => ({
+      ...prev,
+      canClaimToday: false,
+      streak: updatedStreak,
+      todayClaimedDay: optimisticReward.day,
+      currentDay: optimisticReward.day,
+      papersLeft: nextPapers,
+      coins: nextCoins,
+    }));
+    onClaimed?.(nextPapers, nextCoins, updatedStreak);
+
+    try {
+      confetti({
+        particleCount: 55,
+        spread: 65,
+        origin: { y: 0.65 },
+        colors: ['#0A7D3E', '#FFD23F', '#FF6B57', '#ffffff'],
+      });
+    } catch {
+      // ignore confetti errors
+    }
+
+    // Persist in background
     start(async () => {
-      const res = await claimDailyReward();
-      if (res.error) {
-        setError(res.error);
-        return;
-      }
-      if (res.reward) {
-        setClaimedReward(res.reward);
-        const updatedStreak = res.newStreak ?? localStatus.streak + 1;
-        setLocalStatus((prev) => ({
-          ...prev,
-          canClaimToday: false,
-          streak: updatedStreak,
-          todayClaimedDay: res.reward!.day,
-          currentDay: res.reward!.day,
-          papersLeft: res.papersLeft ?? prev.papersLeft + res.reward!.papers,
-          coins: res.coins ?? prev.coins + res.reward!.coins,
-        }));
-        try {
-          confetti({
-            particleCount: 55,
-            spread: 65,
-            origin: { y: 0.65 },
-            colors: ['#0A7D3E', '#FFD23F', '#FF6B57', '#ffffff'],
-          });
-        } catch {
-          // ignore confetti errors
+      try {
+        const res = await claimDailyReward();
+        if (res.error) {
+          setLocalStatus(prevStatus);
+          setClaimedReward(null);
+          onClaimed?.(prevStatus.papersLeft, prevStatus.coins, prevStatus.streak);
+          setError(res.error);
+          return;
         }
-        onClaimed?.(
-          res.papersLeft ?? localStatus.papersLeft + res.reward.papers,
-          res.coins ?? localStatus.coins + res.reward.coins,
-          updatedStreak
-        );
         router.refresh();
+      } catch {
+        setLocalStatus(prevStatus);
+        setClaimedReward(null);
+        onClaimed?.(prevStatus.papersLeft, prevStatus.coins, prevStatus.streak);
+        setError('Could not claim reward. Check your connection.');
       }
     });
   };

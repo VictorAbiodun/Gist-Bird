@@ -1,5 +1,8 @@
 // Service Worker for Gist Bird — lightweight client cache for phones & PWA
-const CACHE_NAME = 'gist-bird-v2';
+const CACHE_NAME = 'gist-bird-v3';
+const PAGE_CACHE = 'gist-bird-pages-v3';
+
+const STALE_WHILE_REVALIDATE_PATHS = ['/home', '/sent', '/chats', '/me', '/map', '/rules', '/notifications'];
 
 const PRECACHE_URLS = [
   '/offline',
@@ -42,6 +45,7 @@ self.addEventListener('fetch', (event) => {
     url.pathname.startsWith('/mascot/') ||
     url.pathname.startsWith('/avatars/') ||
     url.pathname.startsWith('/icons/') ||
+    url.pathname.startsWith('/crests/') ||
     url.pathname.startsWith('/images/') ||
     url.pathname.startsWith('/assets/')
   ) {
@@ -60,7 +64,26 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Navigation requests: network-first with offline fallback
+  // Visited core app tabs: stale-while-revalidate from phone cache for instant switching
+  if (request.mode === 'navigate' && STALE_WHILE_REVALIDATE_PATHS.some((p) => url.pathname === p)) {
+    event.respondWith(
+      caches.open(PAGE_CACHE).then(async (cache) => {
+        const cached = await cache.match(request);
+        const networkPromise = fetch(request)
+          .then((response) => {
+            if (response && response.status === 200) {
+              cache.put(request, response.clone());
+            }
+            return response;
+          })
+          .catch(() => cached || caches.match('/offline'));
+        return cached || networkPromise;
+      })
+    );
+    return;
+  }
+
+  // Other navigation requests: network-first with offline fallback
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request).catch(async () => {

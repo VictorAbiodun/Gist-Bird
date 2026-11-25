@@ -92,21 +92,39 @@ export function EditProfileView({ profile }: { profile: Profile }) {
 
   const commitSave = (nextData: ProfileInput) => {
     setError(undefined);
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setError("You're offline. Connect to the internet to save changes.");
+      return;
+    }
+
+    const prevForm = form;
+    // Optimistically confirm immediately on the UI
+    setForm(nextData);
+    setActiveField(null);
+    setSavedToast(true);
+    setTimeout(() => setSavedToast(false), 2000);
+
+    const payload: ProfileInput = {
+      ...nextData,
+      starter: nextData.starter?.trim() || null,
+    };
+
+    // Persist in background; revert with clear feedback if backend rejects
     start(async () => {
-      const payload: ProfileInput = {
-        ...nextData,
-        starter: nextData.starter?.trim() || null,
-      };
-      const res = await saveProfile(payload);
-      if (res.error) {
-        setError(res.error);
-        return;
+      try {
+        const res = await saveProfile(payload);
+        if (res.error) {
+          setForm(prevForm);
+          setSavedToast(false);
+          setError(res.error);
+          return;
+        }
+        router.refresh();
+      } catch {
+        setForm(prevForm);
+        setSavedToast(false);
+        setError('Could not save changes. Check your connection.');
       }
-      setForm(nextData);
-      setActiveField(null);
-      setSavedToast(true);
-      setTimeout(() => setSavedToast(false), 2000);
-      router.refresh();
     });
   };
 
@@ -164,6 +182,11 @@ export function EditProfileView({ profile }: { profile: Profile }) {
       {savedToast && (
         <div className="mx-5 mb-3 rounded-full bg-primary px-4 py-2 text-center text-[13px] font-bold text-white shadow-sm">
           Profile updated
+        </div>
+      )}
+      {error && !activeField && (
+        <div className="mx-5 mb-3">
+          <Notice tone="err" title="Could not save">{error}</Notice>
         </div>
       )}
 

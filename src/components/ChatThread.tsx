@@ -96,14 +96,38 @@ export function ChatThread({
   const starters = otherStarter ? [otherStarter, ...STARTERS] : STARTERS;
 
   function send(body = text) {
-    if (!body.trim() || (locked && hasContactInfo(body))) return;
+    const trimmed = body.trim();
+    if (!trimmed || (locked && hasContactInfo(trimmed))) return;
     setError(undefined);
+
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setError("You're offline. Reconnect to send your message.");
+      return;
+    }
+
+    const tempId = -Date.now();
+    const optimisticMsg: Message = {
+      id: tempId,
+      chat_id: chatId,
+      sender_id: me,
+      body: trimmed,
+      created_at: new Date().toISOString(),
+    };
+
+    // Optimistically show message & clear input immediately
+    setMessages((m) => [...m, optimisticMsg]);
+    if (body === text) setText('');
+    setTimeout(() => bottom.current?.scrollIntoView({ behavior: 'smooth' }), 30);
+
     start(async () => {
-      const r = await sendMessage({ chatId, body });
-      if (r.error) {
-        setError(r.error);
-      } else {
-        setText('');
+      try {
+        const r = await sendMessage({ chatId, body: trimmed });
+        if (r.error) {
+          setMessages((m) => m.filter((x) => x.id !== tempId));
+          if (body === text) setText(trimmed);
+          setError(r.error);
+          return;
+        }
         const { data } = await createClient()
           .from('messages')
           .select('*')
@@ -111,7 +135,10 @@ export function ChatThread({
           .order('id')
           .limit(300);
         if (data) setMessages(data as Message[]);
-        setTimeout(() => bottom.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+      } catch {
+        setMessages((m) => m.filter((x) => x.id !== tempId));
+        if (body === text) setText(trimmed);
+        setError('Could not send. Check your internet connection.');
       }
     });
   }

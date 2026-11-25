@@ -42,11 +42,12 @@ export async function sendMessage(input: {
         const recipientId = chat.user_a === user.id ? chat.user_b : chat.user_a;
         const { data: profile } = await admin
           .from('profiles')
-          .select('display_name')
+          .select('display_name, avatar')
           .eq('id', user.id)
           .maybeSingle();
 
         const senderName = profile?.display_name?.trim() || 'Campus friend';
+        const senderAvatar = profile?.avatar || '/icons/icon.svg';
         const messageText = parsed.data.body;
 
         await admin.from('notifications').insert({
@@ -57,6 +58,7 @@ export async function sendMessage(input: {
           data: {
             chat_id: parsed.data.chatId,
             sender_name: senderName,
+            sender_avatar: senderAvatar,
             body: messageText,
           },
         });
@@ -74,7 +76,8 @@ export async function sendMessage(input: {
             const payload = JSON.stringify({
               title: senderName,
               body: messageText,
-              icon: '/icons/icon.svg',
+              icon: senderAvatar.startsWith('/') ? senderAvatar : '/icons/icon.svg',
+              badge: '/icons/paper.png',
               url: `/chat/${parsed.data.chatId}`,
               tag: `chat-${parsed.data.chatId}`,
             });

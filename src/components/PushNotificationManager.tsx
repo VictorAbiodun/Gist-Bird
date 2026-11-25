@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { VAPID_PUBLIC_KEY, urlBase64ToUint8Array } from '@/lib/push';
@@ -10,11 +11,21 @@ interface PushNotificationManagerProps {
   userId?: string;
 }
 
+interface InAppBanner {
+  id: string;
+  senderName: string;
+  body: string;
+  avatar: string;
+  url: string;
+}
+
 export function PushNotificationManager({ userId }: PushNotificationManagerProps) {
   const [permission, setPermission] = useState<NotificationPermission | 'unsupported'>('default');
   const [showPermissionBanner, setShowPermissionBanner] = useState(false);
+  const [inAppBanner, setInAppBanner] = useState<InAppBanner | null>(null);
   const pathname = usePathname();
   const pathnameRef = useRef(pathname);
+  const bannerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     pathnameRef.current = pathname;
@@ -42,7 +53,6 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
     }
   }, []);
 
-  // Check initial notification support & permission
   useEffect(() => {
     if (typeof window === 'undefined' || !('Notification' in window)) {
       setPermission('unsupported');
@@ -55,7 +65,6 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
       syncPushSubscription();
     }
 
-    // If permission has not been asked yet, show banner after 3 seconds
     if (Notification.permission === 'default') {
       const dismissed = localStorage.getItem('gistbird_notifications_prompt_dismissed');
       if (!dismissed) {
@@ -67,24 +76,35 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
     }
   }, [userId, syncPushSubscription]);
 
+  const showWhatsAppToast = useCallback((banner: InAppBanner) => {
+    setInAppBanner(banner);
+    if (bannerTimerRef.current) clearTimeout(bannerTimerRef.current);
+    bannerTimerRef.current = setTimeout(() => {
+      setInAppBanner(null);
+    }, 4800);
+  }, []);
+
   const triggerDeviceNotification = useCallback(
-    async (title: string, body: string, url: string, tag: string) => {
+    async (title: string, body: string, url: string, tag: string, icon = '/icons/icon.svg') => {
       if (typeof window === 'undefined' || !('Notification' in window)) return;
       if (Notification.permission !== 'granted') return;
 
-      // 1. Try Service Worker showNotification (works reliably in mobile PWAs, iOS 16.4+, and Android)
       if ('serviceWorker' in navigator) {
         try {
           const reg = await navigator.serviceWorker.ready;
           if (reg && reg.showNotification) {
             await reg.showNotification(title, {
               body,
-              icon: '/icons/icon.svg',
-              badge: '/icons/icon.svg',
+              icon,
+              badge: '/icons/paper.png',
               tag,
               renotify: true,
               data: { url },
-              vibrate: [200, 100, 200],
+              vibrate: [180, 90, 180],
+              actions: [
+                { action: 'open', title: 'Reply' },
+                { action: 'dismiss', title: 'Mark read' },
+              ],
             } as unknown as NotificationOptions);
             return;
           }
@@ -93,15 +113,13 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
         }
       }
 
-      // 2. Standard Web Notification API fallback
       try {
         const notification = new Notification(title, {
           body,
-          icon: '/icons/icon.svg',
+          icon,
           tag,
           data: { url },
         });
-
         notification.onclick = () => {
           window.focus();
           window.location.href = url;
@@ -114,7 +132,7 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
     []
   );
 
-  // Subscribe to real-time notification events for this user
+  // Subscribe to real-time notifications for foreground WhatsApp-style toast + device push
   useEffect(() => {
     if (!userId) return;
 
@@ -131,12 +149,14 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
         },
         (payload) => {
           const note = payload.new as {
+            id?: string;
             kind?: string;
             title?: string;
             body?: string | null;
             data?: {
               chat_id?: string;
               sender_name?: string;
+              sender_avatar?: string;
               body?: string;
               paper_id?: string;
             };
@@ -146,7 +166,7 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
             const chatId = note.data?.chat_id;
             const targetUrl = chatId ? `/chat/${chatId}` : '/chats';
 
-            // If the user is actively inside this exact chat in the foreground, don't spam a system banner
+            // Skip if user is already reading that exact chat in the foreground
             if (
               pathnameRef.current === targetUrl &&
               typeof document !== 'undefined' &&
@@ -155,23 +175,42 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
               return;
             }
 
-            // Extract who texted them and what they said
             const senderName = note.data?.sender_name || note.title || 'Campus friend';
             const messageText = note.data?.body || note.body || 'Sent you a new message';
+            const avatar = note.data?.sender_avatar || '/icons/icon.svg';
 
-            triggerDeviceNotification(
+            // Show WhatsApp-style heads-up banner inside app
+            showWhatsAppToast({
+              id: note.id || String(Date.now()),
               senderName,
-              messageText,
-              targetUrl,
-              `chat-${chatId || 'msg'}-${Date.now()}`
-            );
+              body: messageText,
+              avatar,
+              url: targetUrl,
+            });
+
+            // Also fire system notification if tab is backgrounded
+            if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+              triggerDeviceNotification(
+                senderName,
+                messageText,
+                targetUrl,
+                `chat-${chatId || 'msg'}`,
+                avatar.startsWith('/') ? avatar : '/icons/icon.svg'
+              );
+            }
           } else if (note.kind === 'paper_landed') {
-            triggerDeviceNotification(
-              note.title || 'A paper landed for you',
-              note.body || 'Chief Coo brought a new letter to your tree!',
-              '/home',
-              `paper-${note.data?.paper_id || 'landed'}`
-            );
+            const title = note.title || 'A paper landed for you';
+            const body = note.body || 'Chief Coo brought a new letter to your tree!';
+            showWhatsAppToast({
+              id: note.id || String(Date.now()),
+              senderName: title,
+              body,
+              avatar: '/icons/paper.png',
+              url: '/home',
+            });
+            if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+              triggerDeviceNotification(title, body, '/home', `paper-${note.data?.paper_id || 'landed'}`);
+            }
           }
         }
       )
@@ -180,7 +219,7 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userId, triggerDeviceNotification]);
+  }, [userId, triggerDeviceNotification, showWhatsAppToast]);
 
   const requestPermission = async () => {
     if (typeof window === 'undefined' || !('Notification' in window)) return;
@@ -191,10 +230,9 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
 
       if (res === 'granted') {
         await syncPushSubscription();
-        // Send a celebratory test notification so the user sees it immediately on their device
         triggerDeviceNotification(
-          'Gist Bird Notifications Active',
-          "You will now see who texts you and what they said directly on your phone!",
+          'Gist Bird',
+          "Notifications enabled — you'll see messages just like WhatsApp!",
           '/home',
           'welcome-notification'
         );
@@ -210,46 +248,93 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
     setShowPermissionBanner(false);
   };
 
-  if (!showPermissionBanner || permission !== 'default') {
-    return null;
-  }
-
   return (
-    <aside
-      aria-label="Notification permissions"
-      className="fixed top-4 left-1/2 z-50 w-[92%] max-w-[440px] -translate-x-1/2 rounded-[20px] border-[1.5px] border-line bg-surface/95 p-3.5 shadow-lg backdrop-blur-md transition-all animate-in fade-in slide-in-from-top-4 duration-300"
-    >
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-lemon text-ink">
-            <Icon name="bell" size={19} />
-          </span>
-          <div className="min-w-0 flex-1">
-            <h2 className="font-display text-[14px] font-bold text-ink leading-4 truncate">
-              Turn on phone notifications
-            </h2>
-            <p className="text-[12px] text-muted leading-4 truncate">
-              See who texted you & their message preview
-            </p>
+    <>
+      {/* ── Live WhatsApp-Style Heads-Up Message Banner ── */}
+      {inAppBanner && (
+        <div className="fixed top-3 left-1/2 z-[60] w-[94%] max-w-[448px] -translate-x-1/2 animate-in fade-in slide-in-from-top-4 duration-200">
+          <div className="flex items-center gap-3 rounded-[20px] border border-line/80 bg-white/95 p-3 shadow-[0_10px_30px_rgba(14,42,27,0.16)] backdrop-blur-md">
+            <Link
+              href={inAppBanner.url}
+              onClick={() => setInAppBanner(null)}
+              className="flex min-w-0 flex-1 items-center gap-3"
+            >
+              <div className="relative h-11 w-11 shrink-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={inAppBanner.avatar}
+                  alt={inAppBanner.senderName}
+                  className="h-11 w-11 rounded-full border border-line bg-surface-alt object-cover"
+                />
+                <span className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#25D366] ring-2 ring-white">
+                  <Icon name="chat" size={10} className="text-white" />
+                </span>
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="truncate font-display text-[15px] font-bold text-ink">
+                    {inAppBanner.senderName}
+                  </p>
+                  <span className="shrink-0 text-[11px] font-semibold text-[#0A7D3E]">now</span>
+                </div>
+                <p className="line-clamp-2 text-[13px] leading-snug text-muted">
+                  {inAppBanner.body}
+                </p>
+              </div>
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => setInAppBanner(null)}
+              aria-label="Dismiss notification"
+              className="shrink-0 rounded-full p-1 text-muted hover:text-ink"
+            >
+              <Icon name="close" size={16} />
+            </button>
           </div>
         </div>
+      )}
 
-        <div className="flex items-center gap-1.5 shrink-0">
-          <button
-            onClick={requestPermission}
-            className="rounded-full bg-primary px-3 py-1.5 text-[12px] font-bold text-on-primary shadow-xs active:scale-95 transition"
-          >
-            Enable
-          </button>
-          <button
-            onClick={dismissBanner}
-            aria-label="Close"
-            className="text-muted hover:text-ink p-1 active:scale-90 transition"
-          >
-            <Icon name="close" size={16} />
-          </button>
-        </div>
-      </div>
-    </aside>
+      {/* ── WhatsApp-Style Notification Permission Prompt ── */}
+      {showPermissionBanner && permission === 'default' && !inAppBanner && (
+        <aside
+          aria-label="Notification permissions"
+          className="fixed top-3 left-1/2 z-50 w-[94%] max-w-[448px] -translate-x-1/2 rounded-[20px] border border-[#0A7D3E]/20 bg-white/95 p-3.5 shadow-[0_10px_28px_rgba(10,125,62,0.14)] backdrop-blur-md transition-all animate-in fade-in slide-in-from-top-4 duration-300"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#25D366] text-white shadow-xs">
+                <Icon name="bell" size={20} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <h2 className="truncate font-display text-[14px] font-bold leading-4 text-ink">
+                  Turn on message alerts
+                </h2>
+                <p className="mt-0.5 truncate text-[12px] leading-4 text-muted">
+                  See who texted &amp; reply right from notifications
+                </p>
+              </div>
+            </div>
+
+            <div className="flex shrink-0 items-center gap-1.5">
+              <button
+                onClick={requestPermission}
+                className="rounded-full bg-[#0A7D3E] px-3.5 py-1.5 text-[12px] font-bold text-white shadow-xs transition active:scale-95"
+              >
+                Turn On
+              </button>
+              <button
+                onClick={dismissBanner}
+                aria-label="Close"
+                className="p-1 text-muted transition hover:text-ink active:scale-90"
+              >
+                <Icon name="close" size={16} />
+              </button>
+            </div>
+          </div>
+        </aside>
+      )}
+    </>
   );
 }

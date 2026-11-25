@@ -98,6 +98,8 @@ self.addEventListener('fetch', (event) => {
 // ───────────────────────── Native Push Notifications & Clicks ─────────────────────────
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
+  if (event.action === 'dismiss') return;
+
   const targetUrl = (event.notification.data && event.notification.data.url) || '/home';
 
   event.waitUntil(
@@ -129,11 +131,15 @@ self.addEventListener('push', (event) => {
     const options = {
       body: payload.body || 'You have a new message',
       icon: payload.icon || '/icons/icon.svg',
-      badge: '/icons/icon.svg',
+      badge: payload.badge || '/icons/paper.png',
       data: { url: payload.url || '/home' },
       tag: payload.tag || 'gist-bird-message',
       renotify: true,
-      vibrate: [200, 100, 200],
+      vibrate: [180, 90, 180],
+      actions: [
+        { action: 'open', title: 'Reply' },
+        { action: 'dismiss', title: 'Mark read' },
+      ],
     };
     event.waitUntil(self.registration.showNotification(title, options));
   } catch (_e) {
@@ -141,6 +147,7 @@ self.addEventListener('push', (event) => {
       self.registration.showNotification('Gist Bird', {
         body: event.data.text(),
         icon: '/icons/icon.svg',
+        badge: '/icons/paper.png',
       })
     );
   }

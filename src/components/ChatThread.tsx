@@ -119,6 +119,16 @@ export function ChatThread({
   const messageRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wasDraggingRef = useRef(false);
+  const initialIdsRef = useRef<Set<number>>(new Set(initial.map((m) => m.id)));
+  const clientKeysRef = useRef<Map<number, string>>(new Map());
+  const getMessageKey = (id: number) => {
+    let k = clientKeysRef.current.get(id);
+    if (!k) {
+      k = `msg-${id}`;
+      clientKeysRef.current.set(id, k);
+    }
+    return k;
+  };
   const channelRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']> | null>(null);
   const lastTypingSentRef = useRef(0);
   const stopTypingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -261,7 +271,31 @@ export function ChatThread({
             playReceiveSound();
             dispatchRead();
           }
-          setMessages((m) => (m.some((x) => x.id === msg.id) ? m : [...m, msg]));
+          setMessages((prev) => {
+            if (prev.some((x) => x.id === msg.id)) return prev;
+            // Replace matching optimistic message in-place so it never doubles
+            if (msg.sender_id === me) {
+              const optIdx = prev.findIndex(
+                (x) => x.id < 0 && x.sender_id === me && x.body === msg.body
+              );
+              if (optIdx !== -1) {
+                const oldId = prev[optIdx].id;
+                const stableKey = clientKeysRef.current.get(oldId) ?? `msg-${oldId}`;
+                clientKeysRef.current.set(msg.id, stableKey);
+                initialIdsRef.current.add(msg.id);
+                setReplyMap((rm) => {
+                  if (!rm[oldId]) return rm;
+                  const next = { ...rm, [msg.id]: rm[oldId] };
+                  delete next[oldId];
+                  return next;
+                });
+                const next = [...prev];
+                next[optIdx] = msg;
+                return next;
+              }
+            }
+            return [...prev, msg];
+          });
         }
       )
       .on('broadcast', { event: 'typing' }, ({ payload }) => {
@@ -668,36 +702,36 @@ export function ChatThread({
           setError(r.error);
           return;
         }
-        if (replyToId && r.messageId) {
+        if (r.messageId) {
           const confirmedId = r.messageId;
-          setReplyMap((prev) => {
-            const next = { ...prev, [confirmedId]: replyToId };
-            delete next[tempId];
-            return next;
+          const stableKey = clientKeysRef.current.get(tempId) ?? `msg-${tempId}`;
+          clientKeysRef.current.set(confirmedId, stableKey);
+          initialIdsRef.current.add(confirmedId);
+
+          if (replyToId) {
+            setReplyMap((prev) => {
+              const next = { ...prev, [confirmedId]: replyToId };
+              delete next[tempId];
+              return next;
+            });
+            channelRef.current
+              ?.send({
+                type: 'broadcast',
+                event: 'reply_link',
+                payload: { messageId: confirmedId, replyToId },
+              })
+              .catch(() => {});
+          }
+
+          setMessages((prev) => {
+            // If Realtime already replaced tempId with confirmedId, leave it as-is
+            if (prev.some((x) => x.id === confirmedId)) {
+              return prev.filter((x) => x.id !== tempId);
+            }
+            return prev.map((x) => (x.id === tempId ? { ...x, id: confirmedId } : x));
           });
-          channelRef.current
-            ?.send({
-              type: 'broadcast',
-              event: 'reply_link',
-              payload: { messageId: confirmedId, replyToId },
-            })
-            .catch(() => {});
         }
         playSendSound();
-        const { data } = await createClient()
-          .from('messages')
-          .select('*')
-          .eq('chat_id', chatId)
-          .order('id')
-          .limit(300);
-        const remaining = getQueuedMessages(chatId).map((q) => ({
-          id: q.tempId,
-          chat_id: q.chatId,
-          sender_id: me,
-          body: q.body,
-          created_at: q.createdAt,
-        }));
-        if (data) setMessages([...(data as Message[]), ...remaining]);
       } catch {
         // Network failure mid-flight: queue locally instead of dropping the message
         enqueueMessage({ tempId, chatId, body: trimmed, createdAt, replyToId });
@@ -757,7 +791,7 @@ export function ChatThread({
       style={{ height: viewportHeight ? `${viewportHeight}px` : '100dvh' }}
     >
       {/* ── Sleek Official App Header ── */}
-      <header className="flex h-[56px] shrink-0 items-center justify-between border-b border-line bg-surface/95 px-3 backdrop-blur-md">
+      <header className="relative z-40 flex h-[56px] shrink-0 items-center justify-between border-b border-line bg-surface/95 px-3 backdrop-blur-md">
         <div className="flex min-w-0 items-center gap-2.5">
           <Link
             href="/chats"
@@ -1065,16 +1099,15 @@ export function ChatThread({
               const isDeletedAll = deletedForAll.includes(m.id);
               const isEdited = editedIds.includes(m.id);
               const isStarred = starredIds.includes(m.id);
-              const canEdit =
-                isMine &&
-                m.id > 0 &&
-                !isDeletedAll &&
-                Date.now() - new Date(m.created_at).getTime() <= 15 * 60 * 1000;
               const isSearchMatch = searchMatches[searchMatchIdx] === m.id;
+              const isNewMsg = !initialIdsRef.current.has(m.id);
 
               return (
-                <div
-                  key={m.id}
+                <motion.div
+                  key={getMessageKey(m.id)}
+                  initial={isNewMsg ? { opacity: 0, y: 12, scale: 0.96 } : false}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
                   ref={(el) => {
                     messageRefs.current[m.id] = el;
                   }}
@@ -1131,137 +1164,6 @@ export function ChatThread({
                           </svg>
                         </div>
                       )}
-
-                      {/* Floating Emoji & WhatsApp Options Bar */}
-                      <AnimatePresence>
-                        {activeReactionMenuMsgId === m.id && !isDeletedAll && (
-                          <motion.div
-                            initial={{ opacity: 0, scale: 0.8, y: -4 }}
-                            animate={{ opacity: 1, scale: 1, y: -8 }}
-                            exit={{ opacity: 0, scale: 0.8, y: -4 }}
-                            transition={{ type: 'spring', damping: 22, stiffness: 350 }}
-                            className={`absolute z-30 flex flex-col gap-1.5 ${
-                              index === 0 ? 'top-full mt-2' : 'bottom-full mb-2'
-                            } ${isMine ? 'right-0 items-end' : 'left-0 items-start'}`}
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {/* Emoji Row */}
-                            <div className="flex items-center gap-1 rounded-full border border-line/80 bg-white/95 px-2 py-1 shadow-lg backdrop-blur-md">
-                              {CHAT_EMOJIS.map((em) => {
-                                const hasReacted = msgReactions.some(
-                                  (r) => r.emoji === em.key && r.users.includes(me)
-                                );
-                                return (
-                                  <button
-                                    key={em.key}
-                                    type="button"
-                                    onClick={() => handleReactionSelect(m.id, em.key)}
-                                    className={`flex h-7 w-7 items-center justify-center rounded-full transition-transform active:scale-130 hover:scale-120 ${
-                                      hasReacted
-                                        ? 'bg-primary/20 ring-2 ring-primary'
-                                        : 'hover:bg-black/5'
-                                    }`}
-                                    title={em.label}
-                                  >
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img
-                                      src={em.file}
-                                      alt={em.label}
-                                      className="h-5 w-5 object-contain pointer-events-none"
-                                    />
-                                  </button>
-                                );
-                              })}
-                              {m.id > 0 && (
-                                <>
-                                  <span className="mx-0.5 h-4 w-[1px] bg-line" aria-hidden />
-                                  <button
-                                    type="button"
-                                    onClick={() => startReply(m)}
-                                    aria-label="Reply to message"
-                                    title="Reply"
-                                    className="flex h-7 items-center gap-1 rounded-full px-2 text-[11px] font-bold text-primary transition hover:bg-primary/10 active:scale-95"
-                                  >
-                                    <span>↩</span>
-                                    <span>Reply</span>
-                                  </button>
-                                </>
-                              )}
-                            </div>
-
-                            {/* WhatsApp Message Action Pills */}
-                            {m.id > 0 && (
-                              <div className="flex flex-wrap items-center gap-1 rounded-2xl border border-line/80 bg-white/95 px-2 py-1 shadow-lg backdrop-blur-md text-[11px] font-bold text-ink">
-                                <button
-                                  type="button"
-                                  onClick={() => handleCopyMessage(m)}
-                                  className="rounded-lg px-2 py-1 hover:bg-surface-alt active:scale-95"
-                                >
-                                  📋 Copy
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setActiveReactionMenuMsgId(null);
-                                    setForwardModalMsg(m);
-                                  }}
-                                  className="rounded-lg px-2 py-1 hover:bg-surface-alt active:scale-95"
-                                >
-                                  ↗ Forward
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleToggleStar(m)}
-                                  className="rounded-lg px-2 py-1 hover:bg-surface-alt active:scale-95"
-                                >
-                                  {isStarred ? '★ Unstar' : '⭐ Star'}
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleTogglePin(m)}
-                                  className="rounded-lg px-2 py-1 hover:bg-surface-alt active:scale-95"
-                                >
-                                  {pinnedMessageId === m.id ? '📌 Unpin' : '📌 Pin'}
-                                </button>
-                                {canEdit && (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setActiveReactionMenuMsgId(null);
-                                      setEditModalMsg(m);
-                                    }}
-                                    className="rounded-lg px-2 py-1 hover:bg-surface-alt active:scale-95"
-                                  >
-                                    ✏️ Edit
-                                  </button>
-                                )}
-                                {isMine && (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setActiveReactionMenuMsgId(null);
-                                      setInfoModalMsg(m);
-                                    }}
-                                    className="rounded-lg px-2 py-1 hover:bg-surface-alt active:scale-95"
-                                  >
-                                    ℹ️ Info
-                                  </button>
-                                )}
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setActiveReactionMenuMsgId(null);
-                                    setDeleteModalMsg(m);
-                                  }}
-                                  className="rounded-lg px-2 py-1 text-danger hover:bg-danger/10 active:scale-95"
-                                >
-                                  🗑️ Delete
-                                </button>
-                              </div>
-                            )}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
 
                       <motion.div
                         drag={m.id > 0 && !isDeletedAll ? 'x' : false}
@@ -1412,7 +1314,7 @@ export function ChatThread({
                       )}
                     </div>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
 
@@ -1692,6 +1594,166 @@ export function ChatThread({
           data={otherProfilePreview}
         />
       )}
+
+      {/* ── WhatsApp Message Context Overlay (Never Covered by Chat) ── */}
+      <AnimatePresence>
+        {activeReactionMenuMsgId !== null &&
+          messagesById.get(activeReactionMenuMsgId) &&
+          !deletedForAll.includes(activeReactionMenuMsgId) && (() => {
+            const activeMsg = messagesById.get(activeReactionMenuMsgId)!;
+            const activeIsMine = activeMsg.sender_id === me;
+            const activeReactions = reactions[activeMsg.id] || [];
+            const activeIsStarred = starredIds.includes(activeMsg.id);
+            const activeCanEdit =
+              activeIsMine &&
+              activeMsg.id > 0 &&
+              Date.now() - new Date(activeMsg.created_at).getTime() <= 15 * 60 * 1000;
+
+            return (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                onClick={() => setActiveReactionMenuMsgId(null)}
+                className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/30 p-4 backdrop-blur-[2px]"
+              >
+                <motion.div
+                  initial={{ scale: 0.92, y: 12, opacity: 0 }}
+                  animate={{ scale: 1, y: 0, opacity: 1 }}
+                  exit={{ scale: 0.92, y: 12, opacity: 0 }}
+                  transition={{ type: 'spring', damping: 24, stiffness: 320 }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex w-full max-w-[340px] flex-col gap-2.5"
+                >
+                  {/* Emoji Reaction Bar */}
+                  <div className="flex items-center justify-between gap-1 rounded-full border border-line/80 bg-surface px-2.5 py-1.5 shadow-xl">
+                    {CHAT_EMOJIS.map((em) => {
+                      const hasReacted = activeReactions.some(
+                        (r) => r.emoji === em.key && r.users.includes(me)
+                      );
+                      return (
+                        <button
+                          key={em.key}
+                          type="button"
+                          onClick={() => handleReactionSelect(activeMsg.id, em.key)}
+                          className={`flex h-8 w-8 items-center justify-center rounded-full transition-transform active:scale-125 hover:scale-115 ${
+                            hasReacted ? 'bg-primary/20 ring-2 ring-primary' : 'hover:bg-surface-alt'
+                          }`}
+                          title={em.label}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={em.file}
+                            alt={em.label}
+                            className="h-5.5 w-5.5 object-contain pointer-events-none"
+                          />
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Selected Message Preview */}
+                  <div
+                    className={`rounded-2xl px-4 py-2.5 text-[14.5px] leading-relaxed shadow-lg ${
+                      activeIsMine
+                        ? 'bg-primary text-on-primary font-medium'
+                        : 'border border-line bg-surface text-ink'
+                    }`}
+                  >
+                    <p className="line-clamp-4 whitespace-pre-wrap break-words">{activeMsg.body}</p>
+                  </div>
+
+                  {/* WhatsApp Action Sheet */}
+                  {activeMsg.id > 0 && (
+                    <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-xl divide-y divide-line/60 text-[14px] font-semibold text-ink">
+                      <button
+                        type="button"
+                        onClick={() => startReply(activeMsg)}
+                        className="flex w-full items-center justify-between px-4 py-3 hover:bg-surface-alt active:bg-surface-alt"
+                      >
+                        <span>Reply</span>
+                        <span className="text-primary">↩</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyMessage(activeMsg)}
+                        className="flex w-full items-center justify-between px-4 py-3 hover:bg-surface-alt active:bg-surface-alt"
+                      >
+                        <span>Copy</span>
+                        <span>📋</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveReactionMenuMsgId(null);
+                          setForwardModalMsg(activeMsg);
+                        }}
+                        className="flex w-full items-center justify-between px-4 py-3 hover:bg-surface-alt active:bg-surface-alt"
+                      >
+                        <span>Forward / Share</span>
+                        <span>↗</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleStar(activeMsg)}
+                        className="flex w-full items-center justify-between px-4 py-3 hover:bg-surface-alt active:bg-surface-alt"
+                      >
+                        <span>{activeIsStarred ? 'Unstar' : 'Star'}</span>
+                        <span>{activeIsStarred ? '★' : '⭐'}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleTogglePin(activeMsg)}
+                        className="flex w-full items-center justify-between px-4 py-3 hover:bg-surface-alt active:bg-surface-alt"
+                      >
+                        <span>{pinnedMessageId === activeMsg.id ? 'Unpin' : 'Pin'}</span>
+                        <span>📌</span>
+                      </button>
+                      {activeCanEdit && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveReactionMenuMsgId(null);
+                            setEditModalMsg(activeMsg);
+                          }}
+                          className="flex w-full items-center justify-between px-4 py-3 hover:bg-surface-alt active:bg-surface-alt"
+                        >
+                          <span>Edit</span>
+                          <span>✏️</span>
+                        </button>
+                      )}
+                      {activeIsMine && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveReactionMenuMsgId(null);
+                            setInfoModalMsg(activeMsg);
+                          }}
+                          className="flex w-full items-center justify-between px-4 py-3 hover:bg-surface-alt active:bg-surface-alt"
+                        >
+                          <span>Message Info</span>
+                          <span>ℹ️</span>
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveReactionMenuMsgId(null);
+                          setDeleteModalMsg(activeMsg);
+                        }}
+                        className="flex w-full items-center justify-between px-4 py-3 text-danger hover:bg-danger/10 active:bg-danger/10"
+                      >
+                        <span>Delete</span>
+                        <span>🗑️</span>
+                      </button>
+                    </div>
+                  )}
+                </motion.div>
+              </motion.div>
+            );
+          })()}
+      </AnimatePresence>
 
       {/* ── WhatsApp Message & Chat Modals ── */}
       <DeleteMessageModal

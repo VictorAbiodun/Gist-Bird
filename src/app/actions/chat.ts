@@ -40,18 +40,18 @@ export async function sendMessage(input: {
     } = await client.auth.getUser();
 
     if (user) {
-      if (parsed.data.replyToId) {
-        const { data: latestMsg } = await admin
-          .from('messages')
-          .select('id')
-          .eq('chat_id', parsed.data.chatId)
-          .eq('sender_id', user.id)
-          .order('id', { ascending: false })
-          .limit(1)
-          .maybeSingle();
+      const { data: latestMsg } = await admin
+        .from('messages')
+        .select('id')
+        .eq('chat_id', parsed.data.chatId)
+        .eq('sender_id', user.id)
+        .order('id', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-        if (latestMsg?.id) {
-          insertedMessageId = Number(latestMsg.id);
+      if (latestMsg?.id) {
+        insertedMessageId = Number(latestMsg.id);
+        if (parsed.data.replyToId) {
           await admin.from('notifications').insert({
             user_id: user.id,
             kind: 'message_reply',

@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Avatar, Chip } from './ui';
+import { Avatar } from './ui';
 import { Icon } from './Icon';
 import { DailyRewardModal } from './DailyRewardModal';
+import { ProfilePreviewModal } from './ProfilePreviewModal';
 import type { Profile } from '@/lib/types';
 import type { RewardStatus } from '@/lib/rewards';
 import type { BirdStats } from '@/lib/bird';
@@ -308,70 +309,28 @@ export function ProfileView({
       />
 
       {/* ── Profile Preview Modal ── */}
-      {previewOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Profile preview"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-5 backdrop-blur-[2px]"
-          onClick={() => setPreviewOpen(false)}
-        >
-          <div
-            className="w-full max-w-[360px] rounded-[24px] border border-line bg-[#FAF7F0] p-5 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between pb-3 border-b border-line">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted">
-                How others see you
-              </p>
-              <button
-                type="button"
-                onClick={() => setPreviewOpen(false)}
-                className="text-label font-bold text-muted hover:text-ink"
-              >
-                Close ✕
-              </button>
-            </div>
-
-            <div className="mt-4 flex items-center gap-3">
-              <Avatar
-                name={profile.display_name}
-                scarf={profile.scarf}
-                avatar={displayAvatar}
-                size={56}
-              />
-              <div>
-                <h2 className="font-display text-[19px] font-bold text-ink">
-                  {profile.display_name}
-                </h2>
-                <p className="flex items-center gap-1 text-caption font-semibold text-muted">
-                  <Icon name="map" size={14} />
-                  <span>{profile.university ? `${profile.university} · ${spotName}` : spotName}</span>
-                </p>
-              </div>
-            </div>
-
-            {profile.interests.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-1.5">
-                {profile.interests.map((interest) => (
-                  <Chip key={interest}>{interest}</Chip>
-                ))}
-              </div>
-            )}
-
-            {profile.starter_prompt && (
-              <div className="mt-4 rounded-[14px] border border-line bg-surface p-3">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted">
-                  Conversation starter
-                </p>
-                <p className="mt-1 text-label italic text-ink">
-                  &ldquo;{profile.starter_prompt}&rdquo;
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <ProfilePreviewModal
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        data={{
+          displayName: profile.display_name,
+          userTag: profile.user_tag,
+          avatar: profile.avatar,
+          photoUrl: profile.photo_url,
+          scarf: profile.scarf,
+          university: profile.university,
+          country: profile.country,
+          age: profile.age,
+          gender: profile.gender,
+          bio: profile.starter_prompt,
+          interests: profile.interests,
+          spotName,
+          xp: birdStats.xp,
+          streak,
+          papersSent: papersSentCount,
+          isOwnProfile: true,
+        }}
+      />
     </main>
   );
 }

@@ -1,22 +1,27 @@
 'use client';
-import { useState, useTransition } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, Chip, Field, inputCls, Notice, Header } from './ui';
 import { CampusMap } from './CampusMap';
+import { UniversityLogo } from './UniversityLogo';
+import { DateOfBirthWheelPicker, ScrollWheelPicker } from './ScrollWheelPicker';
 import { INTERESTS, randomAlias } from '@/lib/copy';
 import { SCARF_HEX, type Scarf } from '@/lib/types';
 import { getSpot } from '@/lib/campus';
+import { NIGERIAN_UNIVERSITIES, formatAgeDob } from '@/lib/universities';
 import { finishOnboarding, saveProfile, type ProfileInput } from '@/app/actions/profile';
 import { AVATAR_LIST } from '@/lib/assets';
 import { Icon } from './Icon';
 
-const STEPS = ['name', 'interests', 'spot', 'starter'] as const;
+const STEPS = ['name', 'university', 'dob', 'interests', 'spot', 'starter'] as const;
+const GENDERS = ['Male', 'Female', 'Non-binary', 'Prefer not to say'];
 
 export function ProfileWizard({ initial, mode = 'onboarding' }: { initial?: Partial<ProfileInput>; mode?: 'onboarding' | 'edit' }) {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [pending, start] = useTransition();
   const [error, setError] = useState<string>();
+  const [uniSearch, setUniSearch] = useState('');
   const [v, setV] = useState<ProfileInput>({
     displayName: initial?.displayName ?? '',
     nameMode: initial?.nameMode ?? 'real',
@@ -26,10 +31,36 @@ export function ProfileWizard({ initial, mode = 'onboarding' }: { initial?: Part
     interests: initial?.interests ?? [],
     spot: initial?.spot ?? null,
     starter: initial?.starter ?? '',
+    university: initial?.university ?? NIGERIAN_UNIVERSITIES[0].name,
+    country: initial?.country ?? 'Nigeria',
+    age: initial?.age ?? formatAgeDob(15, 6, 2005),
+    gender: initial?.gender ?? 'Prefer not to say',
   });
   const set = <K extends keyof ProfileInput>(k: K, val: ProfileInput[K]) => setV((p) => ({ ...p, [k]: val }));
 
-  const valid = [v.displayName.trim().length >= 2, true, !!v.spot, true][step];
+  const uniOptions = useMemo(() => {
+    const q = uniSearch.trim().toLowerCase();
+    const list = q
+      ? NIGERIAN_UNIVERSITIES.filter(
+          (u) => u.name.toLowerCase().includes(q) || u.shortName.toLowerCase().includes(q)
+        )
+      : NIGERIAN_UNIVERSITIES;
+    return list.map((u) => ({
+      value: u.name,
+      label: u.name,
+      sublabel: u.type,
+      icon: <UniversityLogo university={u} size={20} />,
+    }));
+  }, [uniSearch]);
+
+  const valid = [
+    v.displayName.trim().length >= 2,
+    Boolean(v.university && v.university.trim().length > 0),
+    Boolean(v.age && v.age.trim().length > 0),
+    true,
+    !!v.spot,
+    true,
+  ][step];
   const last = step === STEPS.length - 1;
 
   function doSave() {
@@ -164,6 +195,55 @@ export function ProfileWizard({ initial, mode = 'onboarding' }: { initial?: Part
         )}
         {step === 1 && (
           <>
+            <h1 className="text-[28px] leading-[34px]">Which university are you in?</h1>
+            <p className="text-muted">Scroll through Nigerian universities or search to pick yours.</p>
+            <input
+              value={uniSearch}
+              onChange={(e) => setUniSearch(e.target.value)}
+              placeholder="Search university (e.g. Redeemer's, Covenant, UNILAG)…"
+              className={`${inputCls()} h-[46px] text-[14px]`}
+            />
+            {uniOptions.length > 0 ? (
+              <ScrollWheelPicker
+                options={uniOptions}
+                value={v.university || uniOptions[0].value}
+                onChange={(val) => set('university', val)}
+                visibleCount={5}
+                itemHeight={48}
+              />
+            ) : (
+              <Notice tone="info" title="No match">
+                Try another search term or clear the search box.
+              </Notice>
+            )}
+          </>
+        )}
+        {step === 2 && (
+          <>
+            <h1 className="text-[28px] leading-[34px]">When&apos;s your birthday?</h1>
+            <p className="text-muted">Spin the wheels to set your date of birth and age.</p>
+            <DateOfBirthWheelPicker
+              initialAgeStr={v.age}
+              onChange={(val) => set('age', val)}
+            />
+            <fieldset className="pt-2">
+              <legend className="mb-2 text-label font-semibold text-muted">Gender</legend>
+              <div className="grid grid-cols-2 gap-2">
+                {GENDERS.map((g) => (
+                  <Chip
+                    key={g}
+                    selected={v.gender === g}
+                    onClick={() => set('gender', g)}
+                  >
+                    {g}
+                  </Chip>
+                ))}
+              </div>
+            </fieldset>
+          </>
+        )}
+        {step === 3 && (
+          <>
             <h1 className="text-[28px] leading-[34px]">Pick up to 5 interests</h1>
             <p className="inline-flex rounded-full bg-lemon px-3 py-1.5 text-label font-bold">{v.interests.length} of 5</p>
             <div className="flex flex-wrap gap-2.5">
@@ -174,7 +254,7 @@ export function ProfileWizard({ initial, mode = 'onboarding' }: { initial?: Part
             </div>
           </>
         )}
-        {step === 2 && (
+        {step === 4 && (
           <>
             <h1 className="text-[28px] leading-[34px]">Pick a favourite spot</h1>
             <CampusMap selected={v.spot} onSelect={(id) => set('spot', id)} label="Tap a spot to pick it" />
@@ -184,7 +264,7 @@ export function ProfileWizard({ initial, mode = 'onboarding' }: { initial?: Part
             </div>
           </>
         )}
-        {step === 3 && (
+        {step === 5 && (
           <>
             <h1 className="text-[28px] leading-[34px]">Add a conversation starter</h1>
             <p className="text-muted">Optional. It helps people say more than &quot;hi&quot;.</p>
@@ -217,7 +297,7 @@ export function ProfileWizard({ initial, mode = 'onboarding' }: { initial?: Part
             ? 'Next step'
             : 'Continue'}
         </Button>
-        {step === 3 && <Button variant="ghost" className="w-full" disabled={pending} onClick={() => { set('starter', ''); next(); }}>Skip for now</Button>}
+        {last && <Button variant="ghost" className="w-full" disabled={pending} onClick={() => { set('starter', ''); next(); }}>Skip for now</Button>}
       </div>
     </div>
   );

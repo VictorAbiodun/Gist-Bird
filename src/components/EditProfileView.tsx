@@ -1,14 +1,18 @@
 'use client';
 
-import { useRef, useState, useTransition } from 'react';
+import { useMemo, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Avatar, Button, Chip, inputCls, Notice } from './ui';
 import { Icon } from './Icon';
 import { CampusMap } from './CampusMap';
+import { UniversityLogo } from './UniversityLogo';
+import { DateOfBirthWheelPicker, ScrollWheelPicker } from './ScrollWheelPicker';
+import { ProfilePreviewModal } from './ProfilePreviewModal';
 import { AVATAR_LIST } from '@/lib/assets';
 import { INTERESTS } from '@/lib/copy';
 import { getSpot } from '@/lib/campus';
+import { NIGERIAN_UNIVERSITIES } from '@/lib/universities';
 import { SCARF_HEX, type Profile, type Scarf } from '@/lib/types';
 import { saveProfile, type ProfileInput } from '@/app/actions/profile';
 
@@ -36,6 +40,24 @@ export function EditProfileView({ profile }: { profile: Profile }) {
   const [savedToast, setSavedToast] = useState(false);
   const [activeField, setActiveField] = useState<EditField>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [uniQuery, setUniQuery] = useState('');
+
+  const uniOptions = useMemo(() => {
+    const q = uniQuery.trim().toLowerCase();
+    const list = q
+      ? NIGERIAN_UNIVERSITIES.filter(
+          (u) =>
+            u.name.toLowerCase().includes(q) ||
+            u.shortName.toLowerCase().includes(q)
+        )
+      : NIGERIAN_UNIVERSITIES;
+    return list.map((u) => ({
+      value: u.name,
+      label: u.name,
+      sublabel: u.type,
+      icon: <UniversityLogo university={u} size={20} />,
+    }));
+  }, [uniQuery]);
 
   const defaultTag =
     profile.user_tag ||
@@ -114,7 +136,6 @@ export function EditProfileView({ profile }: { profile: Profile }) {
   };
 
   const spotName = getSpot(form.spot)?.name ?? 'Not set';
-  const displayAvatar = form.photoUrl || form.avatar;
 
   return (
     <main className="min-h-dvh bg-[#F4F8FB] pb-10">
@@ -248,8 +269,9 @@ export function EditProfileView({ profile }: { profile: Profile }) {
           >
             <div className="min-w-0 flex-1">
               <p className="font-display text-[15px] font-bold text-ink">University name</p>
-              <p className="mt-1 truncate text-[13px] italic text-muted">
-                {form.university || 'Add your university…'}
+              <p className="mt-1 flex items-center gap-1.5 truncate text-[13px] italic text-muted">
+                {form.university && <UniversityLogo university={form.university} size={16} />}
+                <span className="truncate">{form.university || 'Add your university…'}</span>
               </p>
             </div>
             <Icon name="chev" size={18} className="shrink-0 text-muted" />
@@ -434,13 +456,27 @@ export function EditProfileView({ profile }: { profile: Profile }) {
             )}
 
             {activeField === 'university' && (
-              <input
-                value={draft.university ?? ''}
-                onChange={(e) => setDraft((d) => ({ ...d, university: e.target.value }))}
-                maxLength={80}
-                placeholder="e.g. Redeemer's University"
-                className={`${inputCls()} h-[50px]`}
-              />
+              <div className="space-y-3">
+                <input
+                  value={uniQuery}
+                  onChange={(e) => setUniQuery(e.target.value)}
+                  placeholder="Search Nigerian university…"
+                  className={`${inputCls()} h-[44px] text-[14px]`}
+                />
+                {uniOptions.length > 0 ? (
+                  <ScrollWheelPicker
+                    options={uniOptions}
+                    value={draft.university || uniOptions[0].value}
+                    onChange={(val) => setDraft((d) => ({ ...d, university: val }))}
+                    visibleCount={5}
+                    itemHeight={48}
+                  />
+                ) : (
+                  <p className="py-6 text-center text-label text-muted">
+                    No matching university found.
+                  </p>
+                )}
+              </div>
             )}
 
             {activeField === 'country' && (
@@ -454,12 +490,9 @@ export function EditProfileView({ profile }: { profile: Profile }) {
             )}
 
             {activeField === 'age' && (
-              <input
-                value={draft.age ?? ''}
-                onChange={(e) => setDraft((d) => ({ ...d, age: e.target.value }))}
-                maxLength={30}
-                placeholder="e.g. 20 (28/03/2006)"
-                className={`${inputCls()} h-[50px]`}
+              <DateOfBirthWheelPicker
+                initialAgeStr={draft.age}
+                onChange={(val) => setDraft((d) => ({ ...d, age: val }))}
               />
             )}
 
@@ -521,66 +554,25 @@ export function EditProfileView({ profile }: { profile: Profile }) {
       )}
 
       {/* ── Profile Preview Modal ── */}
-      {previewOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Profile preview"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-5 backdrop-blur-[2px]"
-          onClick={() => setPreviewOpen(false)}
-        >
-          <div
-            className="w-full max-w-[360px] rounded-[24px] border border-line bg-[#FAF7F0] p-5 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between border-b border-line pb-3">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted">
-                Profile Preview
-              </p>
-              <button
-                type="button"
-                onClick={() => setPreviewOpen(false)}
-                className="text-label font-bold text-muted hover:text-ink"
-              >
-                Close ✕
-              </button>
-            </div>
-
-            <div className="mt-4 flex items-center gap-3">
-              <Avatar
-                name={form.displayName}
-                scarf={form.scarf}
-                avatar={displayAvatar}
-                size={56}
-              />
-              <div>
-                <h2 className="font-display text-[19px] font-bold text-ink">
-                  {form.displayName}
-                </h2>
-                <p className="text-caption font-semibold text-muted">
-                  @{form.userTag || defaultTag}
-                  {form.university ? ` · ${form.university}` : ''}
-                </p>
-              </div>
-            </div>
-
-            {form.interests.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-1.5">
-                {form.interests.map((interest) => (
-                  <Chip key={interest}>{interest}</Chip>
-                ))}
-              </div>
-            )}
-
-            {form.starter && (
-              <div className="mt-4 rounded-[14px] border border-line bg-surface p-3">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted">Bio</p>
-                <p className="mt-1 text-label italic text-ink">&ldquo;{form.starter}&rdquo;</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <ProfilePreviewModal
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        data={{
+          displayName: form.displayName,
+          userTag: form.userTag,
+          avatar: form.avatar,
+          photoUrl: form.photoUrl,
+          scarf: form.scarf,
+          university: form.university,
+          country: form.country,
+          age: form.age,
+          gender: form.gender,
+          bio: form.starter,
+          interests: form.interests,
+          spotName,
+          isOwnProfile: false,
+        }}
+      />
     </main>
   );
 }

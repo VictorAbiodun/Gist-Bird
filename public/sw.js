@@ -1,6 +1,6 @@
 // Service Worker for Gist Bird — lightweight client cache for phones & PWA
-const CACHE_NAME = 'gist-bird-v3';
-const PAGE_CACHE = 'gist-bird-pages-v3';
+const CACHE_NAME = 'gist-bird-v4';
+const PAGE_CACHE = 'gist-bird-pages-v4';
 
 const STALE_WHILE_REVALIDATE_PATHS = ['/home', '/sent', '/chats', '/me', '/map', '/rules', '/notifications'];
 
@@ -11,6 +11,13 @@ const PRECACHE_URLS = [
   '/icons/bird-typing.svg',
   '/icons/paper.png',
   '/icons/map.png',
+  '/emojis/heart.svg',
+  '/emojis/laugh.svg',
+  '/emojis/shock.svg',
+  '/emojis/cry.svg',
+  '/emojis/shy.svg',
+  '/emojis/side-eye.svg',
+  '/emojis/moon.svg',
   '/mascot/wave.jpg',
   '/mascot/cool.jpg',
   '/mascot/curious.jpg',
@@ -47,6 +54,7 @@ self.addEventListener('fetch', (event) => {
     url.pathname.startsWith('/avatars/') ||
     url.pathname.startsWith('/icons/') ||
     url.pathname.startsWith('/crests/') ||
+    url.pathname.startsWith('/emojis/') ||
     url.pathname.startsWith('/images/') ||
     url.pathname.startsWith('/assets/')
   ) {

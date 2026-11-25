@@ -44,4 +44,11 @@
 - **Enriched Inbox & Letter Crest**: Author's university metadata attached to unaccepted papers; `CinematicLetterReader` displays the author's official university name and local NARR crest logo.
 - **Blue Read Receipts**: Double checkmark turns WhatsApp Blue (`#34B7F1`) when the other person opens the chat window or views incoming messages, powered by Realtime broadcast + database receipt synchronization.
 
+### Phase 9: Custom Bird Message Reactions
+- **7 Vector Bird Emojis**: Added Heart, Laugh, Shock, Cry, Shy, Side-eye, and Shy Moon vector SVGs in `public/emojis/`.
+- **Floating WhatsApp-Style Reaction Bar**: Tap any message bubble to trigger a floating reaction bar with spring pop animation.
+- **Docked Reaction Badges**: Displayed beneath message bubbles with aggregate count, primary highlight for personal reaction, and tap-to-toggle.
+- **Real-Time Synchronized**: Realtime broadcast across clients with database persistence via `toggleMessageReaction`.
+
+
 

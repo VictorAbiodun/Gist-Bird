@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32">
+  <defs>
+    <radialGradient id="emCryHead" cx="38%" cy="32%" r="68%">
+      <stop offset="0%" stop-color="#A8B8CA" />
+      <stop offset="100%" stop-color="#7F91A6" />
+    </radialGradient>
+    <linearGradient id="emCryStream" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#B8ECFF" />
+      <stop offset="100%" stop-color="#2FA8FF" />
+    </linearGradient>
+    <clipPath id="emCryClip">
+      <circle cx="32" cy="33" r="24" />
+    </clipPath>
+  </defs>
+  <g stroke="#23272D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    
+    <circle cx="32" cy="33" r="24" fill="url(#emCryHead)" />
+    
+    <g clip-path="url(#emCryClip)">
+      <path d="M17 29 L26 29 L24 58 L15 58 Z" fill="url(#emCryStream)" stroke="none" opacity="0.9" />
+      <path d="M38 29 L47 29 L49 58 L40 58 Z" fill="url(#emCryStream)" stroke="none" opacity="0.9" />
+      <line x1="20" y1="33" x2="19" y2="54" stroke="#FFFFFF" stroke-width="1.8" opacity="0.65" />
+      <line x1="44" y1="33" x2="45" y2="54" stroke="#FFFFFF" stroke-width="1.8" opacity="0.65" />
+    </g>
+    
+    <circle cx="32" cy="33" r="24" fill="none" />
+    
+    <path d="M16 23 Q21 22 25 18" fill="none" stroke-width="2.4" />
+    <path d="M48 23 Q43 22 39 18" fill="none" stroke-width="2.4" />
+    
+    <path d="M16 29 Q21.5 32 26.5 28" fill="none" stroke-width="3.2" />
+    <path d="M37.5 28 Q42.5 32 48 29" fill="none" stroke-width="3.2" />
+    
+    <path d="M25 46 C26 36 38 36 39 46 Z" fill="#FF8C24" />
+    <path d="M27.5 45 C28.5 39 35.5 39 36.5 45 Z" fill="#6E1E19" stroke="none" />
+    <path d="M24 41 Q32 34 40 41 Q32 39 24 41 Z" fill="#FF9F38" />
+  </g>
+</svg>

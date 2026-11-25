@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32">
+  <defs>
+    <radialGradient id="emHeartGrad" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#FF7082" />
+      <stop offset="55%" stop-color="#F2384E" />
+      <stop offset="100%" stop-color="#C41B31" />
+    </radialGradient>
+  </defs>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 54 C32 54 8 40 8 23 C8 14.5 14.5 9 22 9 C26.8 9 30.2 11.6 32 15.2 C33.8 11.6 37.2 9 42 9 C49.5 9 56 14.5 56 23 C56 40 32 54 32 54 Z" fill="url(#emHeartGrad)" stroke="#7A1120" stroke-width="3.2" />
+    
+    <path d="M16 22 C16 17.5 19 15 23 15" fill="none" stroke="#FFFFFF" stroke-width="3.2" opacity="0.7" />
+    <circle cx="16.5" cy="28" r="1.8" fill="#FFFFFF" opacity="0.65" />
+  </g>
+</svg>

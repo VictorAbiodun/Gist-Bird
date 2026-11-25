@@ -10,6 +10,8 @@ export interface PaperView {
 export interface ChatRow { id: string; other_id: string; other_name: string; other_scarf: Scarf; other_avatar?: string; last: string | null; last_at: string }
 export interface ChatView { id: string; other_id: string; other_name: string; other_scarf: Scarf; other_avatar?: string; other_interests: string[]; other_starter: string | null; paper_body: string; blocked: boolean; me: string }
 export interface Message { id: number; chat_id: string; sender_id: string; body: string; created_at: string }
+export interface MessageReactionGroup { emoji: string; users: string[] }
+export type MessageReactionsMap = Record<number, MessageReactionGroup[]>;
 export interface Notice { id: string; kind: string; title: string; body: string | null; data: Record<string, string>; read_at: string | null; created_at: string }
 export interface Profile {
   id: string;

@@ -2,7 +2,7 @@ import 'server-only';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { FINITE_ECONOMY_CUTOFF, getLagosDateString, INITIAL_FREE_PAPERS, type RewardStatus } from '@/lib/rewards';
-import type { ChatRow, ChatView, InboxItem, Notice, PaperView, Profile, SentItem } from '@/lib/types';
+import type { ChatRow, ChatView, InboxItem, Notice, PaperView, Profile, SentItem, MessageReactionsMap } from '@/lib/types';
 
 async function rpc<T>(name: string, args?: Record<string, unknown>, fallback?: T): Promise<T> {
   const { data, error } = await createClient().rpc(name, args);
@@ -68,6 +68,39 @@ export async function getChatReadReceipt(chatId: string, otherId: string): Promi
     return null;
   }
 }
+
+export async function getMessageReactions(chatId: string): Promise<MessageReactionsMap> {
+  try {
+    const admin = createAdminClient();
+    const { data } = await admin
+      .from('notifications')
+      .select('user_id, data')
+      .eq('kind', 'message_reaction')
+      .filter('data->>chat_id', 'eq', chatId);
+
+    const map: MessageReactionsMap = {};
+    for (const row of data || []) {
+      const d = row.data as Record<string, unknown> | undefined;
+      const msgId = Number(d?.message_id);
+      const emoji = typeof d?.emoji === 'string' ? d.emoji : '';
+      const userId = typeof row.user_id === 'string' ? row.user_id : '';
+      if (!msgId || !emoji || !userId) continue;
+
+      if (!map[msgId]) map[msgId] = [];
+      const existing = map[msgId].find((r) => r.emoji === emoji);
+      if (existing) {
+        if (!existing.users.includes(userId)) existing.users.push(userId);
+      } else {
+        map[msgId].push({ emoji, users: [userId] });
+      }
+    }
+    return map;
+  } catch (err) {
+    console.warn('Failed to fetch reactions:', err);
+    return {};
+  }
+}
+
 
 export const getSent = () => rpc<SentItem[]>('get_sent', undefined, []);
 export const getPaper = (id: string) => rpc<PaperView | null>('get_paper', { p_id: id }, null);

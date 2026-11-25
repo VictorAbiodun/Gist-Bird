@@ -7,11 +7,12 @@ import { createClient } from '@/lib/supabase/client';
 import { Avatar, Notice } from './ui';
 import { STARTERS, CONTACT_UNLOCK_MESSAGES } from '@/lib/copy';
 import { CONTACT_NOTICE, hasContactInfo } from '@/lib/contentFilter';
-import { sendMessage, markChatRead } from '@/app/actions/chat';
+import { sendMessage, markChatRead, toggleMessageReaction } from '@/app/actions/chat';
 import { Icon } from './Icon';
 import BirdTypingAnimation from './BirdTypingAnimation';
 import { formatMessageTime, formatDateDivider } from '@/lib/date';
-import type { Message, Scarf } from '@/lib/types';
+import { CHAT_EMOJIS, getEmoji } from '@/lib/emojis';
+import type { Message, Scarf, MessageReactionsMap } from '@/lib/types';
 
 interface ChatThreadProps {
   chatId: string;
@@ -24,6 +25,7 @@ interface ChatThreadProps {
   paperBody: string;
   blocked?: boolean;
   initialOtherLastReadAt?: string | null;
+  initialReactions?: MessageReactionsMap;
 }
 
 export function ChatThread({
@@ -37,6 +39,7 @@ export function ChatThread({
   paperBody,
   blocked: isBlocked = false,
   initialOtherLastReadAt = null,
+  initialReactions = {},
 }: ChatThreadProps) {
   const [messages, setMessages] = useState<Message[]>(initial);
   const [text, setText] = useState('');
@@ -45,6 +48,8 @@ export function ChatThread({
   const [viewportHeight, setViewportHeight] = useState<number | null>(null);
   const [otherTyping, setOtherTyping] = useState(false);
   const [otherLastReadAt, setOtherLastReadAt] = useState<string | null>(initialOtherLastReadAt);
+  const [reactions, setReactions] = useState<MessageReactionsMap>(initialReactions);
+  const [activeReactionMenuMsgId, setActiveReactionMenuMsgId] = useState<number | null>(null);
   const [pending, start] = useTransition();
 
   const bottom = useRef<HTMLDivElement>(null);
@@ -118,6 +123,35 @@ export function ChatThread({
         if (!payload || payload.readerId === me || !payload.readAt) return;
         setOtherLastReadAt(payload.readAt);
       })
+      .on('broadcast', { event: 'reaction_broadcast' }, ({ payload }) => {
+        if (!payload || !payload.messageId || !payload.emoji || !payload.userId) return;
+        const { messageId, emoji, userId, action } = payload;
+        setReactions((prev) => {
+          const list = (prev[messageId] ? [...prev[messageId]] : []).map((r) => ({
+            ...r,
+            users: [...r.users],
+          }));
+
+          if (action === 'remove') {
+            const idx = list.findIndex((r) => r.emoji === emoji);
+            if (idx >= 0) {
+              list[idx].users = list[idx].users.filter((u) => u !== userId);
+              if (list[idx].users.length === 0) list.splice(idx, 1);
+            }
+          } else {
+            for (const r of list) {
+              r.users = r.users.filter((u) => u !== userId);
+            }
+            const target = list.find((r) => r.emoji === emoji);
+            if (target) {
+              if (!target.users.includes(userId)) target.users.push(userId);
+            } else {
+              list.push({ emoji, users: [userId] });
+            }
+          }
+          return { ...prev, [messageId]: list.filter((r) => r.users.length > 0) };
+        });
+      })
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
           dispatchRead();
@@ -146,6 +180,56 @@ export function ChatThread({
       event: 'typing',
       payload: { userId: me, isTyping },
     }).catch(() => {});
+  };
+
+  const handleReactionSelect = (messageId: number, emojiKey: string) => {
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      navigator.vibrate(10);
+    }
+    setActiveReactionMenuMsgId(null);
+
+    setReactions((prev) => {
+      const list = (prev[messageId] ? [...prev[messageId]] : []).map((r) => ({
+        ...r,
+        users: [...r.users],
+      }));
+      const alreadyReactedWithThis = list.some(
+        (r) => r.emoji === emojiKey && r.users.includes(me)
+      );
+
+      let action: 'add' | 'remove' = 'add';
+      if (alreadyReactedWithThis) {
+        action = 'remove';
+        const idx = list.findIndex((r) => r.emoji === emojiKey);
+        if (idx >= 0) {
+          list[idx].users = list[idx].users.filter((u) => u !== me);
+          if (list[idx].users.length === 0) list.splice(idx, 1);
+        }
+      } else {
+        action = 'add';
+        for (const r of list) {
+          r.users = r.users.filter((u) => u !== me);
+        }
+        const target = list.find((r) => r.emoji === emojiKey);
+        if (target) {
+          if (!target.users.includes(me)) target.users.push(me);
+        } else {
+          list.push({ emoji: emojiKey, users: [me] });
+        }
+      }
+
+      channelRef.current
+        ?.send({
+          type: 'broadcast',
+          event: 'reaction_broadcast',
+          payload: { messageId, emoji: emojiKey, userId: me, action },
+        })
+        .catch(() => {});
+
+      toggleMessageReaction({ chatId, messageId, emoji: emojiKey }).catch(() => {});
+
+      return { ...prev, [messageId]: list.filter((r) => r.users.length > 0) };
+    });
   };
 
   const handleTextChange = (val: string) => {
@@ -307,6 +391,7 @@ export function ChatThread({
           {/* ── Messages Stream ── */}
           <div
             ref={messagesContainerRef}
+            onClick={() => setActiveReactionMenuMsgId(null)}
             className="flex-1 space-y-2.5 overflow-y-auto px-4 py-3 overscroll-y-contain"
             aria-live="polite"
           >
@@ -321,6 +406,7 @@ export function ChatThread({
               const prevDate = index > 0 ? formatDateDivider(messages[index - 1].created_at) : null;
               const currentDate = formatDateDivider(m.created_at);
               const showDateDivider = index === 0 || prevDate !== currentDate;
+              const msgReactions = reactions[m.id] || [];
 
               return (
                 <div key={m.id} className="space-y-2">
@@ -334,65 +420,160 @@ export function ChatThread({
 
                   <div className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
                     <div
-                      className={`relative max-w-[82%] rounded-[18px] px-3.5 pt-2 pb-1.5 text-[15px] leading-relaxed shadow-xs ${
-                        isMine
-                          ? 'rounded-br-[4px] bg-primary text-on-primary font-medium'
-                          : 'rounded-bl-[4px] border border-line bg-surface text-ink'
+                      className={`group relative flex flex-col ${
+                        isMine ? 'items-end' : 'items-start'
                       }`}
                     >
-                      <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                      {/* Floating Emoji Bar */}
+                      <AnimatePresence>
+                        {activeReactionMenuMsgId === m.id && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.75, y: -4 }}
+                            animate={{ opacity: 1, scale: 1, y: -8 }}
+                            exit={{ opacity: 0, scale: 0.75, y: -4 }}
+                            transition={{ type: 'spring', damping: 22, stiffness: 350 }}
+                            className={`absolute -top-10 z-30 flex items-center gap-1.5 rounded-full border border-line/80 bg-white/95 px-2 py-1 shadow-lg backdrop-blur-md ${
+                              isMine ? 'right-0' : 'left-0'
+                            }`}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {CHAT_EMOJIS.map((em) => {
+                              const hasReacted = msgReactions.some(
+                                (r) => r.emoji === em.key && r.users.includes(me)
+                              );
+                              return (
+                                <button
+                                  key={em.key}
+                                  type="button"
+                                  onClick={() => handleReactionSelect(m.id, em.key)}
+                                  className={`flex h-7 w-7 items-center justify-center rounded-full transition-transform active:scale-130 hover:scale-120 ${
+                                    hasReacted
+                                      ? 'bg-primary/20 ring-2 ring-primary'
+                                      : 'hover:bg-black/5'
+                                  }`}
+                                  title={em.label}
+                                >
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img
+                                    src={em.file}
+                                    alt={em.label}
+                                    className="h-5 w-5 object-contain pointer-events-none"
+                                  />
+                                </button>
+                              );
+                            })}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
                       <div
-                        className={`mt-0.5 flex items-center justify-end gap-1 text-[10.5px] leading-none select-none ${
-                          isMine ? 'text-white/80' : 'text-muted'
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveReactionMenuMsgId((curr) => (curr === m.id ? null : m.id));
+                        }}
+                        className={`relative max-w-[82%] cursor-pointer rounded-[18px] px-3.5 pt-2 pb-1.5 text-[15px] leading-relaxed shadow-xs select-none active:scale-[0.99] transition-transform ${
+                          isMine
+                            ? 'rounded-br-[4px] bg-primary text-on-primary font-medium'
+                            : 'rounded-bl-[4px] border border-line bg-surface text-ink'
                         }`}
                       >
-                        <span suppressHydrationWarning>{formatMessageTime(m.created_at)}</span>
-                        {isMine &&
-                          (m.id < 0 ? (
-                            <svg
-                              className="h-2.5 w-2.5 text-white/70 animate-pulse"
-                              viewBox="0 0 16 16"
-                              fill="currentColor"
-                              aria-label="Sending"
-                            >
-                              <path d="M8 3.5a.5.5 0 0 0-1 0V8a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 7.71V3.5z" />
-                              <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
-                            </svg>
-                          ) : (
-                            (() => {
-                              const isRead =
-                                Boolean(otherLastReadAt) &&
-                                new Date(m.created_at).getTime() <=
-                                  new Date(otherLastReadAt!).getTime() + 1000;
-                              return (
-                                <svg
-                                  className={`h-3 w-3 ${
-                                    isRead ? 'text-[#34B7F1]' : 'text-white/80'
-                                  } transition-colors duration-300`}
-                                  viewBox="0 0 16 15"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  aria-label={isRead ? 'Read' : 'Delivered'}
-                                >
-                                  <path
-                                    d="M14.5 4L6.5 12L2 7.5"
-                                    stroke="currentColor"
-                                    strokeWidth="1.6"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M10.5 4L5.5 9"
-                                    stroke="currentColor"
-                                    strokeWidth="1.6"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
-                              );
-                            })()
-                          ))}
+                        <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                        <div
+                          className={`mt-0.5 flex items-center justify-end gap-1 text-[10.5px] leading-none select-none ${
+                            isMine ? 'text-white/80' : 'text-muted'
+                          }`}
+                        >
+                          <span suppressHydrationWarning>{formatMessageTime(m.created_at)}</span>
+                          {isMine &&
+                            (m.id < 0 ? (
+                              <svg
+                                className="h-2.5 w-2.5 text-white/70 animate-pulse"
+                                viewBox="0 0 16 16"
+                                fill="currentColor"
+                                aria-label="Sending"
+                              >
+                                <path d="M8 3.5a.5.5 0 0 0-1 0V8a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 7.71V3.5z" />
+                                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
+                              </svg>
+                            ) : (
+                              (() => {
+                                const isRead =
+                                  Boolean(otherLastReadAt) &&
+                                  new Date(m.created_at).getTime() <=
+                                    new Date(otherLastReadAt!).getTime() + 1000;
+                                return (
+                                  <svg
+                                    className={`h-3 w-3 ${
+                                      isRead ? 'text-[#34B7F1]' : 'text-white/80'
+                                    } transition-colors duration-300`}
+                                    viewBox="0 0 16 15"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    aria-label={isRead ? 'Read' : 'Delivered'}
+                                  >
+                                    <path
+                                      d="M14.5 4L6.5 12L2 7.5"
+                                      stroke="currentColor"
+                                      strokeWidth="1.6"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                    <path
+                                      d="M10.5 4L5.5 9"
+                                      stroke="currentColor"
+                                      strokeWidth="1.6"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                  </svg>
+                                );
+                              })()
+                            ))}
+                        </div>
                       </div>
+
+                      {/* Docked Reactions */}
+                      {msgReactions.length > 0 && (
+                        <div
+                          className={`mt-1 flex flex-wrap gap-1 ${
+                            isMine ? 'justify-end' : 'justify-start'
+                          }`}
+                        >
+                          {msgReactions.map((r) => {
+                            const em = getEmoji(r.emoji);
+                            if (!em) return null;
+                            const myReaction = r.users.includes(me);
+                            return (
+                              <button
+                                key={r.emoji}
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleReactionSelect(m.id, r.emoji);
+                                }}
+                                className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-bold shadow-2xs backdrop-blur-xs transition active:scale-95 ${
+                                  myReaction
+                                    ? 'border-primary/40 bg-primary/10 text-primary'
+                                    : 'border-line/80 bg-surface text-ink'
+                                }`}
+                                title={
+                                  myReaction
+                                    ? 'Remove your reaction'
+                                    : `React with ${em.label}`
+                                }
+                              >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={em.file}
+                                  alt=""
+                                  className="h-3.5 w-3.5 object-contain"
+                                />
+                                {r.users.length > 1 && <span>{r.users.length}</span>}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

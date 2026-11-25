@@ -117,3 +117,57 @@ export async function markChatRead(chatId: string): Promise<{ success: boolean }
   }
 }
 
+export async function toggleMessageReaction(input: {
+  chatId: string;
+  messageId: number;
+  emoji: string;
+}): Promise<{ action: 'add' | 'remove'; error?: string }> {
+  try {
+    const client = createClient();
+    const {
+      data: { user },
+    } = await client.auth.getUser();
+    if (!user) return { action: 'remove', error: 'Not signed in' };
+
+    const admin = createAdminClient();
+    const { data: existing } = await admin
+      .from('notifications')
+      .select('id, data')
+      .eq('user_id', user.id)
+      .eq('kind', 'message_reaction')
+      .filter('data->>chat_id', 'eq', input.chatId)
+      .filter('data->>message_id', 'eq', String(input.messageId));
+
+    const sameEmoji = existing?.find((r) => {
+      const d = r.data as Record<string, unknown> | undefined;
+      return d?.emoji === input.emoji;
+    });
+
+    if (sameEmoji) {
+      await admin.from('notifications').delete().eq('id', sameEmoji.id);
+      return { action: 'remove' };
+    } else {
+      if (existing && existing.length > 0) {
+        const priorIds = existing.map((r) => r.id);
+        await admin.from('notifications').delete().in('id', priorIds);
+      }
+      await admin.from('notifications').insert({
+        user_id: user.id,
+        kind: 'message_reaction',
+        title: input.emoji,
+        data: {
+          chat_id: input.chatId,
+          message_id: input.messageId,
+          emoji: input.emoji,
+          user_id: user.id,
+        },
+      });
+      return { action: 'add' };
+    }
+  } catch (err) {
+    console.warn('toggleMessageReaction error:', err);
+    return { action: 'remove', error: 'Failed to update reaction' };
+  }
+}
+
+

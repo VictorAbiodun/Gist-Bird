@@ -39,7 +39,8 @@ export function ProfileView({
     ? new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
     : 'Campus Member';
 
-  const handle = `@${profile.display_name.toLowerCase().replace(/[^a-z0-9]/g, '') || 'bird'}`;
+  const handle = `@${(profile.user_tag || profile.display_name).toLowerCase().replace(/[^a-z0-9_]/g, '') || 'bird'}`;
+  const displayAvatar = profile.photo_url || profile.avatar;
 
   return (
     <main className="min-h-dvh bg-bg pb-6">
@@ -96,7 +97,7 @@ export function ProfileView({
               <Avatar
                 name={profile.display_name}
                 scarf={profile.scarf}
-                avatar={profile.avatar}
+                avatar={displayAvatar}
                 size={92}
               />
             </div>
@@ -336,7 +337,7 @@ export function ProfileView({
               <Avatar
                 name={profile.display_name}
                 scarf={profile.scarf}
-                avatar={profile.avatar}
+                avatar={displayAvatar}
                 size={56}
               />
               <div>
@@ -345,7 +346,7 @@ export function ProfileView({
                 </h2>
                 <p className="flex items-center gap-1 text-caption font-semibold text-muted">
                   <Icon name="map" size={14} />
-                  <span>{spotName}</span>
+                  <span>{profile.university ? `${profile.university} · ${spotName}` : spotName}</span>
                 </p>
               </div>
             </div>

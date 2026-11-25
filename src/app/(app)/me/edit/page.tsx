@@ -1,22 +1,8 @@
 import { getProfile } from '@/lib/data';
-import { ProfileWizard } from '@/components/ProfileWizard';
+import { EditProfileView } from '@/components/EditProfileView';
 
 export default async function EditProfile() {
   const p = await getProfile();
   if (!p) return null;
-  return (
-    <ProfileWizard
-      mode="edit"
-      initial={{
-        displayName: p.display_name,
-        nameMode: p.name_mode,
-        scarf: p.scarf,
-        avatar: p.avatar,
-        birdName: p.bird_name ?? 'Chief Coo',
-        interests: p.interests,
-        spot: p.favourite_spot,
-        starter: p.starter_prompt ?? '',
-      }}
-    />
-  );
+  return <EditProfileView profile={p} />;
 }

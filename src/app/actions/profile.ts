@@ -16,6 +16,12 @@ const schema = z.object({
   interests: z.array(z.string().max(30)).max(5),
   spot: z.string().nullable(),
   starter: z.string().trim().max(120).nullable(),
+  userTag: z.string().trim().max(30).optional(),
+  university: z.string().trim().max(80).optional(),
+  country: z.string().trim().max(50).optional(),
+  age: z.string().trim().max(30).optional(),
+  gender: z.string().trim().max(30).optional(),
+  photoUrl: z.string().max(120000).optional(),
 });
 export type ProfileInput = z.infer<typeof schema>;
 
@@ -40,12 +46,30 @@ export async function saveProfile(input: ProfileInput): Promise<{ error?: string
   });
   if (error) return { error: friendlyError(error) };
 
-  // Persist bird name via admin client
+  // Persist bird name & extended profile metadata via admin client
+  const admin = createAdminClient();
   if (v.birdName) {
-    await createAdminClient()
+    await admin
       .from('profiles')
       .update({ bird_name: v.birdName.trim() })
       .eq('id', user.id);
+  }
+
+  const metaUpdates: Record<string, string> = {};
+  if (v.userTag !== undefined) metaUpdates.user_tag = v.userTag.replace(/^@+/, '');
+  if (v.university !== undefined) metaUpdates.university = v.university;
+  if (v.country !== undefined) metaUpdates.country = v.country;
+  if (v.age !== undefined) metaUpdates.age = v.age;
+  if (v.gender !== undefined) metaUpdates.gender = v.gender;
+  if (v.photoUrl !== undefined) metaUpdates.photo_url = v.photoUrl;
+
+  if (Object.keys(metaUpdates).length > 0) {
+    await admin.auth.admin.updateUserById(user.id, {
+      user_metadata: {
+        ...(user.user_metadata ?? {}),
+        ...metaUpdates,
+      },
+    });
   }
 
   revalidatePath('/', 'layout');

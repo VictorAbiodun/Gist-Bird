@@ -25,6 +25,12 @@ export interface Profile {
   paused_until: string | null;
   created_at?: string;
   papers_used?: number;
+  user_tag?: string;
+  university?: string;
+  country?: string;
+  age?: string;
+  gender?: string;
+  photo_url?: string;
 }
 export type Scarf = 'green' | 'lemon' | 'coral' | 'slate' | 'ink';
 export const SCARF_HEX: Record<Scarf, string> = { green: '#0A7D3E', lemon: '#FFD23F', coral: '#FF6B57', slate: '#7F90A3', ink: '#0E2A1B' };

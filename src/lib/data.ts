@@ -120,5 +120,15 @@ export async function getProfile(): Promise<Profile | null> {
   const { data } = await supabase.from('profiles')
     .select('id, display_name, name_mode, scarf, avatar, bird_name, interests, favourite_spot, starter_prompt, status, paused_until, created_at, papers_used')
     .eq('id', user.id).maybeSingle();
-  return (data as Profile | null) ?? null;
+  if (!data) return null;
+  const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+  return {
+    ...(data as Profile),
+    user_tag: typeof meta.user_tag === 'string' ? meta.user_tag : undefined,
+    university: typeof meta.university === 'string' ? meta.university : undefined,
+    country: typeof meta.country === 'string' ? meta.country : undefined,
+    age: typeof meta.age === 'string' ? meta.age : undefined,
+    gender: typeof meta.gender === 'string' ? meta.gender : undefined,
+    photo_url: typeof meta.photo_url === 'string' ? meta.photo_url : undefined,
+  };
 }

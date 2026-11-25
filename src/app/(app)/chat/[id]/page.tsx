@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getChat, getChatReadReceipt, getFriendProfilePreview, getMessageReactions } from '@/lib/data';
+import { getChat, getChatReadReceipt, getFriendProfilePreview, getMessageReactions, getMessageReplies } from '@/lib/data';
 import { createClient } from '@/lib/supabase/server';
 import { ChatThread } from '@/components/ChatThread';
 import type { Message } from '@/lib/types';
@@ -7,10 +7,11 @@ import type { Message } from '@/lib/types';
 export default async function ChatPage({ params }: { params: { id: string } }) {
   const chat = await getChat(params.id);
   if (!chat) notFound();
-  const [{ data }, otherLastReadAt, reactions, otherProfilePreview] = await Promise.all([
+  const [{ data }, otherLastReadAt, reactions, replies, otherProfilePreview] = await Promise.all([
     createClient().from('messages').select('*').eq('chat_id', chat.id).order('id').limit(300),
     getChatReadReceipt(chat.id, chat.other_id),
     getMessageReactions(chat.id),
+    getMessageReplies(chat.id),
     getFriendProfilePreview(chat.other_id),
   ]);
 
@@ -28,6 +29,7 @@ export default async function ChatPage({ params }: { params: { id: string } }) {
         blocked={chat.blocked}
         initialOtherLastReadAt={otherLastReadAt}
         initialReactions={reactions}
+        initialReplies={replies}
         otherProfilePreview={otherProfilePreview}
       />
     </main>

@@ -7,6 +7,7 @@ export interface QueuedMessage {
   chatId: string;
   body: string;
   createdAt: string;
+  replyToId?: number;
 }
 
 const STORAGE_KEY = 'gist_bird_outbox_v1';

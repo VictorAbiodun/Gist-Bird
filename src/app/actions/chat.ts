@@ -8,12 +8,17 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { VAPID_PUBLIC_KEY } from '@/lib/push';
 import { friendlyError, errorCode } from '@/lib/errors';
 
-const schema = z.object({ chatId: z.string().uuid(), body: z.string().trim().min(1).max(1000) });
+const schema = z.object({
+  chatId: z.string().uuid(),
+  body: z.string().trim().min(1).max(1000),
+  replyToId: z.number().int().positive().optional(),
+});
 
 export async function sendMessage(input: {
   chatId: string;
   body: string;
-}): Promise<{ error?: string; code?: string | null }> {
+  replyToId?: number;
+}): Promise<{ error?: string; code?: string | null; messageId?: number }> {
   const parsed = schema.safeParse(input);
   if (!parsed.success) return { error: 'Write something first.' };
 
@@ -25,6 +30,8 @@ export async function sendMessage(input: {
 
   if (error) return { error: friendlyError(error), code: errorCode(error) };
 
+  let insertedMessageId: number | undefined;
+
   // Dispatch rich real-time notification + Web Push to recipient's phones
   try {
     const admin = createAdminClient();
@@ -33,6 +40,31 @@ export async function sendMessage(input: {
     } = await client.auth.getUser();
 
     if (user) {
+      if (parsed.data.replyToId) {
+        const { data: latestMsg } = await admin
+          .from('messages')
+          .select('id')
+          .eq('chat_id', parsed.data.chatId)
+          .eq('sender_id', user.id)
+          .order('id', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (latestMsg?.id) {
+          insertedMessageId = Number(latestMsg.id);
+          await admin.from('notifications').insert({
+            user_id: user.id,
+            kind: 'message_reply',
+            title: String(parsed.data.replyToId),
+            body: null,
+            data: {
+              chat_id: parsed.data.chatId,
+              message_id: insertedMessageId,
+              reply_to_id: parsed.data.replyToId,
+            },
+          });
+        }
+      }
       const { data: chat } = await admin
         .from('chats')
         .select('user_a, user_b')
@@ -91,7 +123,7 @@ export async function sendMessage(input: {
     console.warn('Realtime/WebPush notification dispatch failed:', err);
   }
 
-  return {};
+  return { messageId: insertedMessageId };
 }
 
 export async function markChatRead(chatId: string): Promise<{ success: boolean }> {

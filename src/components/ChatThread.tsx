@@ -16,7 +16,7 @@ import { CHAT_EMOJIS, getEmoji } from '@/lib/emojis';
 import { enqueueMessage, getQueuedMessages, removeQueuedMessage } from '@/lib/offlineQueue';
 import { playSendSound, playReceiveSound, isSoundMuted, setSoundMuted } from '@/lib/sounds';
 import { ProfilePreviewModal, type ProfilePreviewData } from './ProfilePreviewModal';
-import type { Message, Scarf, MessageReactionsMap } from '@/lib/types';
+import type { Message, Scarf, MessageReactionsMap, MessageRepliesMap } from '@/lib/types';
 
 interface ChatThreadProps {
   chatId: string;
@@ -30,6 +30,7 @@ interface ChatThreadProps {
   blocked?: boolean;
   initialOtherLastReadAt?: string | null;
   initialReactions?: MessageReactionsMap;
+  initialReplies?: MessageRepliesMap;
   otherProfilePreview?: ProfilePreviewData | null;
 }
 
@@ -45,6 +46,7 @@ export function ChatThread({
   blocked: isBlocked = false,
   initialOtherLastReadAt = null,
   initialReactions = {},
+  initialReplies = {},
   otherProfilePreview = null,
 }: ChatThreadProps) {
   const router = useRouter();
@@ -64,10 +66,14 @@ export function ChatThread({
   const [isLeaving, setIsLeaving] = useState(false);
   const [chatEnded, setChatEnded] = useState(false);
   const [showFriendProfile, setShowFriendProfile] = useState(false);
+  const [replyMap, setReplyMap] = useState<MessageRepliesMap>(initialReplies);
+  const [replyingTo, setReplyingTo] = useState<Message | null>(null);
+  const [focusedThreadRootId, setFocusedThreadRootId] = useState<number | null>(null);
   const [pending, start] = useTransition();
 
   const bottom = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const channelRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']> | null>(null);
   const lastTypingSentRef = useRef(0);
   const stopTypingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -105,9 +111,17 @@ export function ChatThread({
     setIsSyncingQueue(true);
     for (const item of queued) {
       try {
-        const r = await sendMessage({ chatId, body: item.body });
+        const r = await sendMessage({ chatId, body: item.body, replyToId: item.replyToId });
         if (!r.error) {
           removeQueuedMessage(item.tempId);
+          if (item.replyToId && r.messageId) {
+            const msgId = r.messageId;
+            const rId = item.replyToId;
+            setReplyMap((prev) => ({ ...prev, [msgId]: rId }));
+            channelRef.current
+              ?.send({ type: 'broadcast', event: 'reply_link', payload: { messageId: msgId, replyToId: rId } })
+              .catch(() => {});
+          }
           playSendSound();
         }
       } catch {
@@ -221,6 +235,13 @@ export function ChatThread({
       .on('broadcast', { event: 'chat_ended' }, ({ payload }) => {
         if (!payload || payload.byUserId === me) return;
         setChatEnded(true);
+      })
+      .on('broadcast', { event: 'reply_link' }, ({ payload }) => {
+        if (!payload || !payload.messageId || !payload.replyToId) return;
+        setReplyMap((prev) => ({
+          ...prev,
+          [Number(payload.messageId)]: Number(payload.replyToId),
+        }));
       })
       .on('broadcast', { event: 'reaction_broadcast' }, ({ payload }) => {
         if (!payload || !payload.messageId || !payload.emoji || !payload.userId) return;
@@ -352,6 +373,34 @@ export function ChatThread({
   const hasContact = useMemo(() => locked && hasContactInfo(text), [locked, text]);
   const starters = otherStarter ? [otherStarter, ...STARTERS] : STARTERS;
 
+  const messagesById = useMemo(() => {
+    const map = new Map<number, Message>();
+    for (const msg of messages) map.set(msg.id, msg);
+    return map;
+  }, [messages]);
+
+  const repliesByParent = useMemo(() => {
+    const map = new Map<number, Message[]>();
+    for (const msg of messages) {
+      const parentId = replyMap[msg.id];
+      if (!parentId) continue;
+      const list = map.get(parentId) ?? [];
+      list.push(msg);
+      map.set(parentId, list);
+    }
+    return map;
+  }, [messages, replyMap]);
+
+  const startReply = (msg: Message) => {
+    if (msg.id < 0) return;
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      navigator.vibrate(10);
+    }
+    setActiveReactionMenuMsgId(null);
+    setReplyingTo(msg);
+    setTimeout(() => inputRef.current?.focus(), 40);
+  };
+
   function send(body = text) {
     const trimmed = body.trim();
     if (!trimmed || (locked && hasContactInfo(trimmed)) || chatEnded) return;
@@ -359,6 +408,7 @@ export function ChatThread({
 
     const tempId = -Date.now();
     const createdAt = new Date().toISOString();
+    const replyToId = replyingTo && replyingTo.id > 0 ? replyingTo.id : undefined;
     const optimisticMsg: Message = {
       id: tempId,
       chat_id: chatId,
@@ -372,24 +422,43 @@ export function ChatThread({
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       navigator.vibrate(12);
     }
+    if (replyToId) {
+      setReplyMap((prev) => ({ ...prev, [tempId]: replyToId }));
+    }
     setMessages((m) => [...m, optimisticMsg]);
     if (body === text) setText('');
+    setReplyingTo(null);
     setTimeout(() => bottom.current?.scrollIntoView({ behavior: 'smooth' }), 30);
 
     // If offline, store in local phone outbox queue for auto-send on reconnect
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
-      enqueueMessage({ tempId, chatId, body: trimmed, createdAt });
+      enqueueMessage({ tempId, chatId, body: trimmed, createdAt, replyToId });
       return;
     }
 
     start(async () => {
       try {
-        const r = await sendMessage({ chatId, body: trimmed });
+        const r = await sendMessage({ chatId, body: trimmed, replyToId });
         if (r.error) {
           setMessages((m) => m.filter((x) => x.id !== tempId));
           if (body === text) setText(trimmed);
           setError(r.error);
           return;
+        }
+        if (replyToId && r.messageId) {
+          const confirmedId = r.messageId;
+          setReplyMap((prev) => {
+            const next = { ...prev, [confirmedId]: replyToId };
+            delete next[tempId];
+            return next;
+          });
+          channelRef.current
+            ?.send({
+              type: 'broadcast',
+              event: 'reply_link',
+              payload: { messageId: confirmedId, replyToId },
+            })
+            .catch(() => {});
         }
         playSendSound();
         const { data } = await createClient()
@@ -408,7 +477,7 @@ export function ChatThread({
         if (data) setMessages([...(data as Message[]), ...remaining]);
       } catch {
         // Network failure mid-flight: queue locally instead of dropping the message
-        enqueueMessage({ tempId, chatId, body: trimmed, createdAt });
+        enqueueMessage({ tempId, chatId, body: trimmed, createdAt, replyToId });
       }
     });
   }
@@ -611,9 +680,19 @@ export function ChatThread({
               const currentDate = formatDateDivider(m.created_at);
               const showDateDivider = index === 0 || prevDate !== currentDate;
               const msgReactions = reactions[m.id] || [];
+              const parentId = replyMap[m.id];
+              const parentMsg = parentId ? messagesById.get(parentId) : undefined;
+              const childReplies = repliesByParent.get(m.id) ?? [];
+              const isReplyTarget = replyingTo?.id === m.id;
+              const isDimmedByReplyFocus = Boolean(replyingTo) && !isReplyTarget;
 
               return (
-                <div key={m.id} className="space-y-2">
+                <div
+                  key={m.id}
+                  className={`space-y-2 transition-all duration-200 ${
+                    isReplyTarget ? 'relative z-20' : ''
+                  } ${isDimmedByReplyFocus ? 'opacity-40 blur-[1px]' : ''}`}
+                >
                   {showDateDivider && currentDate && (
                     <div className="my-2.5 flex justify-center">
                       <span className="rounded-full border border-line/60 bg-surface/90 px-3 py-0.5 text-[11px] font-semibold text-muted shadow-2xs backdrop-blur-xs select-none">
@@ -626,9 +705,45 @@ export function ChatThread({
                     <div
                       className={`group relative flex flex-col ${
                         isMine ? 'items-end' : 'items-start'
-                      }`}
+                      } max-w-[84%]`}
                     >
-                      {/* Floating Emoji Bar */}
+                      {/* iMessage-style Parent Preview & Curved Thread Connector */}
+                      {parentMsg && (
+                        <div className={`flex flex-col ${isMine ? 'items-end' : 'items-start'} mb-0.5`}>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFocusedThreadRootId(parentMsg.id);
+                            }}
+                            className={`max-w-[230px] rounded-[14px] border border-line/60 bg-surface-alt/85 px-2.5 py-1 text-left text-[12px] text-muted shadow-2xs transition active:scale-95 ${
+                              isMine ? 'mr-3' : 'ml-3'
+                            }`}
+                          >
+                            <span className="block text-[10px] font-bold text-primary">
+                              {parentMsg.sender_id === me ? 'You' : otherName}
+                            </span>
+                            <span className="line-clamp-1 break-words">{parentMsg.body}</span>
+                          </button>
+                          <svg
+                            width="24"
+                            height="14"
+                            viewBox="0 0 24 14"
+                            fill="none"
+                            aria-hidden="true"
+                            className={`text-line ${isMine ? 'mr-2 -scale-x-100' : 'ml-2'}`}
+                          >
+                            <path
+                              d="M4 0 C4 9, 10 12, 24 12"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                        </div>
+                      )}
+
+                      {/* Floating Emoji & Reply Action Bar */}
                       <AnimatePresence>
                         {activeReactionMenuMsgId === m.id && (
                           <motion.div
@@ -636,7 +751,7 @@ export function ChatThread({
                             animate={{ opacity: 1, scale: 1, y: -8 }}
                             exit={{ opacity: 0, scale: 0.75, y: -4 }}
                             transition={{ type: 'spring', damping: 22, stiffness: 350 }}
-                            className={`absolute -top-10 z-30 flex items-center gap-1.5 rounded-full border border-line/80 bg-white/95 px-2 py-1 shadow-lg backdrop-blur-md ${
+                            className={`absolute -top-10 z-30 flex items-center gap-1 rounded-full border border-line/80 bg-white/95 px-2 py-1 shadow-lg backdrop-blur-md ${
                               isMine ? 'right-0' : 'left-0'
                             }`}
                             onClick={(e) => e.stopPropagation()}
@@ -666,20 +781,44 @@ export function ChatThread({
                                 </button>
                               );
                             })}
+                            {m.id > 0 && (
+                              <>
+                                <span className="mx-0.5 h-4 w-[1px] bg-line" aria-hidden />
+                                <button
+                                  type="button"
+                                  onClick={() => startReply(m)}
+                                  aria-label="Reply to message"
+                                  title="Reply"
+                                  className="flex h-7 items-center gap-1 rounded-full px-2 text-[11px] font-bold text-primary transition hover:bg-primary/10 active:scale-95"
+                                >
+                                  <span>↩</span>
+                                  <span>Reply</span>
+                                </button>
+                              </>
+                            )}
                           </motion.div>
                         )}
                       </AnimatePresence>
 
-                      <div
+                      <motion.div
+                        drag={m.id > 0 ? 'x' : false}
+                        dragConstraints={{ left: 0, right: 54 }}
+                        dragElastic={0.2}
+                        dragSnapToOrigin
+                        onDragEnd={(_, info) => {
+                          if (m.id > 0 && info.offset.x > 38) {
+                            startReply(m);
+                          }
+                        }}
                         onClick={(e) => {
                           e.stopPropagation();
                           setActiveReactionMenuMsgId((curr) => (curr === m.id ? null : m.id));
                         }}
-                        className={`relative max-w-[82%] cursor-pointer rounded-[18px] px-3.5 pt-2 pb-1.5 text-[15px] leading-relaxed shadow-xs select-none active:scale-[0.99] transition-transform ${
+                        className={`relative w-full cursor-pointer rounded-[18px] px-3.5 pt-2 pb-1.5 text-[15px] leading-relaxed shadow-xs select-none active:scale-[0.99] transition-transform ${
                           isMine
                             ? 'rounded-br-[4px] bg-primary text-on-primary font-medium'
                             : 'rounded-bl-[4px] border border-line bg-surface text-ink'
-                        }`}
+                        } ${isReplyTarget ? 'ring-2 ring-primary/40 shadow-md' : ''}`}
                       >
                         <p className="whitespace-pre-wrap break-words">{m.body}</p>
                         <div
@@ -734,7 +873,21 @@ export function ChatThread({
                               })()
                             ))}
                         </div>
-                      </div>
+                      </motion.div>
+
+                      {/* iMessage "N Replies" Thread Link */}
+                      {childReplies.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFocusedThreadRootId(m.id);
+                          }}
+                          className="mt-1 text-[11px] font-bold text-primary hover:underline active:opacity-75"
+                        >
+                          {childReplies.length === 1 ? '1 Reply' : `${childReplies.length} Replies`}
+                        </button>
+                      )}
 
                       {/* Docked Reactions */}
                       {msgReactions.length > 0 && (
@@ -808,6 +961,25 @@ export function ChatThread({
 
           {/* ── Bottom Input Section ── */}
           <div className="shrink-0 border-t border-line bg-surface px-3 py-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] shadow-xs">
+            {replyingTo && (
+              <div className="mb-2 flex items-center justify-between gap-2 rounded-xl border border-line bg-surface-alt/80 px-3 py-1.5">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11px] font-bold text-primary">
+                    Replying to {replyingTo.sender_id === me ? 'yourself' : otherName}
+                  </p>
+                  <p className="truncate text-[12px] text-muted">{replyingTo.body}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setReplyingTo(null)}
+                  aria-label="Cancel reply"
+                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/80 text-[12px] font-bold text-muted hover:text-ink"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
             {messages.length === 0 && (
               <div className="mb-2 space-y-1.5">
                 <p className="text-[12px] font-bold text-muted">Need a starter?</p>
@@ -848,6 +1020,7 @@ export function ChatThread({
               }}
             >
               <input
+                ref={inputRef}
                 value={text}
                 onChange={(e) => handleTextChange(e.target.value)}
                 onFocus={handleInputFocus}
@@ -919,6 +1092,117 @@ export function ChatThread({
             </motion.div>
           </motion.div>
         )}
+      </AnimatePresence>
+
+      {/* ── iMessage Focused Reply Thread Overlay ── */}
+      <AnimatePresence>
+        {focusedThreadRootId && messagesById.get(focusedThreadRootId) && (() => {
+          const root = messagesById.get(focusedThreadRootId)!;
+          const threadReplies = repliesByParent.get(focusedThreadRootId) ?? [];
+          const rootIsMine = root.sender_id === me;
+
+          return (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setFocusedThreadRootId(null)}
+              className="fixed inset-0 z-50 flex flex-col justify-between bg-bg/80 p-4 backdrop-blur-md"
+            >
+              <div className="mx-auto flex w-full max-w-[460px] items-center justify-between pt-2">
+                <span className="text-[12px] font-bold uppercase tracking-wider text-muted">
+                  Reply Thread
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setFocusedThreadRootId(null)}
+                  className="rounded-full bg-surface px-3.5 py-1.5 text-[12px] font-bold text-primary shadow-xs border border-line"
+                >
+                  Done
+                </button>
+              </div>
+
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="mx-auto my-4 w-full max-w-[460px] flex-1 overflow-y-auto space-y-2 py-4"
+              >
+                {/* Root Message */}
+                <div className={`flex ${rootIsMine ? 'justify-end' : 'justify-start'}`}>
+                  <div
+                    className={`max-w-[82%] rounded-[18px] px-3.5 py-2.5 text-[15px] leading-relaxed shadow-md ${
+                      rootIsMine
+                        ? 'rounded-br-[4px] bg-primary text-on-primary font-medium'
+                        : 'rounded-bl-[4px] border border-line bg-surface text-ink'
+                    }`}
+                  >
+                    <p className="text-[10px] font-bold opacity-75 mb-0.5">
+                      {rootIsMine ? 'You' : otherName}
+                    </p>
+                    <p className="whitespace-pre-wrap break-words">{root.body}</p>
+                    <p className="mt-1 text-right text-[10px] opacity-75">
+                      {formatMessageTime(root.created_at)}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Curved connector + Thread Replies */}
+                {threadReplies.map((rep) => {
+                  const repIsMine = rep.sender_id === me;
+                  return (
+                    <div key={rep.id} className="space-y-1">
+                      <div className={`flex ${repIsMine ? 'justify-end pr-4' : 'justify-start pl-4'}`}>
+                        <svg
+                          width="24"
+                          height="16"
+                          viewBox="0 0 24 16"
+                          fill="none"
+                          aria-hidden="true"
+                          className={`text-line ${repIsMine ? '-scale-x-100' : ''}`}
+                        >
+                          <path
+                            d="M4 0 C4 10, 10 14, 24 14"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      </div>
+                      <div className={`flex ${repIsMine ? 'justify-end' : 'justify-start'}`}>
+                        <div
+                          className={`max-w-[80%] rounded-[18px] px-3.5 py-2 text-[14.5px] leading-relaxed shadow-xs ${
+                            repIsMine
+                              ? 'rounded-br-[4px] bg-primary text-on-primary font-medium'
+                              : 'rounded-bl-[4px] border border-line bg-surface text-ink'
+                          }`}
+                        >
+                          <p className="whitespace-pre-wrap break-words">{rep.body}</p>
+                          <p className="mt-0.5 text-right text-[10px] opacity-75">
+                            {formatMessageTime(rep.created_at)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mx-auto flex w-full max-w-[460px] justify-center pb-4">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setFocusedThreadRootId(null);
+                    startReply(root);
+                  }}
+                  className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-primary px-6 text-[13px] font-bold text-on-primary shadow-md active:scale-95 transition"
+                >
+                  <span>↩</span>
+                  <span>Reply in Thread</span>
+                </button>
+              </div>
+            </motion.div>
+          );
+        })()}
       </AnimatePresence>
 
       {/* ── Friend Profile Preview Modal ── */}

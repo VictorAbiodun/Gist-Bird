@@ -30,3 +30,11 @@
 - Built `/me/edit` (`EditProfileView.tsx`) with Avatar & Photo picker, Username, User Tag, Bio, Topics of interest, **University name**, Country, Age, Gender, Favourite spot, and Bird name.
 - Built the rich public **Profile Preview** (`ProfilePreviewModal.tsx`) showing Message Tree + Avatar scene, `Customize` CTA, **University Logo/Crest** (`UniversityLogo.tsx`) replacing country flag, **University** section replacing "Languages spoken", Achievements, and Gifts received.
 - Added **Nigerian Universities scroll-wheel picker** (80+ private, federal, and state universities with official crest colors & monograms in `universities.ts`) and **3-wheel Date of Birth & Age scroll picker** (`ScrollWheelPicker.tsx`) to both Sign Up / Onboarding (`ProfileWizard.tsx`) and Edit Profile (`EditProfileView.tsx`).
+
+### Phase 7: WhatsApp-Style UX, Real-Time Notifications & Merged Chats
+- **Merged duplicate chat threads**: Guaranteed single unified conversation thread per user pair when accepting letters.
+- **WhatsApp-style in-app toast banners & Web Push**: Subscriptions via VAPID + `web-push`, background lock-screen notifications with quick actions ("Reply", "Mark as read"), and top toast banners.
+- **Optimistic saves & client cache**: Instant UI updates with offline guard for profile changes and daily rewards; Service Worker stale-while-revalidate navigation across tabs.
+- **Auto-submitting OTP**: Seamless 6-digit email confirmation code verification.
+- **Bird-themed typing indicator**: Native looping animated SVG (`BirdTypingAnimation.tsx` & `/icons/bird-typing.svg`) showing a pigeon pecking at seeds in real-time when the chat partner types via Supabase Realtime broadcast.
+

@@ -9,6 +9,7 @@ import { STARTERS, CONTACT_UNLOCK_MESSAGES } from '@/lib/copy';
 import { CONTACT_NOTICE, hasContactInfo } from '@/lib/contentFilter';
 import { sendMessage } from '@/app/actions/chat';
 import { Icon } from './Icon';
+import BirdTypingAnimation from './BirdTypingAnimation';
 import type { Message, Scarf } from '@/lib/types';
 
 interface ChatThreadProps {
@@ -316,20 +317,7 @@ export function ChatThread({
                   aria-label={`${otherName} is typing`}
                 >
                   <div className="inline-flex items-center gap-2 rounded-[18px] rounded-bl-[4px] border border-line bg-surface px-3.5 py-2 shadow-xs">
-                    <motion.img
-                      src="/icons/bird-typing.png"
-                      alt=""
-                      className="h-7 w-10 origin-bottom-left object-contain"
-                      animate={{
-                        rotate: [0, 12, 0, 12, 0],
-                        y: [0, 1.5, 0, 1.5, 0],
-                      }}
-                      transition={{
-                        duration: 1.1,
-                        repeat: Infinity,
-                        ease: 'easeInOut',
-                      }}
-                    />
+                    <BirdTypingAnimation className="h-7 w-auto" />
                     <span className="text-[12px] font-semibold text-muted">typing…</span>
                   </div>
                 </motion.div>

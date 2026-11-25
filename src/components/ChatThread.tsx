@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { Avatar, Notice } from './ui';
 import { STARTERS, CONTACT_UNLOCK_MESSAGES } from '@/lib/copy';
@@ -38,10 +39,15 @@ export function ChatThread({
   const [error, setError] = useState<string>();
   const [showPaper, setShowPaper] = useState(false);
   const [viewportHeight, setViewportHeight] = useState<number | null>(null);
+  const [otherTyping, setOtherTyping] = useState(false);
   const [pending, start] = useTransition();
 
   const bottom = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const channelRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']> | null>(null);
+  const lastTypingSentRef = useRef(0);
+  const stopTypingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearOtherTypingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Synchronize height with window.visualViewport to keep input firmly above mobile keyboards
   useEffect(() => {
@@ -67,7 +73,7 @@ export function ChatThread({
     };
   }, []);
 
-  // Real-time message subscription
+  // Real-time message subscription + live typing broadcast
   useEffect(() => {
     const supabase = createClient();
     const ch = supabase
@@ -75,21 +81,63 @@ export function ChatThread({
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'messages', filter: `chat_id=eq.${chatId}` },
-        (p) =>
-          setMessages((m) =>
-            m.some((x) => x.id === (p.new as Message).id) ? m : [...m, p.new as Message]
-          )
+        (p) => {
+          const msg = p.new as Message;
+          if (msg.sender_id !== me) setOtherTyping(false);
+          setMessages((m) => (m.some((x) => x.id === msg.id) ? m : [...m, msg]));
+        }
       )
+      .on('broadcast', { event: 'typing' }, ({ payload }) => {
+        if (!payload || payload.userId === me) return;
+        const active = Boolean(payload.isTyping);
+        setOtherTyping(active);
+        if (clearOtherTypingTimerRef.current) clearTimeout(clearOtherTypingTimerRef.current);
+        if (active) {
+          clearOtherTypingTimerRef.current = setTimeout(() => setOtherTyping(false), 3500);
+        }
+      })
       .subscribe();
+
+    channelRef.current = ch;
     return () => {
+      channelRef.current = null;
+      if (clearOtherTypingTimerRef.current) clearTimeout(clearOtherTypingTimerRef.current);
+      if (stopTypingTimerRef.current) clearTimeout(stopTypingTimerRef.current);
       supabase.removeChannel(ch);
     };
-  }, [chatId]);
+  }, [chatId, me]);
 
-  // Auto-scroll to bottom when messages update
+  // Auto-scroll to bottom when messages or typing indicator update
   useEffect(() => {
     bottom.current?.scrollIntoView({ block: 'end' });
-  }, [messages.length]);
+  }, [messages.length, otherTyping]);
+
+  const broadcastTyping = (isTyping: boolean) => {
+    const ch = channelRef.current;
+    if (!ch) return;
+    ch.send({
+      type: 'broadcast',
+      event: 'typing',
+      payload: { userId: me, isTyping },
+    }).catch(() => {});
+  };
+
+  const handleTextChange = (val: string) => {
+    setText(val);
+    const now = Date.now();
+    if (val.trim().length > 0) {
+      if (now - lastTypingSentRef.current > 1100) {
+        lastTypingSentRef.current = now;
+        broadcastTyping(true);
+      }
+      if (stopTypingTimerRef.current) clearTimeout(stopTypingTimerRef.current);
+      stopTypingTimerRef.current = setTimeout(() => {
+        broadcastTyping(false);
+      }, 2200);
+    } else {
+      broadcastTyping(false);
+    }
+  };
 
   const locked = messages.length < CONTACT_UNLOCK_MESSAGES;
   const hasContact = useMemo(() => locked && hasContactInfo(text), [locked, text]);
@@ -115,6 +163,7 @@ export function ChatThread({
     };
 
     // Optimistically show message & clear input immediately
+    broadcastTyping(false);
     setMessages((m) => [...m, optimisticMsg]);
     if (body === text) setText('');
     setTimeout(() => bottom.current?.scrollIntoView({ behavior: 'smooth' }), 30);
@@ -172,8 +221,8 @@ export function ChatThread({
           <div className="min-w-0 flex-1">
             <h1 className="truncate font-display text-[15px] font-bold leading-5 text-ink">{otherName}</h1>
             <p className="flex items-center gap-1 text-[11px] font-semibold text-primary">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary" />
-              Campus chat
+              <span className={`inline-block h-1.5 w-1.5 rounded-full bg-primary ${otherTyping ? 'animate-ping' : ''}`} />
+              {otherTyping ? 'pecking a reply…' : 'Campus chat'}
             </p>
           </div>
         </div>
@@ -254,6 +303,39 @@ export function ChatThread({
                 </div>
               );
             })}
+
+            {/* ── Bird-Eating-Seed Typing Indicator ── */}
+            <AnimatePresence>
+              {otherTyping && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.94 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 6, scale: 0.94 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex justify-start"
+                  aria-label={`${otherName} is typing`}
+                >
+                  <div className="inline-flex items-center gap-2 rounded-[18px] rounded-bl-[4px] border border-line bg-surface px-3.5 py-2 shadow-xs">
+                    <motion.img
+                      src="/icons/bird-typing.png"
+                      alt=""
+                      className="h-7 w-10 origin-bottom-left object-contain"
+                      animate={{
+                        rotate: [0, 12, 0, 12, 0],
+                        y: [0, 1.5, 0, 1.5, 0],
+                      }}
+                      transition={{
+                        duration: 1.1,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                      }}
+                    />
+                    <span className="text-[12px] font-semibold text-muted">typing…</span>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <div ref={bottom} />
           </div>
 
@@ -300,7 +382,7 @@ export function ChatThread({
             >
               <input
                 value={text}
-                onChange={(e) => setText(e.target.value)}
+                onChange={(e) => handleTextChange(e.target.value)}
                 onFocus={handleInputFocus}
                 maxLength={1000}
                 type="text"

@@ -1,4 +1,5 @@
 import rawUniversities from '@/data/nigerian-universities.json';
+import localCrests from '@/data/local-crests.json';
 
 export interface NigerianUniversity {
   id: string;
@@ -96,13 +97,16 @@ export const NIGERIAN_UNIVERSITIES: NigerianUniversity[] = (rawUniversities as R
         : monogram;
     const colors = COLOR_MAP[shortName.toUpperCase()] ?? PALETTE[idx % PALETTE.length];
 
+    const id = slugify(u.name);
+    const localLogo = (localCrests as Record<string, string>)[id];
+
     return {
-      id: slugify(u.name),
+      id,
       name: u.name.trim(),
       shortName,
       motto: u.motto && u.motto !== 'Non Found' ? u.motto : undefined,
       web: u.web,
-      logoUrl: isLikelyImageUrl(u.logo) ? u.logo!.trim() : undefined,
+      logoUrl: localLogo ?? (isLikelyImageUrl(u.logo) ? u.logo!.trim() : undefined),
       colors,
       monogram,
     };

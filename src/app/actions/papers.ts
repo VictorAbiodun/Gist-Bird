@@ -2,6 +2,7 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { papersLeft } from '@/lib/data';
 import { friendlyError, errorCode } from '@/lib/errors';
 import { hasContactInfo } from '@/lib/contentFilter';
 import { MAX_PAPER, MIN_PAPER } from '@/lib/copy';
@@ -12,9 +13,11 @@ export async function sendPaper(input: { body: string; origin: string }): Promis
   const parsed = sendSchema.safeParse(input);
   if (!parsed.success) return { error: friendlyError(input.body.trim().length < MIN_PAPER ? 'too_short' : 'too_long') };
   if (hasContactInfo(parsed.data.body)) return { error: friendlyError('contact_info'), code: 'contact_info' };
+  const left = await papersLeft();
+  if (left <= 0) return { error: friendlyError('no_papers_left'), code: 'no_papers_left' };
   const { data, error } = await createClient().rpc('send_paper', { p_body: parsed.data.body, p_origin: parsed.data.origin });
   if (error) return { error: friendlyError(error), code: errorCode(error) };
-  revalidatePath('/sent'); revalidatePath('/home');
+  revalidatePath('/sent'); revalidatePath('/home'); revalidatePath('/write');
   return { id: data as string };
 }
 

@@ -44,7 +44,7 @@ export function WriteForm({ initialBody = '', defaultOrigin, left }: { initialBo
         </select>
       </Field>
       <div className="mt-auto space-y-2 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-        {left <= 0 && <Notice tone="info" title="No papers left today">Chief Coo needs a rest. You get fresh papers tomorrow.</Notice>}
+        {left <= 0 && <Notice tone="info" title="No papers left">You ran out of papers! Claim your daily reward on the Home screen to earn more.</Notice>}
         <Button className="w-full" icon="sent" disabled={!ok || pending} onClick={send}>{pending ? 'Sending…' : 'Send with Chief Coo'}</Button>
       </div>
     </div>

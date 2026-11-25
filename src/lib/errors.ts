@@ -3,7 +3,7 @@ const MESSAGES: Record<string, string> = {
   contact_info: 'Numbers and links wait until later. Take it out and say hi with your words first.',
   too_short: 'Write a little more. Papers need at least 20 characters.',
   too_long: 'That is over 280 characters. Trim it a little.',
-  no_papers_left: 'No papers left today. You get fresh ones tomorrow.',
+  no_papers_left: 'No papers left. Claim your daily reward on Home to get more papers!',
   account_paused: 'Your account is paused right now.',
   invalid_spot: 'Pick a shared spot. Faculty buildings are pass-through only.',
   profile_required: 'Finish setting up your profile first.',

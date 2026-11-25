@@ -1,13 +1,14 @@
 import Link from 'next/link';
-import { getInbox, getNotifications, getProfile, getSent, papersLeft } from '@/lib/data';
+import { getInbox, getNotifications, getProfile, getRewardStatus, getSent } from '@/lib/data';
 import { Icon } from '@/components/Icon';
 import { LinkButton } from '@/components/ui';
 import { getSpot } from '@/lib/campus';
 import { TreeScene } from '@/components/tree/TreeScene';
+import { HomeRewardsBar } from '@/components/HomeRewardsBar';
 
 export default async function Home() {
-  const [left, notes, sent, inbox, profile] = await Promise.all([
-    papersLeft(),
+  const [rewardStatus, notes, sent, inbox, profile] = await Promise.all([
+    getRewardStatus(),
     getNotifications(),
     getSent(),
     getInbox(),
@@ -27,23 +28,7 @@ export default async function Home() {
       >
         {/* Top Header & Actions — pointer-events-auto so links work */}
         <div className="pointer-events-auto">
-          <header className="flex items-center gap-2.5 px-5 pb-2 pt-[max(1.25rem,env(safe-area-inset-top))]">
-            <span className="flex-1 font-display text-[26px] font-bold leading-8 text-primary drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">
-              Gist Bird
-            </span>
-            <span aria-label={`${left} ${left === 1 ? 'paper' : 'papers'} left`} className="flex items-center gap-1.5 rounded-full bg-lemon px-3 py-1.5 text-label font-bold shadow-sm">
-              <Icon name="paper" size={18} />
-              <span>{left}</span>
-            </span>
-            <Link
-              href="/notifications"
-              aria-label={unread ? `Notifications, ${unread} new` : 'Notifications'}
-              className="relative flex h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-line bg-surface/95 shadow-sm backdrop-blur transition-transform active:scale-95"
-            >
-              <Icon name="bell" size={22} />
-              {unread > 0 && <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-coral" />}
-            </Link>
-          </header>
+          <HomeRewardsBar rewardStatus={rewardStatus} unreadNotifications={unread} />
 
           <div className="flex items-center justify-end px-5 pt-1">
             <Link

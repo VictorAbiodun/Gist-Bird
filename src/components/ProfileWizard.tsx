@@ -48,7 +48,7 @@ export function ProfileWizard({ initial, mode = 'onboarding' }: { initial?: Part
     return list.map((u) => ({
       value: u.name,
       label: u.name,
-      sublabel: u.type,
+      sublabel: u.shortName,
       icon: <UniversityLogo university={u} size={20} />,
     }));
   }, [uniSearch]);

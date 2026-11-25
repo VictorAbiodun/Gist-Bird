@@ -54,7 +54,7 @@ export function EditProfileView({ profile }: { profile: Profile }) {
     return list.map((u) => ({
       value: u.name,
       label: u.name,
-      sublabel: u.type,
+      sublabel: u.shortName,
       icon: <UniversityLogo university={u} size={20} />,
     }));
   }, [uniQuery]);

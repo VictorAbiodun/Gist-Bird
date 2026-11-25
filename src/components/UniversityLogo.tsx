@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import { findUniversity, type NigerianUniversity } from '@/lib/universities';
 
 interface UniversityLogoProps {
@@ -8,6 +11,23 @@ interface UniversityLogoProps {
 
 export function UniversityLogo({ university, size = 22, className = '' }: UniversityLogoProps) {
   const uni = typeof university === 'string' ? findUniversity(university) : university;
+  const [imgError, setImgError] = useState(false);
+
+  if (uni?.logoUrl && !imgError) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={uni.logoUrl}
+        alt={uni.shortName}
+        width={size}
+        height={size}
+        onError={() => setImgError(true)}
+        className={`inline-block shrink-0 rounded-full bg-white object-contain ${className}`}
+        style={{ width: size, height: size }}
+      />
+    );
+  }
+
   const primary = uni?.colors[0] ?? '#0A7D3E';
   const secondary = uni?.colors[1] ?? '#FFD23F';
   const mono = (uni?.monogram ?? 'UNI').slice(0, 3);

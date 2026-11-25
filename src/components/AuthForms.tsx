@@ -1,4 +1,5 @@
 'use client';
+import { useRef, useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import Link from 'next/link';
 import { requestCode, verifyCode, loginWithPassword, setPassword, type FormState } from '@/app/actions/auth';
@@ -45,22 +46,58 @@ export function EmailForm() {
 
 export function VerifyForm({ email, defaultToken = '' }: { email: string; defaultToken?: string }) {
   const [state, action] = useFormState(verifyCode, initial);
+  const [token, setToken] = useState(defaultToken);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const handleTokenChange = (raw: string) => {
+    const digits = raw.replace(/\D/g, '').slice(0, 8);
+    setToken(digits);
+    // Auto-submit immediately when 6-digit or 8-digit OTP is autofilled or pasted
+    if (digits.length === 6 || digits.length === 8) {
+      setTimeout(() => {
+        formRef.current?.requestSubmit();
+      }, 60);
+    }
+  };
+
+  const handlePasteClipboard = async () => {
+    try {
+      const clip = await navigator.clipboard.readText();
+      const match = clip.match(/\b\d{6,8}\b/);
+      if (match) handleTokenChange(match[0]);
+    } catch {
+      // ignore if clipboard permission denied
+    }
+  };
+
   return (
-    <form action={action} className="space-y-4" noValidate>
+    <form ref={formRef} action={action} className="space-y-4" noValidate>
       <input type="hidden" name="email" value={email} />
-      <Field label="6-digit verification code" error={state.error} hint="Check your inbox for the code.">
+      <Field label="6-digit verification code" error={state.error} hint="Tap the suggested code above your keyboard or paste from Gmail — it verifies automatically.">
         <input
           name="token"
+          type="text"
           inputMode="numeric"
+          pattern="[0-9]*"
           autoComplete="one-time-code"
           maxLength={8}
-          defaultValue={defaultToken}
+          value={token}
+          onChange={(e) => handleTokenChange(e.target.value)}
           required
           placeholder="123456"
           className={`${inputCls(!!state.error)} h-[60px] text-center font-display text-title tracking-[0.3em]`}
           aria-invalid={!!state.error}
         />
       </Field>
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={handlePasteClipboard}
+          className="text-label font-semibold text-primary underline"
+        >
+          Paste code from clipboard
+        </button>
+      </div>
       {state.error && <Notice tone="err" title="That code didn't work">{state.error}</Notice>}
       <Submit>Verify</Submit>
     </form>

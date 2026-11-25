@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { VAPID_PUBLIC_KEY, urlBase64ToUint8Array } from '@/lib/push';
 import { Icon } from './Icon';
 
 interface PushNotificationManagerProps {
@@ -19,6 +20,28 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
     pathnameRef.current = pathname;
   }, [pathname]);
 
+  const syncPushSubscription = useCallback(async () => {
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    if (Notification.permission !== 'granted') return;
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) {
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as BufferSource,
+        });
+      }
+      await fetch('/api/push/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscription: sub.toJSON() }),
+      });
+    } catch (err) {
+      console.warn('Web push subscription sync skipped:', err);
+    }
+  }, []);
+
   // Check initial notification support & permission
   useEffect(() => {
     if (typeof window === 'undefined' || !('Notification' in window)) {
@@ -27,6 +50,10 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
     }
 
     setPermission(Notification.permission);
+
+    if (Notification.permission === 'granted' && userId) {
+      syncPushSubscription();
+    }
 
     // If permission has not been asked yet, show banner after 3 seconds
     if (Notification.permission === 'default') {
@@ -38,7 +65,7 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
         return () => clearTimeout(timer);
       }
     }
-  }, []);
+  }, [userId, syncPushSubscription]);
 
   const triggerDeviceNotification = useCallback(
     async (title: string, body: string, url: string, tag: string) => {
@@ -163,6 +190,7 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
       setShowPermissionBanner(false);
 
       if (res === 'granted') {
+        await syncPushSubscription();
         // Send a celebratory test notification so the user sees it immediately on their device
         triggerDeviceNotification(
           'Gist Bird Notifications Active',

@@ -1,8 +1,10 @@
 'use server';
 
 import { z } from 'zod';
+import * as webpush from 'web-push';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { VAPID_PUBLIC_KEY } from '@/lib/push';
 import { friendlyError, errorCode } from '@/lib/errors';
 
 const schema = z.object({ chatId: z.string().uuid(), body: z.string().trim().min(1).max(1000) });
@@ -22,7 +24,7 @@ export async function sendMessage(input: {
 
   if (error) return { error: friendlyError(error), code: errorCode(error) };
 
-  // Dispatch rich real-time notification with sender's name and message body
+  // Dispatch rich real-time notification + Web Push to recipient's phones
   try {
     const admin = createAdminClient();
     const {
@@ -58,10 +60,31 @@ export async function sendMessage(input: {
             body: messageText,
           },
         });
+
+        // Send Web Push to all subscribed devices of the recipient (works when phone is locked/app closed)
+        const vapidPrivate = process.env.VAPID_PRIVATE_KEY;
+        if (vapidPrivate) {
+          webpush.setVapidDetails('mailto:support@gistbird.app', VAPID_PUBLIC_KEY, vapidPrivate);
+          const { data: recipientAuth } = await admin.auth.admin.getUserById(recipientId);
+          const subs = Array.isArray(recipientAuth?.user?.user_metadata?.push_subscriptions)
+            ? (recipientAuth.user.user_metadata.push_subscriptions as webpush.PushSubscription[])
+            : [];
+
+          if (subs.length > 0) {
+            const payload = JSON.stringify({
+              title: senderName,
+              body: messageText,
+              icon: '/icons/icon.svg',
+              url: `/chat/${parsed.data.chatId}`,
+              tag: `chat-${parsed.data.chatId}`,
+            });
+            await Promise.allSettled(subs.map((sub) => webpush.sendNotification(sub, payload)));
+          }
+        }
       }
     }
   } catch (err) {
-    console.warn('Realtime push notification payload dispatch failed:', err);
+    console.warn('Realtime/WebPush notification dispatch failed:', err);
   }
 
   return {};

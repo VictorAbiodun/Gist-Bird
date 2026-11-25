@@ -5,7 +5,7 @@ import { FINITE_ECONOMY_CUTOFF, getLagosDateString, INITIAL_FREE_PAPERS, type Re
 import { getBirdStats } from '@/lib/bird';
 import { getSpot } from '@/lib/campus';
 import type { ProfilePreviewData } from '@/components/ProfilePreviewModal';
-import type { ChatRow, ChatView, InboxItem, Notice, PaperView, Profile, SentItem, MessageReactionsMap, MessageRepliesMap } from '@/lib/types';
+import type { ChatRow, ChatView, InboxItem, Notice, PaperView, Profile, SentItem, MessageReactionsMap, MessageRepliesMap, ChatMessageMeta } from '@/lib/types';
 
 async function rpc<T>(name: string, args?: Record<string, unknown>, fallback?: T): Promise<T> {
   const { data, error } = await createClient().rpc(name, args);
@@ -126,6 +126,80 @@ export async function getMessageReplies(chatId: string): Promise<MessageRepliesM
   } catch (err) {
     console.warn('Failed to fetch message replies:', err);
     return {};
+  }
+}
+
+export async function getChatMessageMeta(chatId: string, userId: string): Promise<ChatMessageMeta> {
+  const empty: ChatMessageMeta = {
+    deletedForMeIds: [],
+    deletedForAllIds: [],
+    editedIds: [],
+    starredIds: [],
+    pinnedMessageId: null,
+    clearedAt: null,
+    isMuted: false,
+  };
+
+  try {
+    const admin = createAdminClient();
+    const { data } = await admin
+      .from('notifications')
+      .select('user_id, kind, data, created_at')
+      .in('kind', [
+        'message_deleted_for_me',
+        'message_deleted_for_all',
+        'message_edited',
+        'message_starred',
+        'chat_pinned_message',
+        'chat_cleared_at',
+        'chat_muted',
+      ])
+      .filter('data->>chat_id', 'eq', chatId)
+      .order('created_at', { ascending: true });
+
+    const deletedForMe = new Set<number>();
+    const deletedForAll = new Set<number>();
+    const edited = new Set<number>();
+    const starred = new Set<number>();
+    let pinnedMessageId: number | null = null;
+    let clearedAt: string | null = null;
+    let isMuted = false;
+
+    for (const row of data || []) {
+      const d = (row.data ?? {}) as Record<string, unknown>;
+      const msgId = Number(d.message_id);
+
+      if (row.kind === 'message_deleted_for_all' && msgId > 0) {
+        deletedForAll.add(msgId);
+      } else if (row.kind === 'message_edited' && msgId > 0) {
+        edited.add(msgId);
+      } else if (row.kind === 'chat_pinned_message') {
+        pinnedMessageId = msgId > 0 ? msgId : null;
+      } else if (row.user_id === userId) {
+        if (row.kind === 'message_deleted_for_me' && msgId > 0) {
+          deletedForMe.add(msgId);
+        } else if (row.kind === 'message_starred' && msgId > 0) {
+          starred.add(msgId);
+        } else if (row.kind === 'chat_cleared_at' && typeof d.cleared_at === 'string') {
+          clearedAt = d.cleared_at;
+        } else if (row.kind === 'chat_muted') {
+          isMuted = true;
+        }
+      }
+    }
+
+    return {
+      deletedForMeIds: Array.from(deletedForMe),
+      deletedForAllIds: Array.from(deletedForAll),
+      editedIds: Array.from(edited),
+      starredIds: Array.from(starred),
+      pinnedMessageId,
+      clearedAt,
+      isMuted,
+    };
+  } catch (err) {
+    console.warn('Failed to fetch chat message metadata:', err);
+    return empty;
   }
 }
 

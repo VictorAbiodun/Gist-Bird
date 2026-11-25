@@ -8,7 +8,19 @@ import { createClient } from '@/lib/supabase/client';
 import { Avatar, Notice, LinkButton } from './ui';
 import { STARTERS, CONTACT_UNLOCK_MESSAGES } from '@/lib/copy';
 import { CONTACT_NOTICE, hasContactInfo } from '@/lib/contentFilter';
-import { sendMessage, markChatRead, toggleMessageReaction, leaveChat } from '@/app/actions/chat';
+import {
+  sendMessage,
+  markChatRead,
+  toggleMessageReaction,
+  leaveChat,
+  deleteMessageForMe,
+  deleteMessageForEveryone,
+  editChatMessage,
+  toggleStarMessage,
+  togglePinMessage,
+  clearChatForMe,
+  toggleMuteChat,
+} from '@/app/actions/chat';
 import { Icon } from './Icon';
 import BirdTypingAnimation from './BirdTypingAnimation';
 import { formatMessageTime, formatDateDivider } from '@/lib/date';
@@ -16,7 +28,15 @@ import { CHAT_EMOJIS, getEmoji } from '@/lib/emojis';
 import { enqueueMessage, getQueuedMessages, removeQueuedMessage } from '@/lib/offlineQueue';
 import { playSendSound, playReceiveSound, isSoundMuted, setSoundMuted } from '@/lib/sounds';
 import { ProfilePreviewModal, type ProfilePreviewData } from './ProfilePreviewModal';
-import type { Message, Scarf, MessageReactionsMap, MessageRepliesMap } from '@/lib/types';
+import {
+  DeleteMessageModal,
+  EditMessageModal,
+  ForwardShareModal,
+  MessageInfoModal,
+  StarredMessagesDrawer,
+  ClearChatModal,
+} from './ChatModals';
+import type { Message, Scarf, MessageReactionsMap, MessageRepliesMap, ChatMessageMeta, ChatRow } from '@/lib/types';
 
 interface ChatThreadProps {
   chatId: string;
@@ -31,6 +51,8 @@ interface ChatThreadProps {
   initialOtherLastReadAt?: string | null;
   initialReactions?: MessageReactionsMap;
   initialReplies?: MessageRepliesMap;
+  initialMeta?: ChatMessageMeta;
+  forwardTargets?: ChatRow[];
   otherProfilePreview?: ProfilePreviewData | null;
 }
 
@@ -47,6 +69,8 @@ export function ChatThread({
   initialOtherLastReadAt = null,
   initialReactions = {},
   initialReplies = {},
+  initialMeta,
+  forwardTargets = [],
   otherProfilePreview = null,
 }: ChatThreadProps) {
   const router = useRouter();
@@ -69,11 +93,31 @@ export function ChatThread({
   const [replyMap, setReplyMap] = useState<MessageRepliesMap>(initialReplies);
   const [replyingTo, setReplyingTo] = useState<Message | null>(null);
   const [focusedThreadRootId, setFocusedThreadRootId] = useState<number | null>(null);
+  const [deletedForMe, setDeletedForMe] = useState<number[]>(initialMeta?.deletedForMeIds ?? []);
+  const [deletedForAll, setDeletedForAll] = useState<number[]>(initialMeta?.deletedForAllIds ?? []);
+  const [editedIds, setEditedIds] = useState<number[]>(initialMeta?.editedIds ?? []);
+  const [starredIds, setStarredIds] = useState<number[]>(initialMeta?.starredIds ?? []);
+  const [pinnedMessageId, setPinnedMessageId] = useState<number | null>(initialMeta?.pinnedMessageId ?? null);
+  const [clearedAt, setClearedAt] = useState<string | null>(initialMeta?.clearedAt ?? null);
+  const [isMuted, setIsMuted] = useState<boolean>(initialMeta?.isMuted ?? false);
+  const [showHeaderMenu, setShowHeaderMenu] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchMatchIdx, setSearchMatchIdx] = useState(0);
+  const [showStarredDrawer, setShowStarredDrawer] = useState(false);
+  const [showClearModal, setShowClearModal] = useState(false);
+  const [deleteModalMsg, setDeleteModalMsg] = useState<Message | null>(null);
+  const [editModalMsg, setEditModalMsg] = useState<Message | null>(null);
+  const [forwardModalMsg, setForwardModalMsg] = useState<Message | null>(null);
+  const [infoModalMsg, setInfoModalMsg] = useState<Message | null>(null);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
   const bottom = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const messageRefs = useRef<Record<number, HTMLDivElement | null>>({});
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const channelRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']> | null>(null);
   const lastTypingSentRef = useRef(0);
   const stopTypingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -243,6 +287,23 @@ export function ChatThread({
           [Number(payload.messageId)]: Number(payload.replyToId),
         }));
       })
+      .on('broadcast', { event: 'msg_deleted_all' }, ({ payload }) => {
+        const msgId = Number(payload?.messageId);
+        if (msgId > 0) {
+          setDeletedForAll((prev) => (prev.includes(msgId) ? prev : [...prev, msgId]));
+        }
+      })
+      .on('broadcast', { event: 'msg_edited' }, ({ payload }) => {
+        const msgId = Number(payload?.messageId);
+        const newBody = typeof payload?.newBody === 'string' ? payload.newBody : '';
+        if (msgId > 0 && newBody) {
+          setMessages((prev) => prev.map((m) => (m.id === msgId ? { ...m, body: newBody } : m)));
+          setEditedIds((prev) => (prev.includes(msgId) ? prev : [...prev, msgId]));
+        }
+      })
+      .on('broadcast', { event: 'chat_pinned' }, ({ payload }) => {
+        setPinnedMessageId(payload?.pinnedMessageId ? Number(payload.pinnedMessageId) : null);
+      })
       .on('broadcast', { event: 'reaction_broadcast' }, ({ payload }) => {
         if (!payload || !payload.messageId || !payload.emoji || !payload.userId) return;
         const { messageId, emoji, userId, action } = payload;
@@ -391,14 +452,175 @@ export function ChatThread({
     return map;
   }, [messages, replyMap]);
 
+  const showToast = useCallback((msg: string) => {
+    setToastMsg(msg);
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => setToastMsg(null), 2400);
+  }, []);
+
+  const visibleMessages = useMemo(() => {
+    const delSet = new Set(deletedForMe);
+    const clearTime = clearedAt ? new Date(clearedAt).getTime() : 0;
+    return messages.filter((m) => {
+      if (delSet.has(m.id)) return false;
+      if (clearTime && new Date(m.created_at).getTime() <= clearTime) return false;
+      return true;
+    });
+  }, [messages, deletedForMe, clearedAt]);
+
+  const searchMatches = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return [];
+    const delAllSet = new Set(deletedForAll);
+    return visibleMessages
+      .filter((m) => !delAllSet.has(m.id) && m.body.toLowerCase().includes(q))
+      .map((m) => m.id);
+  }, [visibleMessages, searchQuery, deletedForAll]);
+
+  const starredMessages = useMemo(() => {
+    const sSet = new Set(starredIds);
+    const delAllSet = new Set(deletedForAll);
+    return visibleMessages.filter((m) => sSet.has(m.id) && !delAllSet.has(m.id));
+  }, [visibleMessages, starredIds, deletedForAll]);
+
+  const scrollToMessage = useCallback((msgId: number) => {
+    const el = messageRefs.current[msgId];
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, []);
+
   const startReply = (msg: Message) => {
-    if (msg.id < 0) return;
+    if (msg.id < 0 || deletedForAll.includes(msg.id)) return;
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       navigator.vibrate(10);
     }
     setActiveReactionMenuMsgId(null);
     setReplyingTo(msg);
     setTimeout(() => inputRef.current?.focus(), 40);
+  };
+
+  const handleCopyMessage = async (msg: Message) => {
+    setActiveReactionMenuMsgId(null);
+    try {
+      await navigator.clipboard.writeText(msg.body);
+      showToast('Copied to clipboard');
+    } catch {
+      showToast('Could not copy');
+    }
+  };
+
+  const handleToggleStar = async (msg: Message) => {
+    setActiveReactionMenuMsgId(null);
+    const wasStarred = starredIds.includes(msg.id);
+    setStarredIds((prev) =>
+      wasStarred ? prev.filter((id) => id !== msg.id) : [...prev, msg.id]
+    );
+    showToast(wasStarred ? 'Removed from Starred' : 'Message starred ⭐');
+    await toggleStarMessage(chatId, msg.id).catch(() => {});
+  };
+
+  const handleTogglePin = async (msg: Message) => {
+    setActiveReactionMenuMsgId(null);
+    const nextPin = pinnedMessageId === msg.id ? null : msg.id;
+    setPinnedMessageId(nextPin);
+    channelRef.current
+      ?.send({
+        type: 'broadcast',
+        event: 'chat_pinned',
+        payload: { pinnedMessageId: nextPin },
+      })
+      .catch(() => {});
+    showToast(nextPin ? 'Message pinned 📌' : 'Message unpinned');
+    await togglePinMessage(chatId, nextPin).catch(() => {});
+  };
+
+  const handleDeleteForMe = async (msg: Message) => {
+    setDeleteModalMsg(null);
+    setDeletedForMe((prev) => (prev.includes(msg.id) ? prev : [...prev, msg.id]));
+    showToast('Deleted for you');
+    await deleteMessageForMe(chatId, msg.id).catch(() => {});
+  };
+
+  const handleDeleteForEveryone = async (msg: Message) => {
+    setDeleteModalMsg(null);
+    setDeletedForAll((prev) => (prev.includes(msg.id) ? prev : [...prev, msg.id]));
+    if (pinnedMessageId === msg.id) setPinnedMessageId(null);
+    channelRef.current
+      ?.send({
+        type: 'broadcast',
+        event: 'msg_deleted_all',
+        payload: { messageId: msg.id },
+      })
+      .catch(() => {});
+    showToast('Deleted for everyone');
+    await deleteMessageForEveryone(chatId, msg.id).catch(() => {});
+  };
+
+  const handleSaveEdit = async (msg: Message, newBody: string) => {
+    if (locked && hasContactInfo(newBody)) {
+      setError('Chat first before sharing contact info.');
+      setEditModalMsg(null);
+      return;
+    }
+    const res = await editChatMessage({ chatId, messageId: msg.id, body: newBody });
+    if (res.error) {
+      setError(res.error);
+      setEditModalMsg(null);
+      return;
+    }
+    setMessages((prev) => prev.map((m) => (m.id === msg.id ? { ...m, body: newBody } : m)));
+    setEditedIds((prev) => (prev.includes(msg.id) ? prev : [...prev, msg.id]));
+    setEditModalMsg(null);
+    channelRef.current
+      ?.send({
+        type: 'broadcast',
+        event: 'msg_edited',
+        payload: { messageId: msg.id, newBody },
+      })
+      .catch(() => {});
+    showToast('Message edited');
+  };
+
+  const handleForwardToChat = async (target: ChatRow, msg: Message) => {
+    const r = await sendMessage({ chatId: target.id, body: msg.body });
+    setForwardModalMsg(null);
+    if (r.error) {
+      showToast(r.error);
+    } else {
+      showToast(`Forwarded to ${target.other_name}`);
+    }
+  };
+
+  const handleShareExternal = async (msg: Message) => {
+    setForwardModalMsg(null);
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({ text: msg.body });
+        return;
+      } catch {
+        // User cancelled or share failed; fallback to copy
+      }
+    }
+    await handleCopyMessage(msg);
+  };
+
+  const handleClearChat = async () => {
+    const res = await clearChatForMe(chatId);
+    setShowClearModal(false);
+    if (res.clearedAt) {
+      setClearedAt(res.clearedAt);
+      setPinnedMessageId(null);
+      showToast('Chat cleared for you');
+    }
+  };
+
+  const handleToggleMuteChat = async () => {
+    setShowHeaderMenu(false);
+    const next = !isMuted;
+    setIsMuted(next);
+    showToast(next ? 'Chat notifications muted 🔕' : 'Chat notifications unmuted 🔔');
+    await toggleMuteChat(chatId).catch(() => {});
   };
 
   function send(body = text) {
@@ -561,18 +783,12 @@ export function ChatThread({
           </button>
         </div>
 
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={toggleMute}
-            aria-label={soundMuted ? 'Unmute chat sounds' : 'Mute chat sounds'}
-            title={soundMuted ? 'Unmute sounds' : 'Mute sounds'}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-surface text-muted hover:text-ink active:bg-surface-alt transition"
-          >
-            <span className="text-[14px]" aria-hidden>
-              {soundMuted ? '🔇' : '🔊'}
+        <div className="relative flex items-center gap-1.5">
+          {isMuted && (
+            <span title="Chat muted" className="text-[13px] text-muted" aria-label="Muted">
+              🔕
             </span>
-          </button>
+          )}
           <button
             type="button"
             onClick={() => setShowPaper((prev) => !prev)}
@@ -588,26 +804,183 @@ export function ChatThread({
           </button>
           <button
             type="button"
-            onClick={() => setShowLeaveModal(true)}
-            aria-label="Fly away (leave chat)"
-            title="Fly away (leave chat)"
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-surface text-muted hover:text-danger active:bg-surface-alt transition"
+            onClick={() => setShowHeaderMenu((prev) => !prev)}
+            aria-label="Chat options"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-surface text-ink hover:bg-surface-alt active:scale-95 transition"
           >
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
-            </svg>
+            <span className="text-[16px] font-bold leading-none">⋮</span>
           </button>
-          <Link
-            href={`/report?chat=${chatId}`}
-            aria-label="Report or block"
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-surface text-muted hover:text-ink active:bg-surface-alt transition"
-          >
-            <Icon name="flag" size={17} />
-          </Link>
+
+          <AnimatePresence>
+            {showHeaderMenu && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.92, y: -4 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.92, y: -4 }}
+                className="absolute right-0 top-10 z-50 w-52 rounded-2xl border border-line bg-surface p-1.5 shadow-xl"
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowHeaderMenu(false);
+                    setShowSearch((prev) => !prev);
+                  }}
+                  className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-[13px] font-semibold text-ink hover:bg-surface-alt"
+                >
+                  <span>🔍</span>
+                  <span>Search in chat</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowHeaderMenu(false);
+                    setShowStarredDrawer(true);
+                  }}
+                  className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-[13px] font-semibold text-ink hover:bg-surface-alt"
+                >
+                  <span className="flex items-center gap-2.5">
+                    <span>⭐</span>
+                    <span>Starred messages</span>
+                  </span>
+                  {starredMessages.length > 0 && (
+                    <span className="text-[11px] font-bold text-primary">{starredMessages.length}</span>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleToggleMuteChat}
+                  className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-[13px] font-semibold text-ink hover:bg-surface-alt"
+                >
+                  <span>{isMuted ? '🔔' : '🔕'}</span>
+                  <span>{isMuted ? 'Unmute notifications' : 'Mute notifications'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowHeaderMenu(false);
+                    toggleMute();
+                  }}
+                  className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-[13px] font-semibold text-ink hover:bg-surface-alt"
+                >
+                  <span>{soundMuted ? '🔊' : '🔇'}</span>
+                  <span>{soundMuted ? 'Unmute sounds' : 'Mute sounds'}</span>
+                </button>
+                <div className="my-1 h-[1px] bg-line/70" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowHeaderMenu(false);
+                    setShowClearModal(true);
+                  }}
+                  className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-[13px] font-semibold text-ink hover:bg-surface-alt"
+                >
+                  <span>🧹</span>
+                  <span>Clear chat</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowHeaderMenu(false);
+                    setShowLeaveModal(true);
+                  }}
+                  className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-[13px] font-semibold text-danger hover:bg-danger/10"
+                >
+                  <span>🕊️</span>
+                  <span>Fly away (Leave)</span>
+                </button>
+                <Link
+                  href={`/report?chat=${chatId}`}
+                  onClick={() => setShowHeaderMenu(false)}
+                  className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-[13px] font-semibold text-danger hover:bg-danger/10"
+                >
+                  <span>🚩</span>
+                  <span>Report or block</span>
+                </Link>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </header>
+
+      {/* ── Search in Chat Bar ── */}
+      {showSearch && (
+        <div className="flex shrink-0 items-center gap-2 border-b border-line bg-surface-alt px-3 py-2">
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setSearchMatchIdx(0);
+            }}
+            placeholder="Search messages…"
+            autoFocus
+            className="h-9 min-w-0 flex-1 rounded-full border border-line bg-surface px-3.5 text-[13px] text-ink focus:border-primary focus:outline-none"
+          />
+          {searchQuery.trim() && (
+            <span className="shrink-0 text-[11px] font-bold text-muted">
+              {searchMatches.length > 0 ? `${searchMatchIdx + 1}/${searchMatches.length}` : '0/0'}
+            </span>
+          )}
+          <button
+            type="button"
+            disabled={searchMatches.length === 0}
+            onClick={() => {
+              const nextIdx = (searchMatchIdx - 1 + searchMatches.length) % searchMatches.length;
+              setSearchMatchIdx(nextIdx);
+              scrollToMessage(searchMatches[nextIdx]);
+            }}
+            className="flex h-7 w-7 items-center justify-center rounded-full border border-line bg-surface text-[12px] font-bold disabled:opacity-40"
+          >
+            ↑
+          </button>
+          <button
+            type="button"
+            disabled={searchMatches.length === 0}
+            onClick={() => {
+              const nextIdx = (searchMatchIdx + 1) % searchMatches.length;
+              setSearchMatchIdx(nextIdx);
+              scrollToMessage(searchMatches[nextIdx]);
+            }}
+            className="flex h-7 w-7 items-center justify-center rounded-full border border-line bg-surface text-[12px] font-bold disabled:opacity-40"
+          >
+            ↓
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setShowSearch(false);
+              setSearchQuery('');
+            }}
+            className="px-1.5 text-[12px] font-bold text-muted hover:text-ink"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* ── Pinned Message Banner ── */}
+      {pinnedMessageId && messagesById.get(pinnedMessageId) && !deletedForAll.includes(pinnedMessageId) && (
+        <div className="flex shrink-0 items-center justify-between gap-2 border-b border-line bg-primary/8 px-4 py-1.5">
+          <button
+            type="button"
+            onClick={() => scrollToMessage(pinnedMessageId)}
+            className="flex min-w-0 flex-1 items-center gap-2 text-left"
+          >
+            <span className="text-[13px]">📌</span>
+            <p className="truncate text-[12.5px] font-semibold text-ink">
+              {messagesById.get(pinnedMessageId)!.body}
+            </p>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTogglePin(messagesById.get(pinnedMessageId)!)}
+            aria-label="Unpin message"
+            className="text-[11px] font-bold text-muted hover:text-ink"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* ── Offline / Queue Sync Banner ── */}
       {(isOffline || isSyncingQueue) && (
@@ -664,7 +1037,10 @@ export function ChatThread({
           {/* ── Messages Stream ── */}
           <div
             ref={messagesContainerRef}
-            onClick={() => setActiveReactionMenuMsgId(null)}
+            onClick={() => {
+              setActiveReactionMenuMsgId(null);
+              setShowHeaderMenu(false);
+            }}
             className="flex-1 space-y-2.5 overflow-y-auto px-4 py-3 overscroll-y-contain"
             aria-live="polite"
           >
@@ -674,9 +1050,9 @@ export function ChatThread({
               <p className="mt-1 line-clamp-3 text-label italic text-ink">&ldquo;{paperBody}&rdquo;</p>
             </div>
 
-            {messages.map((m, index) => {
+            {visibleMessages.map((m, index) => {
               const isMine = m.sender_id === me;
-              const prevDate = index > 0 ? formatDateDivider(messages[index - 1].created_at) : null;
+              const prevDate = index > 0 ? formatDateDivider(visibleMessages[index - 1].created_at) : null;
               const currentDate = formatDateDivider(m.created_at);
               const showDateDivider = index === 0 || prevDate !== currentDate;
               const msgReactions = reactions[m.id] || [];
@@ -685,10 +1061,22 @@ export function ChatThread({
               const childReplies = repliesByParent.get(m.id) ?? [];
               const isReplyTarget = replyingTo?.id === m.id;
               const isDimmedByReplyFocus = Boolean(replyingTo) && !isReplyTarget;
+              const isDeletedAll = deletedForAll.includes(m.id);
+              const isEdited = editedIds.includes(m.id);
+              const isStarred = starredIds.includes(m.id);
+              const canEdit =
+                isMine &&
+                m.id > 0 &&
+                !isDeletedAll &&
+                Date.now() - new Date(m.created_at).getTime() <= 15 * 60 * 1000;
+              const isSearchMatch = searchMatches[searchMatchIdx] === m.id;
 
               return (
                 <div
                   key={m.id}
+                  ref={(el) => {
+                    messageRefs.current[m.id] = el;
+                  }}
                   className={`space-y-2 transition-all duration-200 ${
                     isReplyTarget ? 'relative z-20' : ''
                   } ${isDimmedByReplyFocus ? 'opacity-40 blur-[1px]' : ''}`}
@@ -743,89 +1131,171 @@ export function ChatThread({
                         </div>
                       )}
 
-                      {/* Floating Emoji & Reply Action Bar */}
+                      {/* Floating Emoji & WhatsApp Options Bar */}
                       <AnimatePresence>
-                        {activeReactionMenuMsgId === m.id && (
+                        {activeReactionMenuMsgId === m.id && !isDeletedAll && (
                           <motion.div
-                            initial={{ opacity: 0, scale: 0.75, y: -4 }}
+                            initial={{ opacity: 0, scale: 0.8, y: -4 }}
                             animate={{ opacity: 1, scale: 1, y: -8 }}
-                            exit={{ opacity: 0, scale: 0.75, y: -4 }}
+                            exit={{ opacity: 0, scale: 0.8, y: -4 }}
                             transition={{ type: 'spring', damping: 22, stiffness: 350 }}
-                            className={`absolute -top-10 z-30 flex items-center gap-1 rounded-full border border-line/80 bg-white/95 px-2 py-1 shadow-lg backdrop-blur-md ${
-                              isMine ? 'right-0' : 'left-0'
+                            className={`absolute -top-20 z-30 flex flex-col gap-1.5 ${
+                              isMine ? 'right-0 items-end' : 'left-0 items-start'
                             }`}
                             onClick={(e) => e.stopPropagation()}
                           >
-                            {CHAT_EMOJIS.map((em) => {
-                              const hasReacted = msgReactions.some(
-                                (r) => r.emoji === em.key && r.users.includes(me)
-                              );
-                              return (
-                                <button
-                                  key={em.key}
-                                  type="button"
-                                  onClick={() => handleReactionSelect(m.id, em.key)}
-                                  className={`flex h-7 w-7 items-center justify-center rounded-full transition-transform active:scale-130 hover:scale-120 ${
-                                    hasReacted
-                                      ? 'bg-primary/20 ring-2 ring-primary'
-                                      : 'hover:bg-black/5'
-                                  }`}
-                                  title={em.label}
-                                >
-                                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                                  <img
-                                    src={em.file}
-                                    alt={em.label}
-                                    className="h-5 w-5 object-contain pointer-events-none"
-                                  />
-                                </button>
-                              );
-                            })}
+                            {/* Emoji Row */}
+                            <div className="flex items-center gap-1 rounded-full border border-line/80 bg-white/95 px-2 py-1 shadow-lg backdrop-blur-md">
+                              {CHAT_EMOJIS.map((em) => {
+                                const hasReacted = msgReactions.some(
+                                  (r) => r.emoji === em.key && r.users.includes(me)
+                                );
+                                return (
+                                  <button
+                                    key={em.key}
+                                    type="button"
+                                    onClick={() => handleReactionSelect(m.id, em.key)}
+                                    className={`flex h-7 w-7 items-center justify-center rounded-full transition-transform active:scale-130 hover:scale-120 ${
+                                      hasReacted
+                                        ? 'bg-primary/20 ring-2 ring-primary'
+                                        : 'hover:bg-black/5'
+                                    }`}
+                                    title={em.label}
+                                  >
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
+                                      src={em.file}
+                                      alt={em.label}
+                                      className="h-5 w-5 object-contain pointer-events-none"
+                                    />
+                                  </button>
+                                );
+                              })}
+                              {m.id > 0 && (
+                                <>
+                                  <span className="mx-0.5 h-4 w-[1px] bg-line" aria-hidden />
+                                  <button
+                                    type="button"
+                                    onClick={() => startReply(m)}
+                                    aria-label="Reply to message"
+                                    title="Reply"
+                                    className="flex h-7 items-center gap-1 rounded-full px-2 text-[11px] font-bold text-primary transition hover:bg-primary/10 active:scale-95"
+                                  >
+                                    <span>↩</span>
+                                    <span>Reply</span>
+                                  </button>
+                                </>
+                              )}
+                            </div>
+
+                            {/* WhatsApp Message Action Pills */}
                             {m.id > 0 && (
-                              <>
-                                <span className="mx-0.5 h-4 w-[1px] bg-line" aria-hidden />
+                              <div className="flex flex-wrap items-center gap-1 rounded-2xl border border-line/80 bg-white/95 px-2 py-1 shadow-lg backdrop-blur-md text-[11px] font-bold text-ink">
                                 <button
                                   type="button"
-                                  onClick={() => startReply(m)}
-                                  aria-label="Reply to message"
-                                  title="Reply"
-                                  className="flex h-7 items-center gap-1 rounded-full px-2 text-[11px] font-bold text-primary transition hover:bg-primary/10 active:scale-95"
+                                  onClick={() => handleCopyMessage(m)}
+                                  className="rounded-lg px-2 py-1 hover:bg-surface-alt active:scale-95"
                                 >
-                                  <span>↩</span>
-                                  <span>Reply</span>
+                                  📋 Copy
                                 </button>
-                              </>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setActiveReactionMenuMsgId(null);
+                                    setForwardModalMsg(m);
+                                  }}
+                                  className="rounded-lg px-2 py-1 hover:bg-surface-alt active:scale-95"
+                                >
+                                  ↗ Forward
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleStar(m)}
+                                  className="rounded-lg px-2 py-1 hover:bg-surface-alt active:scale-95"
+                                >
+                                  {isStarred ? '★ Unstar' : '⭐ Star'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleTogglePin(m)}
+                                  className="rounded-lg px-2 py-1 hover:bg-surface-alt active:scale-95"
+                                >
+                                  {pinnedMessageId === m.id ? '📌 Unpin' : '📌 Pin'}
+                                </button>
+                                {canEdit && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setActiveReactionMenuMsgId(null);
+                                      setEditModalMsg(m);
+                                    }}
+                                    className="rounded-lg px-2 py-1 hover:bg-surface-alt active:scale-95"
+                                  >
+                                    ✏️ Edit
+                                  </button>
+                                )}
+                                {isMine && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setActiveReactionMenuMsgId(null);
+                                      setInfoModalMsg(m);
+                                    }}
+                                    className="rounded-lg px-2 py-1 hover:bg-surface-alt active:scale-95"
+                                  >
+                                    ℹ️ Info
+                                  </button>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setActiveReactionMenuMsgId(null);
+                                    setDeleteModalMsg(m);
+                                  }}
+                                  className="rounded-lg px-2 py-1 text-danger hover:bg-danger/10 active:scale-95"
+                                >
+                                  🗑️ Delete
+                                </button>
+                              </div>
                             )}
                           </motion.div>
                         )}
                       </AnimatePresence>
 
                       <motion.div
-                        drag={m.id > 0 ? 'x' : false}
+                        drag={m.id > 0 && !isDeletedAll ? 'x' : false}
                         dragConstraints={{ left: 0, right: 54 }}
                         dragElastic={0.2}
                         dragSnapToOrigin
                         onDragEnd={(_, info) => {
-                          if (m.id > 0 && info.offset.x > 38) {
+                          if (m.id > 0 && !isDeletedAll && info.offset.x > 38) {
                             startReply(m);
                           }
                         }}
                         onClick={(e) => {
                           e.stopPropagation();
-                          setActiveReactionMenuMsgId((curr) => (curr === m.id ? null : m.id));
+                          if (!isDeletedAll) {
+                            setActiveReactionMenuMsgId((curr) => (curr === m.id ? null : m.id));
+                          }
                         }}
                         className={`relative w-full cursor-pointer rounded-[18px] px-3.5 pt-2 pb-1.5 text-[15px] leading-relaxed shadow-xs select-none active:scale-[0.99] transition-transform ${
                           isMine
                             ? 'rounded-br-[4px] bg-primary text-on-primary font-medium'
                             : 'rounded-bl-[4px] border border-line bg-surface text-ink'
-                        } ${isReplyTarget ? 'ring-2 ring-primary/40 shadow-md' : ''}`}
+                        } ${isReplyTarget || isSearchMatch ? 'ring-2 ring-amber-400 shadow-md' : ''}`}
                       >
-                        <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                        {isDeletedAll ? (
+                          <p className="italic opacity-75 text-[13.5px]">🚫 This message was deleted</p>
+                        ) : (
+                          <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                        )}
                         <div
                           className={`mt-0.5 flex items-center justify-end gap-1 text-[10.5px] leading-none select-none ${
                             isMine ? 'text-white/80' : 'text-muted'
                           }`}
                         >
+                          {isStarred && !isDeletedAll && <span title="Starred">⭐</span>}
+                          {isEdited && !isDeletedAll && <span className="italic opacity-80">edited</span>}
                           <span suppressHydrationWarning>{formatMessageTime(m.created_at)}</span>
                           {isMine &&
                             (m.id < 0 ? (
@@ -1213,6 +1683,59 @@ export function ChatThread({
           data={otherProfilePreview}
         />
       )}
+
+      {/* ── WhatsApp Message & Chat Modals ── */}
+      <DeleteMessageModal
+        message={deleteModalMsg}
+        isMine={deleteModalMsg?.sender_id === me}
+        onClose={() => setDeleteModalMsg(null)}
+        onDeleteForMe={handleDeleteForMe}
+        onDeleteForEveryone={handleDeleteForEveryone}
+      />
+      <EditMessageModal
+        message={editModalMsg}
+        onClose={() => setEditModalMsg(null)}
+        onSave={handleSaveEdit}
+      />
+      <ForwardShareModal
+        message={forwardModalMsg}
+        targets={forwardTargets}
+        onClose={() => setForwardModalMsg(null)}
+        onForwardToChat={handleForwardToChat}
+        onShareExternal={handleShareExternal}
+      />
+      <MessageInfoModal
+        message={infoModalMsg}
+        otherLastReadAt={otherLastReadAt}
+        onClose={() => setInfoModalMsg(null)}
+      />
+      <StarredMessagesDrawer
+        open={showStarredDrawer}
+        messages={starredMessages}
+        me={me}
+        otherName={otherName}
+        onClose={() => setShowStarredDrawer(false)}
+        onSelectMessage={scrollToMessage}
+      />
+      <ClearChatModal
+        open={showClearModal}
+        onClose={() => setShowClearModal(false)}
+        onConfirm={handleClearChat}
+      />
+
+      {/* ── Toast Notification Pill ── */}
+      <AnimatePresence>
+        {toastMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 16 }}
+            className="pointer-events-none fixed bottom-20 left-1/2 z-50 -translate-x-1/2 rounded-full bg-ink/90 px-4 py-2 text-[12px] font-bold text-white shadow-lg backdrop-blur-md"
+          >
+            {toastMsg}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -57,6 +57,11 @@
 - **Friend Profile Preview (`getFriendProfilePreview`)**: Tapping a friend's avatar or name in a chat header (or tapping their avatar on `/chats`) opens the full `ProfilePreviewModal` showing their tree scene/photo, bio, university & crest, age, gender, topics, XP, achievements, and gifts.
 - **iMessage-Style Inline Replies**: Swipe right or tap `↩ Reply` on any message bubble to enter focused reply mode; displays a curved SVG thread connector from a compact parent preview bubble into the reply bubble, `"N Replies"` counters, and a blurred Focused Thread Overlay.
 
+### Phase 11: Full WhatsApp-Style Message & Chat Options
+- **Message Actions**: Copy to clipboard, Forward to another Gist Bird chat / Share externally, Delete for me / Delete for everyone (with `"🚫 This message was deleted"` tombstone), Edit within 15 minutes (`edited` tag), Star/Bookmark, Pin to top banner, and Message Info (Delivered & Read timestamps).
+- **Chat Header Menu (`⋮`)**: Search in chat with up/down match jumping, Starred Messages drawer, Mute/Unmute notifications per chat (honored by Web Push dispatch), Sound Effects mute toggle, Clear Chat for me, Fly Away (leave/unmatch), and Report/Block.
+
+
 
 
 

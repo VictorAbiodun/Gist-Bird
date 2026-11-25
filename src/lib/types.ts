@@ -13,6 +13,15 @@ export interface Message { id: number; chat_id: string; sender_id: string; body:
 export interface MessageReactionGroup { emoji: string; users: string[] }
 export type MessageReactionsMap = Record<number, MessageReactionGroup[]>;
 export type MessageRepliesMap = Record<number, number>;
+export interface ChatMessageMeta {
+  deletedForMeIds: number[];
+  deletedForAllIds: number[];
+  editedIds: number[];
+  starredIds: number[];
+  pinnedMessageId: number | null;
+  clearedAt: string | null;
+  isMuted: boolean;
+}
 export interface Notice { id: string; kind: string; title: string; body: string | null; data: Record<string, string>; read_at: string | null; created_at: string }
 export interface Profile {
   id: string;

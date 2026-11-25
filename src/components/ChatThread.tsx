@@ -10,6 +10,7 @@ import { CONTACT_NOTICE, hasContactInfo } from '@/lib/contentFilter';
 import { sendMessage } from '@/app/actions/chat';
 import { Icon } from './Icon';
 import BirdTypingAnimation from './BirdTypingAnimation';
+import { formatMessageTime, formatDateDivider } from '@/lib/date';
 import type { Message, Scarf } from '@/lib/types';
 
 interface ChatThreadProps {
@@ -165,6 +166,9 @@ export function ChatThread({
 
     // Optimistically show message & clear input immediately
     broadcastTyping(false);
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      navigator.vibrate(12);
+    }
     setMessages((m) => [...m, optimisticMsg]);
     if (body === text) setText('');
     setTimeout(() => bottom.current?.scrollIntoView({ behavior: 'smooth' }), 30);
@@ -288,19 +292,75 @@ export function ChatThread({
               <p className="mt-1 line-clamp-3 text-label italic text-ink">&ldquo;{paperBody}&rdquo;</p>
             </div>
 
-            {messages.map((m) => {
+            {messages.map((m, index) => {
               const isMine = m.sender_id === me;
+              const prevDate = index > 0 ? formatDateDivider(messages[index - 1].created_at) : null;
+              const currentDate = formatDateDivider(m.created_at);
+              const showDateDivider = index === 0 || prevDate !== currentDate;
+
               return (
-                <div key={m.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-                  <p
-                    className={`max-w-[82%] whitespace-pre-wrap break-words rounded-[18px] px-3.5 py-2.5 text-[15px] leading-relaxed shadow-xs ${
-                      isMine
-                        ? 'rounded-br-[4px] bg-primary text-on-primary font-medium'
-                        : 'rounded-bl-[4px] border border-line bg-surface text-ink'
-                    }`}
-                  >
-                    {m.body}
-                  </p>
+                <div key={m.id} className="space-y-2">
+                  {showDateDivider && currentDate && (
+                    <div className="my-2.5 flex justify-center">
+                      <span className="rounded-full border border-line/60 bg-surface/90 px-3 py-0.5 text-[11px] font-semibold text-muted shadow-2xs backdrop-blur-xs select-none">
+                        {currentDate}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
+                    <div
+                      className={`relative max-w-[82%] rounded-[18px] px-3.5 pt-2 pb-1.5 text-[15px] leading-relaxed shadow-xs ${
+                        isMine
+                          ? 'rounded-br-[4px] bg-primary text-on-primary font-medium'
+                          : 'rounded-bl-[4px] border border-line bg-surface text-ink'
+                      }`}
+                    >
+                      <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                      <div
+                        className={`mt-0.5 flex items-center justify-end gap-1 text-[10.5px] leading-none select-none ${
+                          isMine ? 'text-white/80' : 'text-muted'
+                        }`}
+                      >
+                        <span suppressHydrationWarning>{formatMessageTime(m.created_at)}</span>
+                        {isMine &&
+                          (m.id < 0 ? (
+                            <svg
+                              className="h-2.5 w-2.5 text-white/70 animate-pulse"
+                              viewBox="0 0 16 16"
+                              fill="currentColor"
+                              aria-label="Sending"
+                            >
+                              <path d="M8 3.5a.5.5 0 0 0-1 0V8a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 7.71V3.5z" />
+                              <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
+                            </svg>
+                          ) : (
+                            <svg
+                              className="h-3 w-3 text-white/95"
+                              viewBox="0 0 16 15"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                              aria-label="Sent"
+                            >
+                              <path
+                                d="M14.5 4L6.5 12L2 7.5"
+                                stroke="currentColor"
+                                strokeWidth="1.6"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M10.5 4L5.5 9"
+                                stroke="currentColor"
+                                strokeWidth="1.6"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               );
             })}

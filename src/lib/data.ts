@@ -2,6 +2,9 @@ import 'server-only';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { FINITE_ECONOMY_CUTOFF, getLagosDateString, INITIAL_FREE_PAPERS, type RewardStatus } from '@/lib/rewards';
+import { getBirdStats } from '@/lib/bird';
+import { getSpot } from '@/lib/campus';
+import type { ProfilePreviewData } from '@/components/ProfilePreviewModal';
 import type { ChatRow, ChatView, InboxItem, Notice, PaperView, Profile, SentItem, MessageReactionsMap } from '@/lib/types';
 
 async function rpc<T>(name: string, args?: Record<string, unknown>, fallback?: T): Promise<T> {
@@ -231,3 +234,62 @@ export async function getProfile(): Promise<Profile | null> {
     photo_url: typeof meta.photo_url === 'string' ? meta.photo_url : undefined,
   };
 }
+
+export async function getFriendProfilePreview(userId: string): Promise<ProfilePreviewData | null> {
+  if (!userId) return null;
+  try {
+    const admin = createAdminClient();
+    const [{ data: profileRow }, { data: authData }, { count: papersSentCount }, { data: rewardRow }] =
+      await Promise.all([
+        admin
+          .from('profiles')
+          .select('id, display_name, scarf, avatar, bird_name, interests, favourite_spot, starter_prompt, created_at')
+          .eq('id', userId)
+          .maybeSingle(),
+        admin.auth.admin.getUserById(userId),
+        admin
+          .from('papers')
+          .select('id', { count: 'exact', head: true })
+          .eq('author_id', userId),
+        admin
+          .from('notifications')
+          .select('data')
+          .eq('user_id', userId)
+          .eq('kind', 'daily_reward_claimed')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
+
+    if (!profileRow) return null;
+
+    const meta = (authData?.user?.user_metadata ?? {}) as Record<string, unknown>;
+    const sentCount = papersSentCount ?? 0;
+    const birdStats = getBirdStats(profileRow.created_at, sentCount, profileRow.bird_name);
+    const rewardData = (rewardRow?.data ?? {}) as { streak?: number };
+    const streak = Number(rewardData.streak ?? 0);
+
+    return {
+      displayName: profileRow.display_name,
+      userTag: typeof meta.user_tag === 'string' ? meta.user_tag : undefined,
+      avatar: profileRow.avatar ?? '/avatars/avatar-01.svg',
+      photoUrl: typeof meta.photo_url === 'string' ? meta.photo_url : undefined,
+      scarf: profileRow.scarf as Profile['scarf'],
+      university: typeof meta.university === 'string' ? meta.university : undefined,
+      country: typeof meta.country === 'string' ? meta.country : undefined,
+      age: typeof meta.age === 'string' ? meta.age : undefined,
+      gender: typeof meta.gender === 'string' ? meta.gender : undefined,
+      bio: profileRow.starter_prompt,
+      interests: Array.isArray(profileRow.interests) ? profileRow.interests : [],
+      spotName: getSpot(profileRow.favourite_spot)?.name ?? 'Campus',
+      xp: birdStats.xp,
+      streak,
+      papersSent: sentCount,
+      isOwnProfile: false,
+    };
+  } catch (err) {
+    console.warn('Failed to fetch friend profile preview:', err);
+    return null;
+  }
+}
+

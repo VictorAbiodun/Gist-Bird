@@ -54,6 +54,8 @@
 - **Offline Message Queue (`offlineQueue.ts`)**: Messages sent while offline or during patchy campus network drops queue safely in `localStorage` and flush sequentially as soon as connectivity returns.
 - **Synthesized Bird & Chat Sounds (`sounds.ts`)**: Zero-asset Web Audio API tones for sending, receiving (two-note bird chirp), and new paper landings on the tree, with a mute/unmute toggle in the chat header.
 - **Fly Away (`leaveChat`)**: Graceful unmatch/leave-chat confirmation modal that cleans up the conversation, notifies the other client via Realtime broadcast, and returns to `/chats`.
+- **Friend Profile Preview (`getFriendProfilePreview`)**: Tapping a friend's avatar or name in a chat header (or tapping their avatar on `/chats`) opens the full `ProfilePreviewModal` showing their tree scene/photo, bio, university & crest, age, gender, topics, XP, achievements, and gifts.
+
 
 
 

@@ -15,6 +15,7 @@ import { formatMessageTime, formatDateDivider } from '@/lib/date';
 import { CHAT_EMOJIS, getEmoji } from '@/lib/emojis';
 import { enqueueMessage, getQueuedMessages, removeQueuedMessage } from '@/lib/offlineQueue';
 import { playSendSound, playReceiveSound, isSoundMuted, setSoundMuted } from '@/lib/sounds';
+import { ProfilePreviewModal, type ProfilePreviewData } from './ProfilePreviewModal';
 import type { Message, Scarf, MessageReactionsMap } from '@/lib/types';
 
 interface ChatThreadProps {
@@ -29,6 +30,7 @@ interface ChatThreadProps {
   blocked?: boolean;
   initialOtherLastReadAt?: string | null;
   initialReactions?: MessageReactionsMap;
+  otherProfilePreview?: ProfilePreviewData | null;
 }
 
 export function ChatThread({
@@ -43,6 +45,7 @@ export function ChatThread({
   blocked: isBlocked = false,
   initialOtherLastReadAt = null,
   initialReactions = {},
+  otherProfilePreview = null,
 }: ChatThreadProps) {
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>(initial);
@@ -60,6 +63,7 @@ export function ChatThread({
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const [chatEnded, setChatEnded] = useState(false);
+  const [showFriendProfile, setShowFriendProfile] = useState(false);
   const [pending, start] = useTransition();
 
   const bottom = useRef<HTMLDivElement>(null);
@@ -470,14 +474,22 @@ export function ChatThread({
           >
             <Icon name="back" size={20} />
           </Link>
-          <Avatar name={otherName} scarf={otherScarf} avatar={otherAvatar} size={36} />
-          <div className="min-w-0 flex-1">
-            <h1 className="truncate font-display text-[15px] font-bold leading-5 text-ink">{otherName}</h1>
-            <p className="flex items-center gap-1 text-[11px] font-semibold text-primary">
-              <span className={`inline-block h-1.5 w-1.5 rounded-full bg-primary ${otherTyping ? 'animate-ping' : ''}`} />
-              {otherTyping ? 'pecking a reply…' : 'Campus chat'}
-            </p>
-          </div>
+          <button
+            type="button"
+            onClick={() => otherProfilePreview && setShowFriendProfile(true)}
+            disabled={!otherProfilePreview}
+            aria-label={`View ${otherName}'s profile`}
+            className="flex min-w-0 items-center gap-2.5 text-left transition active:opacity-75 disabled:cursor-default"
+          >
+            <Avatar name={otherName} scarf={otherScarf} avatar={otherAvatar} size={36} />
+            <div className="min-w-0 flex-1">
+              <h1 className="truncate font-display text-[15px] font-bold leading-5 text-ink">{otherName}</h1>
+              <p className="flex items-center gap-1 text-[11px] font-semibold text-primary">
+                <span className={`inline-block h-1.5 w-1.5 rounded-full bg-primary ${otherTyping ? 'animate-ping' : ''}`} />
+                {otherTyping ? 'pecking a reply…' : 'Tap to view profile'}
+              </p>
+            </div>
+          </button>
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -908,6 +920,15 @@ export function ChatThread({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ── Friend Profile Preview Modal ── */}
+      {otherProfilePreview && (
+        <ProfilePreviewModal
+          open={showFriendProfile}
+          onClose={() => setShowFriendProfile(false)}
+          data={otherProfilePreview}
+        />
+      )}
     </div>
   );
 }

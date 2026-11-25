@@ -15,11 +15,21 @@ const COLOR_MAP: Record<string, [string, string]> = {
   RUN: ['#1B3B8B', '#F2C12E'],
   CU: ['#5B1F69', '#F4C430'],
   BU: ['#0E3A75', '#E8B923'],
+  BUI: ['#0D4B82', '#FFFFFF'],
   ABUAD: ['#124E37', '#D4AF37'],
   PAU: ['#0C2D57', '#D9A726'],
   NUN: ['#0B3D91', '#4DB8E8'],
+  NTNU: ['#0B3D91', '#4DB8E8'],
   AUN: ['#002868', '#BF0A30'],
   LMU: ['#1E5631', '#D4AF37'],
+  ACU: ['#4A235A', '#F4D03F'],
+  LCU: ['#1B4F72', '#2ECC71'],
+  BIU: ['#6C1D45', '#F4D03F'],
+  VUNA: ['#7B241C', '#F4D03F'],
+  EU: ['#0E6251', '#D4AC0D'],
+  JABU: ['#8E24AA', '#FDD835'],
+  MTU: ['#512DA8', '#FBC02D'],
+  HUI: ['#1B5E20', '#F9A825'],
   UNILAG: ['#7B1FA2', '#FBC02D'],
   UI: ['#1A237E', '#FFD54F'],
   OAU: ['#1B3B8B', '#F9A825'],
@@ -27,6 +37,8 @@ const COLOR_MAP: Record<string, [string, string]> = {
   ABU: ['#00695C', '#FFD54F'],
   UNIBEN: ['#6A1B9A', '#FFD54F'],
   UNILORIN: ['#0D47A1', '#FFD600'],
+  FUTA: ['#4A148C', '#FFB300'],
+  UNIPORT: ['#1565C0', '#FFCA28'],
   LASU: ['#1B5E20', '#FFD600'],
 };
 
@@ -48,7 +60,10 @@ function slugify(str: string): string {
 
 function isLikelyImageUrl(url?: string): boolean {
   if (!url) return false;
-  return /^https?:\/\/.+\.(png|jpe?g|webp|svg|gif)(\?.*)?$/i.test(url.trim());
+  const trimmed = url.trim();
+  // Skip 4icu.org (returns 404) and non-HTTPS URLs (blocked as mixed content on mobile)
+  if (!trimmed.startsWith('https://') || trimmed.includes('4icu.org')) return false;
+  return /^https:\/\/.+\.(png|jpe?g|webp|svg|gif)(\?.*)?$/i.test(trimmed);
 }
 
 function deriveMonogram(name: string, acronym?: string): string {
@@ -94,14 +109,23 @@ export const NIGERIAN_UNIVERSITIES: NigerianUniversity[] = (rawUniversities as R
   }
 );
 
+function normalizeUniText(str: string): string {
+  return str
+    .toLowerCase()
+    .replace(/['’.,-]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export function findUniversity(nameOrId?: string | null): NigerianUniversity | undefined {
   if (!nameOrId) return undefined;
-  const q = nameOrId.trim().toLowerCase();
+  const raw = nameOrId.trim().toLowerCase();
+  const norm = normalizeUniText(nameOrId);
   return (
-    NIGERIAN_UNIVERSITIES.find((u) => u.id === q) ||
-    NIGERIAN_UNIVERSITIES.find((u) => u.name.toLowerCase() === q) ||
-    NIGERIAN_UNIVERSITIES.find((u) => u.shortName.toLowerCase() === q) ||
-    NIGERIAN_UNIVERSITIES.find((u) => u.name.toLowerCase().includes(q))
+    NIGERIAN_UNIVERSITIES.find((u) => u.id === raw) ||
+    NIGERIAN_UNIVERSITIES.find((u) => normalizeUniText(u.name) === norm) ||
+    NIGERIAN_UNIVERSITIES.find((u) => normalizeUniText(u.shortName) === norm) ||
+    NIGERIAN_UNIVERSITIES.find((u) => normalizeUniText(u.name).includes(norm))
   );
 }
 

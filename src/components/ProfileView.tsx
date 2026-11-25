@@ -6,6 +6,7 @@ import { Avatar } from './ui';
 import { Icon } from './Icon';
 import { DailyRewardModal } from './DailyRewardModal';
 import { ProfilePreviewModal } from './ProfilePreviewModal';
+import { UniversityLogo } from './UniversityLogo';
 import type { Profile } from '@/lib/types';
 import type { RewardStatus } from '@/lib/rewards';
 import type { BirdStats } from '@/lib/bird';
@@ -117,6 +118,12 @@ export function ProfileView({
           <div className="min-w-0">
             <p className="truncate font-display text-[17px] font-bold text-ink">{handle}</p>
             <p className="text-[12px] font-medium text-muted">Member since {memberSince}</p>
+            {profile.university && (
+              <p className="mt-1 flex items-center gap-1.5 text-[12px] font-semibold text-ink">
+                <UniversityLogo university={profile.university} size={16} />
+                <span className="truncate">{profile.university}</span>
+              </p>
+            )}
           </div>
 
           <button

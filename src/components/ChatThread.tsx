@@ -118,6 +118,7 @@ export function ChatThread({
   const inputRef = useRef<HTMLInputElement>(null);
   const messageRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wasDraggingRef = useRef(false);
   const channelRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']> | null>(null);
   const lastTypingSentRef = useRef(0);
   const stopTypingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1077,9 +1078,9 @@ export function ChatThread({
                   ref={(el) => {
                     messageRefs.current[m.id] = el;
                   }}
-                  className={`space-y-2 transition-all duration-200 ${
+                  className={`space-y-2 transition-opacity duration-150 ${
                     isReplyTarget ? 'relative z-20' : ''
-                  } ${isDimmedByReplyFocus ? 'opacity-40 blur-[1px]' : ''}`}
+                  } ${isDimmedByReplyFocus ? 'opacity-50' : ''}`}
                 >
                   {showDateDivider && currentDate && (
                     <div className="my-2.5 flex justify-center">
@@ -1139,9 +1140,9 @@ export function ChatThread({
                             animate={{ opacity: 1, scale: 1, y: -8 }}
                             exit={{ opacity: 0, scale: 0.8, y: -4 }}
                             transition={{ type: 'spring', damping: 22, stiffness: 350 }}
-                            className={`absolute -top-20 z-30 flex flex-col gap-1.5 ${
-                              isMine ? 'right-0 items-end' : 'left-0 items-start'
-                            }`}
+                            className={`absolute z-30 flex flex-col gap-1.5 ${
+                              index === 0 ? 'top-full mt-2' : 'bottom-full mb-2'
+                            } ${isMine ? 'right-0 items-end' : 'left-0 items-start'}`}
                             onClick={(e) => e.stopPropagation()}
                           >
                             {/* Emoji Row */}
@@ -1264,25 +1265,33 @@ export function ChatThread({
 
                       <motion.div
                         drag={m.id > 0 && !isDeletedAll ? 'x' : false}
+                        dragDirectionLock
                         dragConstraints={{ left: 0, right: 54 }}
-                        dragElastic={0.2}
+                        dragElastic={0.18}
                         dragSnapToOrigin
+                        onDragStart={() => {
+                          wasDraggingRef.current = true;
+                        }}
                         onDragEnd={(_, info) => {
-                          if (m.id > 0 && !isDeletedAll && info.offset.x > 38) {
+                          if (m.id > 0 && !isDeletedAll && info.offset.x > 36) {
                             startReply(m);
                           }
+                          setTimeout(() => {
+                            wasDraggingRef.current = false;
+                          }, 120);
                         }}
                         onClick={(e) => {
                           e.stopPropagation();
+                          if (wasDraggingRef.current) return;
                           if (!isDeletedAll) {
                             setActiveReactionMenuMsgId((curr) => (curr === m.id ? null : m.id));
                           }
                         }}
-                        className={`relative w-full cursor-pointer rounded-[18px] px-3.5 pt-2 pb-1.5 text-[15px] leading-relaxed shadow-xs select-none active:scale-[0.99] transition-transform ${
+                        className={`relative w-full cursor-pointer rounded-[18px] px-3.5 pt-2 pb-1.5 text-[15px] leading-relaxed shadow-xs select-none ${
                           isMine
                             ? 'rounded-br-[4px] bg-primary text-on-primary font-medium'
                             : 'rounded-bl-[4px] border border-line bg-surface text-ink'
-                        } ${isReplyTarget || isSearchMatch ? 'ring-2 ring-amber-400 shadow-md' : ''}`}
+                        } ${isReplyTarget || isSearchMatch ? 'ring-2 ring-primary/60 shadow-md' : ''}`}
                       >
                         {isDeletedAll ? (
                           <p className="italic opacity-75 text-[13.5px]">🚫 This message was deleted</p>

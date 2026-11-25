@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { calculateAgeFromDob, formatAgeDob } from '@/lib/universities';
 
 export interface WheelOption {
@@ -28,41 +28,50 @@ export function ScrollWheelPicker({
   className = '',
 }: ScrollWheelPickerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [scrollTop, setScrollTop] = useState(0);
   const pad = Math.floor(visibleCount / 2) * itemHeight;
   const totalHeight = visibleCount * itemHeight;
   const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isInternalScrollRef = useRef(false);
+  const didMountRef = useRef(false);
 
-  // Sync scroll position when value changes externally (e.g. search or mount)
+  // Sync scroll position only on mount or external value changes (never fight user momentum scroll)
   useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    if (isInternalScrollRef.current) {
+      isInternalScrollRef.current = false;
+      return;
+    }
+
     const idx = Math.max(
       0,
       options.findIndex((o) => o.value === value)
     );
-    const el = containerRef.current;
-    if (el) {
-      const targetTop = idx * itemHeight;
-      if (Math.abs(el.scrollTop - targetTop) > 2) {
-        el.scrollTo({ top: targetTop, behavior: 'smooth' });
-      }
-      setScrollTop(targetTop);
+    const targetTop = idx * itemHeight;
+
+    if (!didMountRef.current) {
+      el.scrollTop = targetTop;
+      didMountRef.current = true;
+    } else if (Math.abs(el.scrollTop - targetTop) > 2) {
+      el.scrollTo({ top: targetTop, behavior: 'smooth' });
     }
   }, [value, options, itemHeight]);
 
-  const handleScroll = () => {
+  const commitCenter = () => {
     const el = containerRef.current;
-    if (!el) return;
-    const top = el.scrollTop;
-    setScrollTop(top);
+    if (!el || options.length === 0) return;
+    const idx = Math.min(options.length - 1, Math.max(0, Math.round(el.scrollTop / itemHeight)));
+    const opt = options[idx];
+    if (opt && opt.value !== value) {
+      isInternalScrollRef.current = true;
+      onChange(opt.value);
+    }
+  };
 
+  const handleScroll = () => {
     if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
-    scrollTimerRef.current = setTimeout(() => {
-      const idx = Math.min(options.length - 1, Math.max(0, Math.round(top / itemHeight)));
-      const opt = options[idx];
-      if (opt && opt.value !== value) {
-        onChange(opt.value);
-      }
-    }, 80);
+    scrollTimerRef.current = setTimeout(commitCenter, 120);
   };
 
   const snapTo = (idx: number) => {
@@ -72,6 +81,7 @@ export function ScrollWheelPicker({
       el.scrollTo({ top: idx * itemHeight, behavior: 'smooth' });
     }
     if (opt && opt.value !== value) {
+      isInternalScrollRef.current = true;
       onChange(opt.value);
     }
   };
@@ -81,45 +91,40 @@ export function ScrollWheelPicker({
       className={`relative select-none overflow-hidden rounded-[20px] border border-line bg-surface ${className}`}
       style={{ height: totalHeight }}
     >
-      {/* Top & bottom fade masks */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-14 bg-gradient-to-b from-surface via-surface/80 to-transparent" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-14 bg-gradient-to-t from-surface via-surface/80 to-transparent" />
+      {/* Top & bottom GPU gradient masks for smooth depth fade */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-16 bg-gradient-to-b from-surface via-surface/85 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-16 bg-gradient-to-t from-surface via-surface/85 to-transparent" />
 
-      {/* Center highlight bar */}
+      {/* Center highlight band */}
       <div
-        className="pointer-events-none absolute inset-x-2.5 z-0 rounded-[12px] border border-primary/25 bg-surface-alt/70"
+        className="pointer-events-none absolute inset-x-2.5 z-0 rounded-[12px] border border-primary/25 bg-surface-alt/75"
         style={{ top: pad, height: itemHeight }}
       />
 
       <div
         ref={containerRef}
         onScroll={handleScroll}
-        className="relative z-10 h-full overflow-y-auto snap-y snap-mandatory scrollbar-none"
-        style={{ paddingTop: pad, paddingBottom: pad }}
+        className="relative z-10 h-full overflow-y-auto overscroll-y-contain snap-y snap-mandatory scrollbar-none"
+        style={{
+          paddingTop: pad,
+          paddingBottom: pad,
+          WebkitOverflowScrolling: 'touch',
+        }}
       >
         {options.map((opt, idx) => {
-          const centerOffset = (idx * itemHeight - scrollTop) / itemHeight;
-          const absDist = Math.min(2.5, Math.abs(centerOffset));
-          const scale = 1 - absDist * 0.06;
-          const opacity = Math.max(0.28, 1 - absDist * 0.28);
-          const isActive = absDist < 0.45;
-
+          const isSelected = opt.value === value;
           return (
             <button
               key={opt.value}
               type="button"
               onClick={() => snapTo(idx)}
-              className="flex w-full snap-center items-center justify-center gap-2 px-3 text-center transition-transform duration-75"
-              style={{
-                height: itemHeight,
-                transform: `scale(${scale})`,
-                opacity,
-              }}
+              className="flex w-full snap-center items-center justify-center gap-2 px-3 text-center"
+              style={{ height: itemHeight }}
             >
               {opt.icon}
               <span
-                className={`truncate font-display text-[15px] ${
-                  isActive ? 'font-bold text-ink' : 'font-medium text-muted'
+                className={`truncate font-display text-[15px] transition-colors duration-150 ${
+                  isSelected ? 'font-bold text-ink' : 'font-medium text-muted'
                 }`}
               >
                 {opt.label}
@@ -183,28 +188,22 @@ function parseInitialDob(ageStr?: string | null): { day: number; month: number; 
 }
 
 export function DateOfBirthWheelPicker({ initialAgeStr, onChange }: DateOfBirthWheelPickerProps) {
-  const initial = parseInitialDob(initialAgeStr);
-  const [day, setDay] = useState(initial.day);
-  const [month, setMonth] = useState(initial.month);
-  const [year, setYear] = useState(initial.year);
+  const { day: currentDay, month: currentMonth, year: currentYear } = parseInitialDob(initialAgeStr);
 
   const updateDob = (d: number, m: number, y: number) => {
     const maxDays = new Date(y, m, 0).getDate();
     const clampedDay = Math.min(d, maxDays);
-    setDay(clampedDay);
-    setMonth(m);
-    setYear(y);
     onChange(formatAgeDob(clampedDay, m, y));
   };
 
-  const age = calculateAgeFromDob(day, month, year);
+  const age = calculateAgeFromDob(currentDay, currentMonth, currentYear);
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between rounded-[16px] bg-surface-alt px-4 py-2.5">
         <span className="text-label font-semibold text-muted">Calculated Age</span>
         <span className="font-display text-[17px] font-bold text-primary">
-          {age} years old ({String(day).padStart(2, '0')}/{String(month).padStart(2, '0')}/{year})
+          {age} years old ({String(currentDay).padStart(2, '0')}/{String(currentMonth).padStart(2, '0')}/{currentYear})
         </span>
       </div>
 
@@ -215,8 +214,8 @@ export function DateOfBirthWheelPicker({ initialAgeStr, onChange }: DateOfBirthW
           </p>
           <ScrollWheelPicker
             options={DAYS}
-            value={String(day)}
-            onChange={(val) => updateDob(parseInt(val, 10), month, year)}
+            value={String(currentDay)}
+            onChange={(val) => updateDob(parseInt(val, 10), currentMonth, currentYear)}
             visibleCount={5}
             itemHeight={42}
           />
@@ -227,8 +226,8 @@ export function DateOfBirthWheelPicker({ initialAgeStr, onChange }: DateOfBirthW
           </p>
           <ScrollWheelPicker
             options={MONTHS}
-            value={String(month)}
-            onChange={(val) => updateDob(day, parseInt(val, 10), year)}
+            value={String(currentMonth)}
+            onChange={(val) => updateDob(currentDay, parseInt(val, 10), currentYear)}
             visibleCount={5}
             itemHeight={42}
           />
@@ -239,8 +238,8 @@ export function DateOfBirthWheelPicker({ initialAgeStr, onChange }: DateOfBirthW
           </p>
           <ScrollWheelPicker
             options={YEARS}
-            value={String(year)}
-            onChange={(val) => updateDob(day, month, parseInt(val, 10))}
+            value={String(currentYear)}
+            onChange={(val) => updateDob(currentDay, currentMonth, parseInt(val, 10))}
             visibleCount={5}
             itemHeight={42}
           />

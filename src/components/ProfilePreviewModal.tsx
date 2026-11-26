@@ -54,7 +54,7 @@ export function ProfilePreviewModal({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
           transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-          className="fixed inset-0 z-50 overflow-y-auto bg-[#EEF5FA]"
+          className="fixed inset-0 z-50 overflow-y-auto bg-bg"
         >
       <div className="mx-auto min-h-dvh w-full max-w-[480px] pb-10">
         {/* ── Top Hero Scene (Message Tree + Avatar OR Photo) ── */}
@@ -167,25 +167,25 @@ export function ProfilePreviewModal({
 
           {/* ── Two Pill Cards: [University Logo + University/Country] & [XP] ── */}
           <div className="mt-4 grid grid-cols-2 gap-2.5">
-            <div className="flex items-center justify-center gap-2 rounded-[16px] bg-white px-3 py-3 shadow-xs">
+            <div className="flex items-center justify-center gap-2 rounded-[16px] border border-line bg-surface px-3 py-3 shadow-xs">
               <UniversityLogo university={uni ?? data.university} size={22} />
               <span className="truncate font-display text-[15px] font-bold text-ink">
                 {uni?.shortName || data.university || data.country || 'Nigeria'}
               </span>
             </div>
 
-            <div className="flex items-center justify-center gap-2 rounded-[16px] bg-white px-3 py-3 shadow-xs">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#E6F4FA] text-[13px]">
-                🕊️
+            <div className="flex items-center justify-center gap-2 rounded-[16px] border border-line bg-surface px-3 py-3 shadow-xs">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-surface-alt">
+                <Icon name="bird" size={16} />
               </span>
-              <span className="font-display text-[16px] font-bold text-[#2596BE]">
+              <span className="font-display text-[16px] font-bold text-primary">
                 {data.xp ?? 10}
               </span>
             </div>
           </div>
 
           {/* ── Bio, Gender/Age, Topics, University Card ── */}
-          <div className="mt-3 rounded-[22px] bg-white p-5 shadow-xs">
+          <div className="mt-3 rounded-[22px] border border-line bg-surface p-5 shadow-xs">
             {/* Gender & Age Header */}
             {(data.gender || ageNum) && (
               <div className="flex items-center justify-around border-b border-[#EEF2F6] pb-3.5 mb-4 text-[15px] font-semibold text-ink">

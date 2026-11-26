@@ -36,7 +36,7 @@ export default async function Home() {
           <div className="flex items-center justify-end px-5 pt-1">
             <Link
               href="/map"
-              className="flex items-center gap-2 rounded-full border-[1.5px] border-line bg-white/95 px-3.5 py-2 text-label font-bold shadow-sm backdrop-blur transition-transform active:scale-95"
+              className="flex items-center gap-2 rounded-full border-[1.5px] border-line bg-surface/95 px-3.5 py-2 text-label font-bold text-ink shadow-sm backdrop-blur transition-transform active:scale-95"
             >
               <Icon name="map" size={20} />
               See the map

@@ -1149,7 +1149,7 @@ export function ChatThread({
 
       {/* ── Collapsible Original Paper Drawer ── */}
       {showPaper && (
-        <div className="shrink-0 border-b border-line bg-[#FAF7F0] px-4 py-3 shadow-inner transition">
+        <div className="shrink-0 border-b border-line bg-surface-alt/70 px-4 py-3 shadow-inner transition">
           <div className="flex items-center justify-between pb-1">
             <p className="text-[11px] font-bold uppercase tracking-wider text-muted">Original Paper</p>
             <button
@@ -1527,7 +1527,7 @@ export function ChatThread({
                   type="button"
                   onClick={() => setReplyingTo(null)}
                   aria-label="Cancel reply"
-                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/80 text-[12px] font-bold text-muted hover:text-ink"
+                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface text-[12px] font-bold text-muted hover:text-ink"
                 >
                   ✕
                 </button>

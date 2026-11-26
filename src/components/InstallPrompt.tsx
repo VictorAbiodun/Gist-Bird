@@ -126,7 +126,7 @@ export function InstallPrompt() {
 
       {isIOS ? (
         /* ── Apple iOS Safari Instruction Steps ── */
-        <div className="mt-3.5 space-y-2 rounded-[16px] bg-[#FAF7F0] p-3 text-[13px] leading-relaxed text-ink border border-line/60">
+        <div className="mt-3.5 space-y-2 rounded-[16px] bg-surface-alt/70 p-3 text-[13px] leading-relaxed text-ink border border-line/60">
           <div className="flex items-center gap-2">
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-[11px]">
               1

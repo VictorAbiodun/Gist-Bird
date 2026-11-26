@@ -156,7 +156,7 @@ export function EditProfileView({ profile }: { profile: Profile }) {
   const spotName = getSpot(form.spot)?.name ?? 'Not set';
 
   return (
-    <main className="min-h-dvh bg-[#F4F8FB] pb-10">
+    <main className="min-h-dvh bg-bg pb-10">
       {/* ── Top Header Bar ── */}
       <header className="flex items-center justify-between px-4 pb-3 pt-[max(1.25rem,env(safe-area-inset-top))]">
         <Link

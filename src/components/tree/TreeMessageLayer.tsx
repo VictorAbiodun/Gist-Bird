@@ -128,7 +128,7 @@ export function TreeMessageLayer({
   return (
     <>
       {/* ── Campus Filter Floating Segmented Toggle ── */}
-      <div className="pointer-events-auto absolute top-20 left-5 z-[35] flex items-center gap-1 rounded-full border-[1.5px] border-line/80 bg-white/95 p-1 shadow-sm backdrop-blur-md">
+      <div className="pointer-events-auto absolute top-20 left-5 z-[35] flex items-center gap-1 rounded-full border-[1.5px] border-line/80 bg-surface/95 p-1 shadow-sm backdrop-blur-md">
         <button
           type="button"
           onClick={() => setCampusFilter('all')}
@@ -176,7 +176,7 @@ export function TreeMessageLayer({
 
       {/* When filtering to campus but no letters match */}
       {campusFilter === 'campus' && campusMatchCount === 0 && (
-        <div className="pointer-events-auto absolute top-36 inset-x-6 z-[35] mx-auto max-w-[340px] rounded-2xl border border-line bg-white/95 p-4 text-center shadow-lg backdrop-blur-md">
+        <div className="pointer-events-auto absolute top-36 inset-x-6 z-[35] mx-auto max-w-[340px] rounded-2xl border border-line bg-surface/95 p-4 text-center shadow-lg backdrop-blur-md">
           <p className="font-display text-[14px] font-bold text-ink">
             No papers from {userUniversity} yet
           </p>
@@ -270,7 +270,7 @@ export function TreeMessageLayer({
           {/* Top Status Banner */}
           <div className="pointer-events-auto flex items-center justify-center pt-2">
             {envelopes.length > 0 ? (
-              <div className="flex items-center gap-2 rounded-full border border-white/80 bg-white/95 px-4 py-2 text-label font-bold text-ink shadow-md backdrop-blur">
+              <div className="flex items-center gap-2 rounded-full border border-line bg-surface/95 px-4 py-2 text-label font-bold text-ink shadow-md backdrop-blur">
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-xs">
                   📬
                 </span>
@@ -279,7 +279,7 @@ export function TreeMessageLayer({
                 </span>
               </div>
             ) : (
-              <div className="flex items-center gap-2 rounded-full border border-white/80 bg-white/90 px-4 py-2 text-label font-medium text-muted shadow-sm backdrop-blur">
+              <div className="flex items-center gap-2 rounded-full border border-line bg-surface/90 px-4 py-2 text-label font-medium text-muted shadow-sm backdrop-blur">
                 <span>🌿</span>
                 <span>Your branches are quiet — no unaccepted papers</span>
               </div>

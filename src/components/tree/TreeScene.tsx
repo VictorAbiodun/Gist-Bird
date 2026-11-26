@@ -38,7 +38,7 @@ export function TreeScene({
     <div
       className={`relative mx-auto w-full max-w-[480px] overflow-hidden select-none ${
         fullScreen ? 'min-h-[calc(100dvh-88px)]' : 'rounded-[24px] shadow-sm'
-      } bg-[#EAF7EE] ${className}`}
+      } bg-bg ${className}`}
       style={fullScreen ? undefined : { aspectRatio: '1536 / 2752' }}
     >
       {/* Base Layer 0: The Original Storybook Tree Illustration */}

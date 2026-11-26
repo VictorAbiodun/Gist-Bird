@@ -47,7 +47,7 @@ export function ProfileView({
   return (
     <main className="min-h-dvh bg-bg pb-6">
       {/* ── Top Sky/Mint Gradient Header ── */}
-      <div className="bg-gradient-to-b from-[#CFEAF8] via-[#E1F3FC] to-[#EAF7F0] px-5 pb-16 pt-[max(1.25rem,env(safe-area-inset-top))]">
+      <div className="bg-gradient-to-b from-[#CFEAF8] via-[#E1F3FC] to-[#EAF7F0] px-5 pb-16 pt-[max(1.25rem,env(safe-area-inset-top))] dark:from-[#162720] dark:via-[#192D24] dark:to-[#0E1A13]">
         <header className="flex items-center justify-between gap-2">
           <h1 className="truncate font-display text-[24px] font-bold text-ink">
             {profile.display_name}

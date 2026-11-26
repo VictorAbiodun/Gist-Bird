@@ -31,7 +31,7 @@ export function Card({ children, className = '' }: { children: React.ReactNode; 
   return <div className={`rounded-card border-[1.5px] border-line bg-surface p-4 ${className}`}>{children}</div>;
 }
 
-const NOTICE: Record<string, string> = { info: 'bg-sky', ok: 'bg-surface-alt', gentle: 'bg-lemon', err: 'bg-[#FBE3E0]' };
+const NOTICE: Record<string, string> = { info: 'bg-sky', ok: 'bg-surface-alt', gentle: 'bg-lemon', err: 'bg-danger/15' };
 export function Notice({ tone = 'info', title, children }: { tone?: 'info' | 'ok' | 'gentle' | 'err'; title: string; children?: React.ReactNode }) {
   return (
     <div role={tone === 'err' ? 'alert' : 'status'} className={`flex gap-3 rounded-card p-3.5 ${NOTICE[tone]}`}>

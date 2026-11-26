@@ -128,7 +128,7 @@ export function TreeMessageLeaves({
 
               {/* Author Name Label — tucked underneath the envelope */}
               <span
-                className={`relative -mt-0.5 max-w-[70px] truncate rounded-full bg-white/95 px-2 py-0.5 text-center font-extrabold text-ink shadow-sm backdrop-blur-sm ${
+                className={`relative -mt-0.5 max-w-[70px] truncate rounded-full bg-surface/95 px-2 py-0.5 text-center font-extrabold text-ink shadow-sm backdrop-blur-sm ${
                   isDense ? 'text-[8px]' : isCrowded ? 'text-[9px]' : 'text-[10px]'
                 }`}
               >

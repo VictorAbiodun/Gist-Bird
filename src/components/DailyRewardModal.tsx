@@ -172,7 +172,7 @@ export function DailyRewardModal({ open, onClose, status, onClaimed }: DailyRewa
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.94, y: 12, opacity: 0 }}
             transition={{ type: 'spring', damping: 26, stiffness: 340 }}
-            className="relative w-full max-w-[390px] overflow-visible rounded-[24px] bg-white shadow-2xl"
+            className="relative w-full max-w-[390px] overflow-visible rounded-[24px] bg-surface shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
         {/* ── Wooden Chest Header with Streak Flame ── */}
@@ -229,10 +229,10 @@ export function DailyRewardModal({ open, onClose, status, onClaimed }: DailyRewa
                   title={item.title}
                   className={`relative flex aspect-square flex-col items-center justify-center rounded-[10px] p-1 transition ${
                     isCurrent && localStatus.canClaimToday
-                      ? 'bg-[#D2EFFA] ring-2 ring-[#2596BE] shadow-sm'
+                      ? 'bg-sky ring-2 ring-primary shadow-sm'
                       : isClaimed
-                      ? 'bg-[#E5F4EC] opacity-85 ring-1 ring-[#0A7D3E]/30'
-                      : 'bg-[#E6F4FA]'
+                      ? 'bg-surface-alt opacity-85 ring-1 ring-primary/30'
+                      : 'bg-surface-alt/50'
                   }`}
                 >
                   <span
@@ -268,7 +268,7 @@ export function DailyRewardModal({ open, onClose, status, onClaimed }: DailyRewa
           )}
 
           {error && (
-            <div className="mt-3 rounded-[14px] bg-[#FBE3E0] px-3 py-2 text-center text-[12px] font-semibold text-danger">
+            <div className="mt-3 rounded-[14px] bg-danger/15 px-3 py-2 text-center text-[12px] font-semibold text-danger">
               {error}
             </div>
           )}

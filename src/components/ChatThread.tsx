@@ -1195,19 +1195,22 @@ export function ChatThread({
               setActiveReactionMenuMsgId(null);
               setShowHeaderMenu(false);
             }}
-            className="flex-1 space-y-2.5 overflow-y-auto px-4 py-3 overscroll-y-contain"
+            className="flex-1 overflow-y-auto px-4 py-3 overscroll-y-contain"
             aria-live="polite"
           >
             {/* Context anchor at start of chat */}
-            <div className="mx-auto max-w-[90%] rounded-card border border-line bg-surface-alt/40 p-3 text-center">
+            <div className="mx-auto mb-3 max-w-[90%] rounded-card border border-line bg-surface-alt/40 p-3 text-center">
               <p className="text-[11px] font-bold uppercase tracking-wider text-muted">Started with this paper</p>
               <p className="mt-1 line-clamp-3 text-label italic text-ink">&ldquo;{paperBody}&rdquo;</p>
             </div>
 
             {visibleMessages.map((m, index) => {
               const isMine = m.sender_id === me;
-              const prevDate = index > 0 ? formatDateDivider(visibleMessages[index - 1].created_at) : null;
+              const prevMsg = index > 0 ? visibleMessages[index - 1] : null;
+              const nextMsg = index < visibleMessages.length - 1 ? visibleMessages[index + 1] : null;
+              const prevDate = prevMsg ? formatDateDivider(prevMsg.created_at) : null;
               const currentDate = formatDateDivider(m.created_at);
+              const nextDate = nextMsg ? formatDateDivider(nextMsg.created_at) : null;
               const showDateDivider = index === 0 || prevDate !== currentDate;
               const msgReactions = reactions[m.id] || [];
               const parentId = replyMap[m.id];
@@ -1221,6 +1224,40 @@ export function ChatThread({
               const isSearchMatch = searchMatches[searchMatchIdx] === m.id;
               const isNewMsg = !initialIdsRef.current.has(m.id);
 
+              const sameAsPrev =
+                Boolean(prevMsg) &&
+                !showDateDivider &&
+                prevMsg!.sender_id === m.sender_id &&
+                !parentMsg &&
+                (reactions[prevMsg!.id]?.length ?? 0) === 0 &&
+                Math.abs(new Date(m.created_at).getTime() - new Date(prevMsg!.created_at).getTime()) <= 120_000;
+
+              const sameAsNext =
+                Boolean(nextMsg) &&
+                currentDate === nextDate &&
+                nextMsg!.sender_id === m.sender_id &&
+                !replyMap[nextMsg!.id] &&
+                msgReactions.length === 0 &&
+                Math.abs(new Date(nextMsg!.created_at).getTime() - new Date(m.created_at).getTime()) <= 120_000;
+
+              const bubbleShape = isMine
+                ? sameAsPrev && sameAsNext
+                  ? 'rounded-[18px] rounded-r-[6px]'
+                  : sameAsPrev
+                  ? 'rounded-[18px] rounded-tr-[6px] rounded-br-[4px]'
+                  : sameAsNext
+                  ? 'rounded-[18px] rounded-br-[6px]'
+                  : 'rounded-[18px] rounded-br-[4px]'
+                : sameAsPrev && sameAsNext
+                ? 'rounded-[18px] rounded-l-[6px]'
+                : sameAsPrev
+                ? 'rounded-[18px] rounded-tl-[6px] rounded-bl-[4px]'
+                : sameAsNext
+                ? 'rounded-[18px] rounded-bl-[6px]'
+                : 'rounded-[18px] rounded-bl-[4px]';
+
+              const showMetaRow = !sameAsNext || m.id < 0 || isStarred || isEdited;
+
               return (
                 <motion.div
                   key={getMessageKey(m.id)}
@@ -1230,7 +1267,7 @@ export function ChatThread({
                   ref={(el) => {
                     messageRefs.current[m.id] = el;
                   }}
-                  className={`space-y-2 transition-opacity duration-150 ${isReplyTarget ? 'relative z-20' : ''
+                  className={`${sameAsPrev ? 'mt-0.5' : 'mt-2.5'} transition-opacity duration-150 ${isReplyTarget ? 'relative z-20' : ''
                     } ${isDimmedByReplyFocus ? 'opacity-50' : ''}`}
                 >
                   {showDateDivider && currentDate && (
@@ -1305,9 +1342,9 @@ export function ChatThread({
                             setActiveReactionMenuMsgId((curr) => (curr === m.id ? null : m.id));
                           }
                         }}
-                        className={`relative w-full cursor-pointer rounded-[18px] px-3.5 pt-2 pb-1.5 text-[15px] leading-relaxed shadow-xs select-none ${isMine
-                          ? 'rounded-br-[4px] bg-primary text-on-primary font-medium'
-                          : 'rounded-bl-[4px] border border-line bg-surface text-ink'
+                        className={`relative w-full cursor-pointer ${bubbleShape} px-3.5 ${showMetaRow ? 'pt-2 pb-1.5' : 'py-2'} text-[15px] leading-relaxed shadow-xs select-none ${isMine
+                          ? 'bg-primary text-on-primary font-medium'
+                          : 'border border-line bg-surface text-ink'
                           } ${isReplyTarget || isSearchMatch ? 'ring-2 ring-primary/60 shadow-md' : ''}`}
                       >
                         {isDeletedAll ? (
@@ -1318,6 +1355,7 @@ export function ChatThread({
                         ) : (
                           <p className="whitespace-pre-wrap break-words">{m.body}</p>
                         )}
+                        {showMetaRow && (
                         <div
                           className={`mt-0.5 flex items-center justify-end gap-1 text-[10.5px] leading-none select-none ${isMine ? 'text-white/80' : 'text-muted'
                             }`}
@@ -1374,6 +1412,7 @@ export function ChatThread({
                               })()
                             ))}
                         </div>
+                        )}
                       </motion.div>
 
                       {/* iMessage "N Replies" Thread Link */}

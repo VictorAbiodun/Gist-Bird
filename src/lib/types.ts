@@ -46,3 +46,41 @@ export interface Profile {
 }
 export type Scarf = 'green' | 'lemon' | 'coral' | 'slate' | 'ink';
 export const SCARF_HEX: Record<Scarf, string> = { green: '#0A7D3E', lemon: '#FFD23F', coral: '#FF6B57', slate: '#7F90A3', ink: '#0E2A1B' };
+
+export type FeedScope = 'all' | 'campus' | 'bookmarks';
+
+export interface FeedAuthor {
+  id: string;
+  display_name: string;
+  user_tag?: string;
+  avatar?: string | null;
+  photo_url?: string;
+  scarf: Scarf;
+  university?: string;
+}
+
+export interface FeedQuotedPost {
+  id: string;
+  body: string;
+  created_at: string;
+  author: FeedAuthor;
+}
+
+export interface FeedPost {
+  id: string;
+  author_id: string;
+  body: string;
+  university: string | null;
+  reply_to_id: string | null;
+  quote_of_id: string | null;
+  created_at: string;
+  author: FeedAuthor;
+  quote_of?: FeedQuotedPost | null;
+  reposted_by?: { id: string; display_name: string } | null;
+  likes_count: number;
+  reposts_count: number;
+  replies_count: number;
+  liked_by_me: boolean;
+  reposted_by_me: boolean;
+  bookmarked_by_me: boolean;
+}

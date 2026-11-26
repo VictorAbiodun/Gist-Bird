@@ -29,6 +29,8 @@ export default async function Notifications() {
   const href = (n: (typeof list)[number]) =>
     n.data.chat_id
       ? `/chat/${n.data.chat_id}`
+      : n.data.post_id
+      ? `/feed/${n.data.post_id}`
       : n.kind === 'paper_landed'
       ? '/home'
       : n.data.paper_id

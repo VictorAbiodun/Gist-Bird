@@ -8,7 +8,7 @@ import { InstallPrompt } from './InstallPrompt';
 import { PushNotificationManager } from './PushNotificationManager';
 import { initNavDirectionListener } from '@/lib/navDirection';
 
-const HIDE_BAR = ['/chat/', '/write', '/flight/', '/paper/', '/report', '/me/edit', '/settings/'];
+const HIDE_BAR = ['/chat/', '/feed/', '/write', '/flight/', '/paper/', '/report', '/me/edit', '/settings/'];
 
 export function AppShell({
   inbox = 0,

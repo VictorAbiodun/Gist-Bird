@@ -2,7 +2,7 @@
 
 const TAB_ORDER: Record<string, number> = {
   '/home': 0,
-  '/sent': 1,
+  '/feed': 1,
   '/chats': 2,
   '/me': 3,
 };

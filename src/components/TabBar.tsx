@@ -8,12 +8,12 @@ import { Icon, type IconName } from './Icon';
 
 const TABS: { href: string; label: string; icon: IconName }[] = [
   { href: '/home', label: 'Home', icon: 'home' },
-  { href: '/sent', label: 'Sent', icon: 'sent' },
+  { href: '/feed', label: 'Feed', icon: 'feed' },
   { href: '/chats', label: 'Chats', icon: 'chat' },
   { href: '/me', label: 'Me', icon: 'me' },
 ];
 
-const HIDE = ['/chat/', '/write', '/flight/', '/paper/', '/report', '/me/edit', '/settings/'];
+const HIDE = ['/chat/', '/feed/', '/write', '/flight/', '/paper/', '/report', '/me/edit', '/settings/'];
 
 export function TabBar({ inbox = 0, chats = 0 }: { inbox?: number; chats?: number }) {
   const path = usePathname();

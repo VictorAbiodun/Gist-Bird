@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { motion, useSpring, useTransform } from 'framer-motion';
+import { motion, useSpring, useTransform, useVelocity } from 'framer-motion';
 import { Icon, type IconName } from './Icon';
 
 const TABS: { href: string; label: string; icon: IconName }[] = [
@@ -46,11 +46,18 @@ export function TabBar({ inbox = 0, chats = 0 }: { inbox?: number; chats?: numbe
 
   // Smooth spring-driven pill position in percentage (0%, 100%, 200%, 300% of 1 tab width)
   const pillX = useSpring(activeIndex * 100, {
-    stiffness: 420,
-    damping: 32,
+    stiffness: 400,
+    damping: 30,
     mass: 0.7,
   });
   const pillXPercent = useTransform(pillX, (v) => `${v}%`);
+
+  // Velocity-driven liquid stretch & squish (water droplet physics)
+  const pillVelocity = useVelocity(pillX);
+  const rawScaleX = useTransform(pillVelocity, [-1200, 0, 1200], [1.22, 1, 1.22]);
+  const rawScaleY = useTransform(pillVelocity, [-1200, 0, 1200], [0.88, 1, 0.88]);
+  const liquidScaleX = useSpring(rawScaleX, { stiffness: 480, damping: 26 });
+  const liquidScaleY = useSpring(rawScaleY, { stiffness: 480, damping: 26 });
 
   useEffect(() => {
     if (!isScrubbing) {
@@ -163,23 +170,34 @@ export function TabBar({ inbox = 0, chats = 0 }: { inbox?: number; chats?: numbe
         style={{ touchAction: 'none' }}
         className="relative flex select-none"
       >
-        {/* Sliding Liquid Pill */}
+        {/* Clear Liquid-Glass Droplet Pill */}
         <motion.div
           aria-hidden="true"
           style={{ x: pillXPercent }}
-          className="pointer-events-none absolute inset-y-1.5 left-0 w-1/4 px-2"
+          className="pointer-events-none absolute inset-y-1.5 left-0 w-1/4 px-1.5"
         >
           <motion.div
-            animate={{
-              scale: isScrubbing ? 1.07 : 1,
+            style={{
+              scaleX: liquidScaleX,
+              scaleY: liquidScaleY,
             }}
-            transition={{ type: 'spring', stiffness: 450, damping: 30 }}
-            className={`h-full w-full rounded-2xl transition-shadow duration-150 ${
-              isScrubbing
-                ? 'border border-primary/25 bg-primary/15 shadow-md'
-                : 'bg-primary/10'
-            }`}
-          />
+            animate={{
+              scale: isScrubbing ? 1.1 : 1,
+            }}
+            transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+            className="relative h-full w-full overflow-hidden rounded-[22px] border border-white/70 bg-white/30 backdrop-blur-[10px] dark:border-white/25 dark:bg-white/10"
+          >
+            <div
+              className="absolute inset-0 rounded-[22px]"
+              style={{
+                background:
+                  'linear-gradient(180deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.12) 45%, rgba(10,125,62,0.06) 100%)',
+                boxShadow: isScrubbing
+                  ? 'inset 0 1.5px 1.5px rgba(255,255,255,0.95), inset 0 -1.5px 3px rgba(255,255,255,0.4), 0 8px 22px rgba(10,125,62,0.16), 0 2px 6px rgba(0,0,0,0.08)'
+                  : 'inset 0 1.5px 1px rgba(255,255,255,0.85), inset 0 -1px 2px rgba(255,255,255,0.3), 0 3px 12px rgba(10,125,62,0.1), 0 1px 3px rgba(0,0,0,0.05)',
+              }}
+            />
+          </motion.div>
         </motion.div>
 
         {TABS.map((t, idx) => {

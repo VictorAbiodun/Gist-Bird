@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Avatar } from './ui';
@@ -34,6 +34,11 @@ export function ChatsListClient({
   unreadByChat?: Record<string, number>;
 }) {
   const [selectedPreview, setSelectedPreview] = useState<ProfilePreviewData | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <>
@@ -83,12 +88,11 @@ export function ChatsListClient({
                         {c.other_name}
                       </p>
                       <span
-                        suppressHydrationWarning
                         className={`shrink-0 text-[11.5px] font-medium ${
                           unread > 0 ? 'font-bold text-primary' : 'text-muted'
                         }`}
                       >
-                        {formatWhatsAppTime(c.last_at)}
+                        {mounted ? formatWhatsAppTime(c.last_at) : ''}
                       </span>
                     </div>
 

@@ -59,13 +59,17 @@ interface ChatThreadProps {
 }
 
 function formatLastSeen(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return 'Tap to view profile';
+  const raw = new Date(iso);
+  if (Number.isNaN(raw.getTime())) return 'Tap to view profile';
   const now = new Date();
+  const d = raw.getTime() > now.getTime() ? now : raw;
+  const diffMs = now.getTime() - d.getTime();
+  if (diffMs < 60_000) return 'last seen just now';
+
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const day = new Date(d.getFullYear(), d.getMonth(), d.getDate());
   const diffDays = Math.round((today.getTime() - day.getTime()) / 86400000);
-  const timeStr = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase();
+  const timeStr = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
 
   if (diffDays === 0) return `last seen today at ${timeStr}`;
   if (diffDays === 1) return `last seen yesterday at ${timeStr}`;
@@ -103,6 +107,11 @@ export function ChatThread({
     initialOtherLastSeenAt ?? initialOtherLastReadAt
   );
   const [isOtherOnline, setIsOtherOnline] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [reactions, setReactions] = useState<MessageReactionsMap>(initialReactions);
   const [activeReactionMenuMsgId, setActiveReactionMenuMsgId] = useState<number | null>(null);
   const [isOffline, setIsOffline] = useState(false);
@@ -202,7 +211,7 @@ export function ChatThread({
             setReplyMap((prev) => ({ ...prev, [msgId]: rId }));
             channelRef.current
               ?.send({ type: 'broadcast', event: 'reply_link', payload: { messageId: msgId, replyToId: rId } })
-              .catch(() => {});
+              .catch(() => { });
           }
           playSendSound();
         }
@@ -278,12 +287,12 @@ export function ChatThread({
     const supabase = createClient();
 
     const dispatchRead = () => {
-      markChatRead(chatId).catch(() => {});
+      markChatRead(chatId).catch(() => { });
       ch.send({
         type: 'broadcast',
         event: 'read_receipt',
         payload: { readerId: me, readAt: new Date().toISOString() },
-      }).catch(() => {});
+      }).catch(() => { });
     };
 
     const ch = supabase
@@ -406,27 +415,27 @@ export function ChatThread({
     // Subscribe to global online-users presence for accurate online / last seen
     const presenceCh = otherId
       ? supabase
-          .channel('online-users', { config: { presence: { key: me } } })
-          .on('presence', { event: 'sync' }, () => {
-            const state = presenceCh?.presenceState() ?? {};
-            const present = Boolean(state[otherId] && state[otherId].length > 0);
-            setIsOtherOnline((prev) => {
-              if (prev && !present) {
-                setOtherLastSeenAt(new Date().toISOString());
-              }
-              return present;
-            });
-          })
-          .on('presence', { event: 'join' }, ({ key }) => {
-            if (key === otherId) setIsOtherOnline(true);
-          })
-          .on('presence', { event: 'leave' }, ({ key }) => {
-            if (key === otherId) {
-              setIsOtherOnline(false);
+        .channel('online-users', { config: { presence: { key: me } } })
+        .on('presence', { event: 'sync' }, () => {
+          const state = presenceCh?.presenceState() ?? {};
+          const present = Boolean(state[otherId] && state[otherId].length > 0);
+          setIsOtherOnline((prev) => {
+            if (prev && !present) {
               setOtherLastSeenAt(new Date().toISOString());
             }
-          })
-          .subscribe()
+            return present;
+          });
+        })
+        .on('presence', { event: 'join' }, ({ key }) => {
+          if (key === otherId) setIsOtherOnline(true);
+        })
+        .on('presence', { event: 'leave' }, ({ key }) => {
+          if (key === otherId) {
+            setIsOtherOnline(false);
+            setOtherLastSeenAt(new Date().toISOString());
+          }
+        })
+        .subscribe()
       : null;
 
     return () => {
@@ -470,7 +479,7 @@ export function ChatThread({
       type: 'broadcast',
       event: 'typing',
       payload: { userId: me, isTyping },
-    }).catch(() => {});
+    }).catch(() => { });
   };
 
   const handleReactionSelect = (messageId: number, emojiKey: string) => {
@@ -515,9 +524,9 @@ export function ChatThread({
           event: 'reaction_broadcast',
           payload: { messageId, emoji: emojiKey, userId: me, action },
         })
-        .catch(() => {});
+        .catch(() => { });
 
-      toggleMessageReaction({ chatId, messageId, emoji: emojiKey }).catch(() => {});
+      toggleMessageReaction({ chatId, messageId, emoji: emojiKey }).catch(() => { });
 
       return { ...prev, [messageId]: list.filter((r) => r.users.length > 0) };
     });
@@ -627,7 +636,7 @@ export function ChatThread({
       wasStarred ? prev.filter((id) => id !== msg.id) : [...prev, msg.id]
     );
     showToast(wasStarred ? 'Removed from Starred' : 'Message starred ⭐');
-    await toggleStarMessage(chatId, msg.id).catch(() => {});
+    await toggleStarMessage(chatId, msg.id).catch(() => { });
   };
 
   const handleTogglePin = async (msg: Message) => {
@@ -640,16 +649,16 @@ export function ChatThread({
         event: 'chat_pinned',
         payload: { pinnedMessageId: nextPin },
       })
-      .catch(() => {});
+      .catch(() => { });
     showToast(nextPin ? 'Message pinned 📌' : 'Message unpinned');
-    await togglePinMessage(chatId, nextPin).catch(() => {});
+    await togglePinMessage(chatId, nextPin).catch(() => { });
   };
 
   const handleDeleteForMe = async (msg: Message) => {
     setDeleteModalMsg(null);
     setDeletedForMe((prev) => (prev.includes(msg.id) ? prev : [...prev, msg.id]));
     showToast('Deleted for you');
-    await deleteMessageForMe(chatId, msg.id).catch(() => {});
+    await deleteMessageForMe(chatId, msg.id).catch(() => { });
   };
 
   const handleDeleteForEveryone = async (msg: Message) => {
@@ -662,9 +671,9 @@ export function ChatThread({
         event: 'msg_deleted_all',
         payload: { messageId: msg.id },
       })
-      .catch(() => {});
+      .catch(() => { });
     showToast('Deleted for everyone');
-    await deleteMessageForEveryone(chatId, msg.id).catch(() => {});
+    await deleteMessageForEveryone(chatId, msg.id).catch(() => { });
   };
 
   const handleSaveEdit = async (msg: Message, newBody: string) => {
@@ -688,7 +697,7 @@ export function ChatThread({
         event: 'msg_edited',
         payload: { messageId: msg.id, newBody },
       })
-      .catch(() => {});
+      .catch(() => { });
     showToast('Message edited');
   };
 
@@ -750,7 +759,7 @@ export function ChatThread({
     const next = !isMuted;
     setIsMuted(next);
     showToast(next ? 'Chat notifications muted 🔕' : 'Chat notifications unmuted 🔔');
-    await toggleMuteChat(chatId).catch(() => {});
+    await toggleMuteChat(chatId).catch(() => { });
   };
 
   function send(body = text) {
@@ -815,7 +824,7 @@ export function ChatThread({
                 event: 'reply_link',
                 payload: { messageId: confirmedId, replyToId },
               })
-              .catch(() => {});
+              .catch(() => { });
           }
 
           setMessages((prev) => {
@@ -852,7 +861,7 @@ export function ChatThread({
           event: 'chat_ended',
           payload: { byUserId: me },
         })
-        .catch(() => {});
+        .catch(() => { });
 
       const res = await leaveChat(chatId);
       if (res.error) {
@@ -907,20 +916,19 @@ export function ChatThread({
               <h1 className="truncate font-display text-[15px] font-bold leading-5 text-ink">{otherName}</h1>
               <p className="flex items-center gap-1 text-[11px] font-semibold text-primary">
                 <span
-                  className={`inline-block h-1.5 w-1.5 rounded-full ${
-                    otherTyping
-                      ? 'bg-primary animate-ping'
-                      : isOtherOnline
+                  className={`inline-block h-1.5 w-1.5 rounded-full ${otherTyping
+                    ? 'bg-primary animate-ping'
+                    : isOtherOnline
                       ? 'bg-[#25D366]'
                       : 'bg-muted/60'
-                  }`}
+                    }`}
                 />
-                <span suppressHydrationWarning>
+                <span>
                   {otherTyping
                     ? 'pecking a reply…'
                     : isOtherOnline
                     ? 'online'
-                    : otherLastSeenAt
+                    : mounted && otherLastSeenAt
                     ? formatLastSeen(otherLastSeenAt)
                     : 'Tap to view profile'}
                 </span>
@@ -939,11 +947,10 @@ export function ChatThread({
             type="button"
             onClick={() => setShowPaper((prev) => !prev)}
             aria-label={showPaper ? 'Hide paper' : 'View paper'}
-            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[12px] font-bold transition active:scale-95 ${
-              showPaper
-                ? 'border-primary bg-primary text-on-primary'
-                : 'border-line bg-surface-alt text-ink hover:bg-line'
-            }`}
+            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[12px] font-bold transition active:scale-95 ${showPaper
+              ? 'border-primary bg-primary text-on-primary'
+              : 'border-line bg-surface-alt text-ink hover:bg-line'
+              }`}
           >
             <Icon name="paper" size={16} />
             <span>Paper</span>
@@ -1131,9 +1138,8 @@ export function ChatThread({
       {/* ── Offline / Queue Sync Banner ── */}
       {(isOffline || isSyncingQueue) && (
         <div
-          className={`shrink-0 px-4 py-1.5 text-center text-[11.5px] font-semibold ${
-            isSyncingQueue ? 'bg-primary/15 text-primary' : 'bg-amber-100 text-amber-900'
-          }`}
+          className={`shrink-0 px-4 py-1.5 text-center text-[11.5px] font-semibold ${isSyncingQueue ? 'bg-primary/15 text-primary' : 'bg-amber-100 text-amber-900'
+            }`}
         >
           {isSyncingQueue
             ? 'Back online — sending queued messages…'
@@ -1222,9 +1228,8 @@ export function ChatThread({
                   ref={(el) => {
                     messageRefs.current[m.id] = el;
                   }}
-                  className={`space-y-2 transition-opacity duration-150 ${
-                    isReplyTarget ? 'relative z-20' : ''
-                  } ${isDimmedByReplyFocus ? 'opacity-50' : ''}`}
+                  className={`space-y-2 transition-opacity duration-150 ${isReplyTarget ? 'relative z-20' : ''
+                    } ${isDimmedByReplyFocus ? 'opacity-50' : ''}`}
                 >
                   {showDateDivider && currentDate && (
                     <div className="my-2.5 flex justify-center">
@@ -1236,9 +1241,8 @@ export function ChatThread({
 
                   <div className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
                     <div
-                      className={`group relative flex flex-col ${
-                        isMine ? 'items-end' : 'items-start'
-                      } max-w-[84%]`}
+                      className={`group relative flex flex-col ${isMine ? 'items-end' : 'items-start'
+                        } max-w-[84%]`}
                     >
                       {/* iMessage-style Parent Preview & Curved Thread Connector */}
                       {parentMsg && (
@@ -1249,9 +1253,8 @@ export function ChatThread({
                               e.stopPropagation();
                               setFocusedThreadRootId(parentMsg.id);
                             }}
-                            className={`max-w-[230px] rounded-[14px] border border-line/60 bg-surface-alt/85 px-2.5 py-1 text-left text-[12px] text-muted shadow-2xs transition active:scale-95 ${
-                              isMine ? 'mr-3' : 'ml-3'
-                            }`}
+                            className={`max-w-[230px] rounded-[14px] border border-line/60 bg-surface-alt/85 px-2.5 py-1 text-left text-[12px] text-muted shadow-2xs transition active:scale-95 ${isMine ? 'mr-3' : 'ml-3'
+                              }`}
                           >
                             <span className="block text-[10px] font-bold text-primary">
                               {parentMsg.sender_id === me ? 'You' : otherName}
@@ -1300,11 +1303,10 @@ export function ChatThread({
                             setActiveReactionMenuMsgId((curr) => (curr === m.id ? null : m.id));
                           }
                         }}
-                        className={`relative w-full cursor-pointer rounded-[18px] px-3.5 pt-2 pb-1.5 text-[15px] leading-relaxed shadow-xs select-none ${
-                          isMine
-                            ? 'rounded-br-[4px] bg-primary text-on-primary font-medium'
-                            : 'rounded-bl-[4px] border border-line bg-surface text-ink'
-                        } ${isReplyTarget || isSearchMatch ? 'ring-2 ring-primary/60 shadow-md' : ''}`}
+                        className={`relative w-full cursor-pointer rounded-[18px] px-3.5 pt-2 pb-1.5 text-[15px] leading-relaxed shadow-xs select-none ${isMine
+                          ? 'rounded-br-[4px] bg-primary text-on-primary font-medium'
+                          : 'rounded-bl-[4px] border border-line bg-surface text-ink'
+                          } ${isReplyTarget || isSearchMatch ? 'ring-2 ring-primary/60 shadow-md' : ''}`}
                       >
                         {isDeletedAll ? (
                           <p className="italic opacity-75 text-[13.5px]">🚫 This message was deleted</p>
@@ -1312,9 +1314,8 @@ export function ChatThread({
                           <p className="whitespace-pre-wrap break-words">{m.body}</p>
                         )}
                         <div
-                          className={`mt-0.5 flex items-center justify-end gap-1 text-[10.5px] leading-none select-none ${
-                            isMine ? 'text-white/80' : 'text-muted'
-                          }`}
+                          className={`mt-0.5 flex items-center justify-end gap-1 text-[10.5px] leading-none select-none ${isMine ? 'text-white/80' : 'text-muted'
+                            }`}
                         >
                           {isStarred && !isDeletedAll && <span title="Starred">⭐</span>}
                           {isEdited && !isDeletedAll && <span className="italic opacity-80">edited</span>}
@@ -1335,12 +1336,11 @@ export function ChatThread({
                                 const isRead =
                                   Boolean(otherLastReadAt) &&
                                   new Date(m.created_at).getTime() <=
-                                    new Date(otherLastReadAt!).getTime() + 1000;
+                                  new Date(otherLastReadAt!).getTime() + 1000;
                                 return (
                                   <svg
-                                    className={`h-3 w-3 ${
-                                      isRead ? 'text-[#34B7F1]' : 'text-white/80'
-                                    } transition-colors duration-300`}
+                                    className={`h-3 w-3 ${isRead ? 'text-[#34B7F1]' : 'text-white/80'
+                                      } transition-colors duration-300`}
                                     viewBox="0 0 16 15"
                                     fill="none"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -1384,9 +1384,8 @@ export function ChatThread({
                       {/* Docked Reactions */}
                       {msgReactions.length > 0 && (
                         <div
-                          className={`mt-1 flex flex-wrap gap-1 ${
-                            isMine ? 'justify-end' : 'justify-start'
-                          }`}
+                          className={`mt-1 flex flex-wrap gap-1 ${isMine ? 'justify-end' : 'justify-start'
+                            }`}
                         >
                           {msgReactions.map((r) => {
                             const em = getEmoji(r.emoji);
@@ -1400,11 +1399,10 @@ export function ChatThread({
                                   e.stopPropagation();
                                   handleReactionSelect(m.id, r.emoji);
                                 }}
-                                className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-bold shadow-2xs backdrop-blur-xs transition active:scale-95 ${
-                                  myReaction
-                                    ? 'border-primary/40 bg-primary/10 text-primary'
-                                    : 'border-line/80 bg-surface text-ink'
-                                }`}
+                                className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-bold shadow-2xs backdrop-blur-xs transition active:scale-95 ${myReaction
+                                  ? 'border-primary/40 bg-primary/10 text-primary'
+                                  : 'border-line/80 bg-surface text-ink'
+                                  }`}
                                 title={
                                   myReaction
                                     ? 'Remove your reaction'
@@ -1637,11 +1635,10 @@ export function ChatThread({
                 {/* Root Message */}
                 <div className={`flex ${rootIsMine ? 'justify-end' : 'justify-start'}`}>
                   <div
-                    className={`max-w-[82%] rounded-[18px] px-3.5 py-2.5 text-[15px] leading-relaxed shadow-md ${
-                      rootIsMine
-                        ? 'rounded-br-[4px] bg-primary text-on-primary font-medium'
-                        : 'rounded-bl-[4px] border border-line bg-surface text-ink'
-                    }`}
+                    className={`max-w-[82%] rounded-[18px] px-3.5 py-2.5 text-[15px] leading-relaxed shadow-md ${rootIsMine
+                      ? 'rounded-br-[4px] bg-primary text-on-primary font-medium'
+                      : 'rounded-bl-[4px] border border-line bg-surface text-ink'
+                      }`}
                   >
                     <p className="text-[10px] font-bold opacity-75 mb-0.5">
                       {rootIsMine ? 'You' : otherName}
@@ -1677,11 +1674,10 @@ export function ChatThread({
                       </div>
                       <div className={`flex ${repIsMine ? 'justify-end' : 'justify-start'}`}>
                         <div
-                          className={`max-w-[80%] rounded-[18px] px-3.5 py-2 text-[14.5px] leading-relaxed shadow-xs ${
-                            repIsMine
-                              ? 'rounded-br-[4px] bg-primary text-on-primary font-medium'
-                              : 'rounded-bl-[4px] border border-line bg-surface text-ink'
-                          }`}
+                          className={`max-w-[80%] rounded-[18px] px-3.5 py-2 text-[14.5px] leading-relaxed shadow-xs ${repIsMine
+                            ? 'rounded-br-[4px] bg-primary text-on-primary font-medium'
+                            : 'rounded-bl-[4px] border border-line bg-surface text-ink'
+                            }`}
                         >
                           <p className="whitespace-pre-wrap break-words">{rep.body}</p>
                           <p className="mt-0.5 text-right text-[10px] opacity-75">
@@ -1764,9 +1760,8 @@ export function ChatThread({
                           key={em.key}
                           type="button"
                           onClick={() => handleReactionSelect(activeMsg.id, em.key)}
-                          className={`flex h-8 w-8 items-center justify-center rounded-full transition-transform active:scale-125 hover:scale-115 ${
-                            hasReacted ? 'bg-primary/20 ring-2 ring-primary' : 'hover:bg-surface-alt'
-                          }`}
+                          className={`flex h-8 w-8 items-center justify-center rounded-full transition-transform active:scale-125 hover:scale-115 ${hasReacted ? 'bg-primary/20 ring-2 ring-primary' : 'hover:bg-surface-alt'
+                            }`}
                           title={em.label}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1782,11 +1777,10 @@ export function ChatThread({
 
                   {/* Selected Message Preview */}
                   <div
-                    className={`rounded-2xl px-4 py-2.5 text-[14.5px] leading-relaxed shadow-lg ${
-                      activeIsMine
-                        ? 'bg-primary text-on-primary font-medium'
-                        : 'border border-line bg-surface text-ink'
-                    }`}
+                    className={`rounded-2xl px-4 py-2.5 text-[14.5px] leading-relaxed shadow-lg ${activeIsMine
+                      ? 'bg-primary text-on-primary font-medium'
+                      : 'border border-line bg-surface text-ink'
+                      }`}
                   >
                     <p className="line-clamp-4 whitespace-pre-wrap break-words">{activeMsg.body}</p>
                   </div>

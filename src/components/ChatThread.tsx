@@ -111,9 +111,14 @@ export function ChatThread({
   const [forwardModalMsg, setForwardModalMsg] = useState<Message | null>(null);
   const [infoModalMsg, setInfoModalMsg] = useState<Message | null>(null);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [showScrollFab, setShowScrollFab] = useState(false);
+  const [hasNewBelow, setHasNewBelow] = useState(false);
+  const [pendingClearAt, setPendingClearAt] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
   const bottom = useRef<HTMLDivElement>(null);
+  const isAtBottomRef = useRef(true);
+  const clearUndoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const messageRefs = useRef<Record<number, HTMLDivElement | null>>({});
@@ -383,9 +388,29 @@ export function ChatThread({
     };
   }, [chatId, me]);
 
-  // Auto-scroll to bottom when messages or typing indicator update
+  // Track whether bottom of stream is visible for scroll-to-bottom FAB & smart auto-scroll
   useEffect(() => {
-    bottom.current?.scrollIntoView({ block: 'end' });
+    const el = bottom.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        isAtBottomRef.current = entry.isIntersecting;
+        setShowScrollFab(!entry.isIntersecting);
+        if (entry.isIntersecting) setHasNewBelow(false);
+      },
+      { threshold: 0.1 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  // Auto-scroll to bottom only when already near bottom; otherwise badge the FAB
+  useEffect(() => {
+    if (isAtBottomRef.current) {
+      bottom.current?.scrollIntoView({ block: 'end' });
+    } else if (messages.length > 0) {
+      setHasNewBelow(true);
+    }
   }, [messages.length, otherTyping]);
 
   const broadcastTyping = (isTyping: boolean) => {
@@ -641,13 +666,33 @@ export function ChatThread({
   };
 
   const handleClearChat = async () => {
-    const res = await clearChatForMe(chatId);
     setShowClearModal(false);
-    if (res.clearedAt) {
-      setClearedAt(res.clearedAt);
-      setPinnedMessageId(null);
-      showToast('Chat cleared for you');
+    const prevClearedAt = clearedAt;
+    const tempClearedAt = new Date().toISOString();
+    setClearedAt(tempClearedAt);
+    setPinnedMessageId(null);
+    setPendingClearAt(prevClearedAt ?? '__none__');
+    setToastMsg(null);
+
+    if (clearUndoTimerRef.current) clearTimeout(clearUndoTimerRef.current);
+    clearUndoTimerRef.current = setTimeout(async () => {
+      const res = await clearChatForMe(chatId);
+      setPendingClearAt(null);
+      if (!res.clearedAt) {
+        setClearedAt(prevClearedAt);
+        showToast('Could not clear chat');
+      }
+    }, 5000);
+  };
+
+  const handleUndoClear = () => {
+    if (clearUndoTimerRef.current) {
+      clearTimeout(clearUndoTimerRef.current);
+      clearUndoTimerRef.current = null;
     }
+    setClearedAt(pendingClearAt === '__none__' ? null : pendingClearAt);
+    setPendingClearAt(null);
+    showToast('Clear cancelled');
   };
 
   const handleToggleMuteChat = async () => {
@@ -812,7 +857,11 @@ export function ChatThread({
               <h1 className="truncate font-display text-[15px] font-bold leading-5 text-ink">{otherName}</h1>
               <p className="flex items-center gap-1 text-[11px] font-semibold text-primary">
                 <span className={`inline-block h-1.5 w-1.5 rounded-full bg-primary ${otherTyping ? 'animate-ping' : ''}`} />
-                {otherTyping ? 'pecking a reply…' : 'Tap to view profile'}
+                {otherTyping
+                  ? 'pecking a reply…'
+                  : otherLastReadAt
+                  ? `last seen ${formatMessageTime(otherLastReadAt)}`
+                  : 'Tap to view profile'}
               </p>
             </div>
           </button>
@@ -1338,6 +1387,22 @@ export function ChatThread({
             </AnimatePresence>
 
             <div ref={bottom} />
+
+            {showScrollFab && (
+              <div className="sticky bottom-2 z-30 flex justify-center pointer-events-none">
+                <button
+                  type="button"
+                  onClick={() => {
+                    bottom.current?.scrollIntoView({ behavior: 'smooth' });
+                    setHasNewBelow(false);
+                  }}
+                  className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-line bg-surface px-3.5 py-1.5 text-[12px] font-bold text-primary shadow-lg transition active:scale-95"
+                >
+                  <span>↓</span>
+                  <span>{hasNewBelow ? 'New message' : 'Jump to latest'}</span>
+                </button>
+              </div>
+            )}
           </div>
 
           {/* ── Bottom Input Section ── */}
@@ -1405,7 +1470,7 @@ export function ChatThread({
                 value={text}
                 onChange={(e) => handleTextChange(e.target.value)}
                 onFocus={handleInputFocus}
-                maxLength={1000}
+                maxLength={50000}
                 type="text"
                 autoComplete="off"
                 enterKeyHint="send"
@@ -1796,14 +1861,23 @@ export function ChatThread({
 
       {/* ── Toast Notification Pill ── */}
       <AnimatePresence>
-        {toastMsg && (
+        {(toastMsg || pendingClearAt) && (
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 16 }}
-            className="pointer-events-none fixed bottom-20 left-1/2 z-50 -translate-x-1/2 rounded-full bg-ink/90 px-4 py-2 text-[12px] font-bold text-white shadow-lg backdrop-blur-md"
+            className="pointer-events-auto fixed bottom-20 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-full bg-ink/90 px-4 py-2 text-[12px] font-bold text-white shadow-lg backdrop-blur-md"
           >
-            {toastMsg}
+            <span>{pendingClearAt ? 'Chat cleared for you' : toastMsg}</span>
+            {pendingClearAt && (
+              <button
+                type="button"
+                onClick={handleUndoClear}
+                className="rounded-full bg-white/20 px-2.5 py-0.5 text-[11px] font-bold text-white transition hover:bg-white/30"
+              >
+                Undo
+              </button>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

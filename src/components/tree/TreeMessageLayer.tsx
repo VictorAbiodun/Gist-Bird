@@ -32,6 +32,19 @@ export function TreeMessageLayer({
   const [activeEnvelope, setActiveEnvelope] = useState<TreeEnvelope | null>(null);
   const [campusFilter, setCampusFilter] = useState<'all' | 'campus'>('all');
   const [showPrompt, setShowPrompt] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const dismissed = localStorage.getItem('gistbird_onboarding_done');
+      if (!dismissed) setShowOnboarding(true);
+    }
+  }, []);
+
+  const handleDismissOnboarding = () => {
+    setShowOnboarding(false);
+    localStorage.setItem('gistbird_onboarding_done', '1');
+  };
 
   // Sync with server-provided initial inbox
   useEffect(() => {
@@ -207,6 +220,34 @@ export function TreeMessageLayer({
                 Maybe Later
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* First-time onboarding when tree is empty */}
+      {envelopes.length === 0 && campusFilter === 'all' && showOnboarding && (
+        <div className="pointer-events-auto absolute inset-x-5 top-1/3 z-[35] mx-auto max-w-[340px] rounded-2xl border border-line bg-surface/95 p-5 text-center shadow-lg backdrop-blur-md">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/mascot/wave.jpg" alt="" width={100} height={90} className="mx-auto rounded-xl" />
+          <h3 className="mt-3 font-display text-[17px] font-bold text-ink">Welcome to the Tree! 🌳</h3>
+          <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
+            Write a paper and Chief Coo will fly it to someone on campus. If they like it, you start chatting!
+          </p>
+          <div className="mt-4 space-y-2">
+            <Link
+              href="/write"
+              onClick={handleDismissOnboarding}
+              className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-btn bg-primary text-[14px] font-bold text-on-primary shadow-xs transition active:scale-95"
+            >
+              ✍️ Write your first paper
+            </Link>
+            <button
+              type="button"
+              onClick={handleDismissOnboarding}
+              className="text-[12px] font-semibold text-muted hover:text-ink"
+            >
+              Got it, I&rsquo;ll explore first
+            </button>
           </div>
         </div>
       )}

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { Avatar, Card, timeAgo } from './ui';
 import { ProfilePreviewModal, type ProfilePreviewData } from './ProfilePreviewModal';
 import type { ChatRow } from '@/lib/types';
@@ -18,11 +19,16 @@ export function ChatsListClient({
   return (
     <>
       <ul className="space-y-3 px-5 pt-2">
-        {chats.map((c) => {
+        {chats.map((c, idx) => {
           const preview = previews[c.other_id];
           return (
-            <li key={c.id}>
-              <Card className="flex items-center gap-3 p-3.5 transition active:scale-[0.99]">
+            <motion.li
+              key={c.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: Math.min(idx * 0.03, 0.2), duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <Card className="flex items-center gap-3 p-3.5 transition-transform duration-150 active:scale-[0.985]">
                 <button
                   type="button"
                   onClick={(e) => {
@@ -44,7 +50,7 @@ export function ChatsListClient({
                   <span className="shrink-0 text-caption text-muted">{timeAgo(c.last_at)}</span>
                 </Link>
               </Card>
-            </li>
+            </motion.li>
           );
         })}
       </ul>

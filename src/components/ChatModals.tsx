@@ -107,7 +107,7 @@ export function EditMessageModal({
             <textarea
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              maxLength={1000}
+              maxLength={50000}
               rows={3}
               autoFocus
               className="mt-3 w-full rounded-input border-[1.5px] border-line bg-bg p-3 text-[15px] text-ink focus:border-primary focus:outline-none"

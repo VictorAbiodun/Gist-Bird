@@ -10,7 +10,7 @@ const VARIANT: Record<Variant, string> = {
   danger: 'bg-danger text-on-primary active:brightness-90',
   disabled: 'bg-line text-muted cursor-not-allowed',
 };
-const base = 'inline-flex min-h-[52px] items-center justify-center gap-2 rounded-btn px-5 text-body font-bold transition';
+const base = 'inline-flex min-h-[52px] items-center justify-center gap-2 rounded-btn px-5 text-body font-bold transition-all duration-150 ease-out active:scale-[0.97] disabled:active:scale-100';
 
 export function Button({ variant = 'primary', icon, className = '', children, ...rest }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; icon?: IconName }) {
   const v = rest.disabled ? 'disabled' : variant;
@@ -22,9 +22,9 @@ export function LinkButton({ href, variant = 'primary', icon, className = '', ch
 }
 
 export function Chip({ children, selected = false, onClick, disabled }: { children: React.ReactNode; selected?: boolean; onClick?: () => void; disabled?: boolean }) {
-  const cls = `inline-flex min-h-[40px] items-center gap-1.5 rounded-full px-3.5 text-label font-semibold ${selected ? 'bg-primary text-on-primary' : 'border-[1.5px] border-line bg-surface text-ink'}`;
+  const cls = `inline-flex min-h-[40px] items-center gap-1.5 rounded-full px-3.5 text-label font-semibold transition-all duration-150 ease-out ${selected ? 'bg-primary text-on-primary' : 'border-[1.5px] border-line bg-surface text-ink'}`;
   if (!onClick) return <span className={cls}>{selected && <Icon name="check" size={16} />}{children}</span>;
-  return <button type="button" aria-pressed={selected} disabled={disabled} onClick={onClick} className={`${cls} disabled:opacity-50`}>{selected && <Icon name="check" size={16} />}{children}</button>;
+  return <button type="button" aria-pressed={selected} disabled={disabled} onClick={onClick} className={`${cls} active:scale-95 disabled:opacity-50 disabled:active:scale-100`}>{selected && <Icon name="check" size={16} />}{children}</button>;
 }
 
 export function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {

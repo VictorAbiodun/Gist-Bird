@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { REWARD_DAYS, type DailyRewardItem, type RewardIconType, type RewardStatus } from '@/lib/rewards';
 import { claimDailyReward } from '@/app/actions/rewards';
@@ -87,8 +88,6 @@ export function DailyRewardModal({ open, onClose, status, onClaimed }: DailyRewa
   const [claimedReward, setClaimedReward] = useState<DailyRewardItem | null>(null);
   const [localStatus, setLocalStatus] = useState<RewardStatus>(status);
 
-  if (!open) return null;
-
   const displayStreak = localStatus.canClaimToday
     ? localStatus.streak + 1
     : Math.max(1, localStatus.streak);
@@ -155,17 +154,27 @@ export function DailyRewardModal({ open, onClose, status, onClaimed }: DailyRewa
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Daily Rewards"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4 backdrop-blur-[2px]"
-      onClick={onClose}
-    >
-      <div
-        className="relative w-full max-w-[390px] overflow-visible rounded-[24px] bg-white shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Daily Rewards"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4 backdrop-blur-[2px]"
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ scale: 0.92, y: 16, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            exit={{ scale: 0.94, y: 12, opacity: 0 }}
+            transition={{ type: 'spring', damping: 26, stiffness: 340 }}
+            className="relative w-full max-w-[390px] overflow-visible rounded-[24px] bg-white shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
         {/* ── Wooden Chest Header with Streak Flame ── */}
         <div
           className="relative flex flex-col items-center justify-center rounded-t-[24px] border-x-[4px] border-t-[4px] border-b-[4px] border-[#F0B429] px-4 pb-5 pt-4 text-white"
@@ -285,7 +294,9 @@ export function DailyRewardModal({ open, onClose, status, onClaimed }: DailyRewa
             )}
           </div>
         </div>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

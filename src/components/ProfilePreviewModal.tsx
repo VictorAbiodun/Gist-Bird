@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Avatar } from './ui';
 import { Icon } from './Icon';
 import { UniversityLogo } from './UniversityLogo';
@@ -37,20 +38,24 @@ export function ProfilePreviewModal({
 }) {
   const [sceneMode, setSceneMode] = useState<'scene' | 'photo'>('scene');
 
-  if (!open) return null;
-
   const uni = findUniversity(data.university);
   const ageNum = extractAgeNumber(data.age);
   const displayAvatar = data.photoUrl || data.avatar || '/avatars/avatar-01.svg';
   const handle = `@${(data.userTag || data.displayName).toLowerCase().replace(/[^a-z0-9_]/g, '') || 'bird'}`;
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Profile preview"
-      className="fixed inset-0 z-50 overflow-y-auto bg-[#EEF5FA]"
-    >
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Profile preview"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          transition={{ type: 'spring', damping: 28, stiffness: 320 }}
+          className="fixed inset-0 z-50 overflow-y-auto bg-[#EEF5FA]"
+        >
       <div className="mx-auto min-h-dvh w-full max-w-[480px] pb-10">
         {/* ── Top Hero Scene (Message Tree + Avatar OR Photo) ── */}
         <div className="relative h-[220px] w-full overflow-hidden bg-gradient-to-b from-[#98D4F5] to-[#D4EEFC]">
@@ -285,6 +290,8 @@ export function ProfilePreviewModal({
           </div>
         </div>
       </div>
-    </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

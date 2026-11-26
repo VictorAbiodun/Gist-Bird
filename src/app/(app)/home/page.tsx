@@ -5,6 +5,7 @@ import { LinkButton } from '@/components/ui';
 import { getSpot } from '@/lib/campus';
 import { TreeScene } from '@/components/tree/TreeScene';
 import { HomeRewardsBar } from '@/components/HomeRewardsBar';
+import { PullToRefresh } from '@/components/PullToRefresh';
 
 export default async function Home() {
   const [rewardStatus, notes, sent, inbox, profile] = await Promise.all([
@@ -18,7 +19,8 @@ export default async function Home() {
   const flying = sent.find((s) => s.state === 'flying');
 
   return (
-    <main className="relative min-h-[calc(100dvh-88px)] overflow-hidden">
+    <PullToRefresh>
+      <main className="relative min-h-[calc(100dvh-88px)] overflow-hidden">
       <TreeScene
         fullScreen
         userId={profile?.id}
@@ -61,6 +63,7 @@ export default async function Home() {
           </LinkButton>
         </div>
       </TreeScene>
-    </main>
+      </main>
+    </PullToRefresh>
   );
 }

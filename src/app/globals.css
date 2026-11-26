@@ -3,19 +3,50 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-bg: #F3FBF5;
+    --color-surface: #FFFFFF;
+    --color-surface-alt: #E1F4E7;
+    --color-ink: #0E2A1B;
+    --color-muted: #4A6455;
+    --color-primary: #0A7D3E;
+    --color-on-primary: #FFFFFF;
+    --color-lemon: #FFD23F;
+    --color-coral: #FF6B57;
+    --color-sky: #DFF3FF;
+    --color-line: #CDE6D6;
+    --color-danger: #B3261E;
+  }
+
+  .dark {
+    --color-bg: #0E1A13;
+    --color-surface: #162218;
+    --color-surface-alt: #1E2F24;
+    --color-ink: #E8F5EC;
+    --color-muted: #8FA899;
+    --color-primary: #2ECC71;
+    --color-on-primary: #0E1A13;
+    --color-lemon: #FFD23F;
+    --color-coral: #FF6B57;
+    --color-sky: #1A2C38;
+    --color-line: #2A3D30;
+    --color-danger: #EF5350;
+  }
+
   html {
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior-y: none;
+    scroll-behavior: smooth;
   }
   body {
-    @apply bg-bg font-body text-body text-ink antialiased;
+    @apply bg-bg font-body text-body text-ink antialiased transition-colors duration-200;
     overscroll-behavior-y: none;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
   }
   h1, h2, h3 { @apply font-display font-bold; }
-  :focus-visible { outline: 3px solid #0A7D3E; outline-offset: 2px; border-radius: 8px; }
-  ::selection { background: #FFD23F; }
+  :focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; border-radius: 8px; }
+  ::selection { background: var(--color-lemon); }
   button, a, nav, header {
     -webkit-user-select: none;
     user-select: none;

@@ -4,6 +4,7 @@ import '@fontsource-variable/dm-sans';
 import './globals.css';
 import { OfflineBanner } from '@/components/OfflineBanner';
 import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister';
+import { DarkModeInit } from '@/components/DarkModeInit';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://gist-bird.vercel.app'),
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
+        <DarkModeInit />
         <ServiceWorkerRegister />
         <OfflineBanner />
         <div className="relative mx-auto flex min-h-dvh w-full max-w-[480px] flex-col overflow-x-hidden">{children}</div>

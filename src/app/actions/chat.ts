@@ -8,9 +8,11 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { VAPID_PUBLIC_KEY } from '@/lib/push';
 import { friendlyError, errorCode } from '@/lib/errors';
 
+const MAX_CHAT_MESSAGE_LENGTH = 50000;
+
 const schema = z.object({
   chatId: z.string().uuid(),
-  body: z.string().trim().min(1).max(1000),
+  body: z.string().trim().min(1).max(MAX_CHAT_MESSAGE_LENGTH),
   replyToId: z.number().int().positive().optional(),
 });
 
@@ -309,7 +311,9 @@ export async function editChatMessage(input: {
   body: string;
 }): Promise<{ error?: string }> {
   const trimmed = input.body.trim();
-  if (!trimmed || trimmed.length > 1000) return { error: 'Message must be 1 to 1000 characters.' };
+  if (!trimmed || trimmed.length > MAX_CHAT_MESSAGE_LENGTH) {
+    return { error: `Message must be 1 to ${MAX_CHAT_MESSAGE_LENGTH.toLocaleString()} characters.` };
+  }
 
   try {
     const client = createClient();

@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { getInbox, getProfile } from '@/lib/data';
+import { getInbox, getNotifications, getProfile } from '@/lib/data';
 import { Empty, LinkButton } from '@/components/ui';
 import { AppShell } from '@/components/AppShell';
 
@@ -18,6 +18,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </main>
     );
   }
-  const inbox = (await getInbox()).filter((i) => i.state === 'landed').length;
-  return <AppShell inbox={inbox} userId={profile.id}>{children}</AppShell>;
+  const [inboxList, notes] = await Promise.all([getInbox(), getNotifications()]);
+  const inbox = inboxList.filter((i) => i.state === 'landed').length;
+  const unreadChats = notes.filter((n) => n.kind === 'new_message' && !n.read_at).length;
+  return <AppShell inbox={inbox} chats={unreadChats} userId={profile.id}>{children}</AppShell>;
 }

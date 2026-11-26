@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client';
 import { FeedPostCard } from './FeedPostCard';
 import { FeedComposeModal } from './FeedComposeModal';
 import { ProfilePreviewModal, type ProfilePreviewData } from './ProfilePreviewModal';
+import { Icon } from './Icon';
 import { UniversityLogo } from './UniversityLogo';
 import { findUniversity, normalizeUniText } from '@/lib/universities';
 import {
@@ -203,13 +204,14 @@ export function FeedClient({ initialPosts, profile }: FeedClientProps) {
           <button
             type="button"
             onClick={() => setScope('all')}
-            className={`flex-1 rounded-full py-1.5 text-[12px] font-bold transition active:scale-95 ${
+            className={`flex flex-1 items-center justify-center gap-1.5 rounded-full py-1.5 text-[12px] font-bold transition active:scale-95 ${
               scope === 'all'
                 ? 'bg-primary text-on-primary shadow-xs'
                 : 'bg-surface-alt text-muted hover:text-ink'
             }`}
           >
-            🌍 All Schools
+            <Icon name="globe" size={14} />
+            <span>All Schools</span>
           </button>
           <button
             type="button"
@@ -220,19 +222,24 @@ export function FeedClient({ initialPosts, profile }: FeedClientProps) {
                 : 'bg-surface-alt text-muted hover:text-ink'
             }`}
           >
-            {userUni && <UniversityLogo university={userUni} size={13} />}
+            {userUni ? (
+              <UniversityLogo university={userUni} size={13} />
+            ) : (
+              <Icon name="school" size={13} />
+            )}
             <span className="truncate">{userUniMeta?.shortName || 'My School'}</span>
           </button>
           <button
             type="button"
             onClick={() => setScope('bookmarks')}
-            className={`rounded-full px-3 py-1.5 text-[12px] font-bold transition active:scale-95 ${
+            className={`flex items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-bold transition active:scale-95 ${
               scope === 'bookmarks'
                 ? 'bg-primary text-on-primary shadow-xs'
                 : 'bg-surface-alt text-muted hover:text-ink'
             }`}
           >
-            🔖 Saved
+            <Icon name="bookmark" size={13} />
+            <span>Saved</span>
           </button>
         </div>
       </header>
@@ -277,7 +284,9 @@ export function FeedClient({ initialPosts, profile }: FeedClientProps) {
         </div>
       ) : visiblePosts.length === 0 ? (
         <div className="mx-5 mt-8 rounded-card border border-line bg-surface p-6 text-center">
-          <p className="text-3xl">💭</p>
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-surface-alt text-primary">
+            <Icon name={scope === 'bookmarks' ? 'bookmark' : 'chat'} size={24} />
+          </div>
           <p className="mt-2 font-display text-[17px] font-bold text-ink">
             {scope === 'bookmarks'
               ? 'No saved posts yet'

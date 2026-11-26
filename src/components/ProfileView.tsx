@@ -184,8 +184,8 @@ export function ProfileView({
           >
             <div className="flex w-full items-start justify-between">
               <div className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-surface-alt text-[13px]">
-                  🕊️
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-surface-alt">
+                  <Icon name="bird" size={16} />
                 </span>
                 <span className="font-display text-[22px] font-extrabold leading-none text-ink">
                   {birdStats.xp}
@@ -268,8 +268,8 @@ export function ProfileView({
             href="/me/edit"
             className="flex items-center gap-3.5 px-4 py-3.5 transition active:bg-surface-alt"
           >
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center text-[18px]">
-              🕊️
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center">
+              <Icon name="bird" size={20} />
             </span>
             <div className="min-w-0 flex-1">
               <p className="truncate font-bold text-ink">{birdStats.name}</p>

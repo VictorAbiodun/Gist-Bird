@@ -635,7 +635,7 @@ export function ChatThread({
     setStarredIds((prev) =>
       wasStarred ? prev.filter((id) => id !== msg.id) : [...prev, msg.id]
     );
-    showToast(wasStarred ? 'Removed from Starred' : 'Message starred ⭐');
+    showToast(wasStarred ? 'Removed from Starred' : 'Message starred');
     await toggleStarMessage(chatId, msg.id).catch(() => { });
   };
 
@@ -650,7 +650,7 @@ export function ChatThread({
         payload: { pinnedMessageId: nextPin },
       })
       .catch(() => { });
-    showToast(nextPin ? 'Message pinned 📌' : 'Message unpinned');
+    showToast(nextPin ? 'Message pinned' : 'Message unpinned');
     await togglePinMessage(chatId, nextPin).catch(() => { });
   };
 
@@ -758,7 +758,7 @@ export function ChatThread({
     setShowHeaderMenu(false);
     const next = !isMuted;
     setIsMuted(next);
-    showToast(next ? 'Chat notifications muted 🔕' : 'Chat notifications unmuted 🔔');
+    showToast(next ? 'Chat notifications muted' : 'Chat notifications unmuted');
     await toggleMuteChat(chatId).catch(() => { });
   };
 
@@ -927,10 +927,10 @@ export function ChatThread({
                   {otherTyping
                     ? 'pecking a reply…'
                     : isOtherOnline
-                    ? 'online'
-                    : mounted && otherLastSeenAt
-                    ? formatLastSeen(otherLastSeenAt)
-                    : 'Tap to view profile'}
+                      ? 'online'
+                      : mounted && otherLastSeenAt
+                        ? formatLastSeen(otherLastSeenAt)
+                        : 'Tap to view profile'}
                 </span>
               </p>
             </div>
@@ -939,8 +939,8 @@ export function ChatThread({
 
         <div className="relative flex items-center gap-1.5">
           {isMuted && (
-            <span title="Chat muted" className="text-[13px] text-muted" aria-label="Muted">
-              🔕
+            <span title="Chat muted" className="flex items-center text-muted" aria-label="Muted">
+              <Icon name="bellOff" size={16} />
             </span>
           )}
           <button
@@ -980,7 +980,7 @@ export function ChatThread({
                   }}
                   className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-[13px] font-semibold text-ink hover:bg-surface-alt"
                 >
-                  <span>🔍</span>
+                  <Icon name="search" size={16} />
                   <span>Search in chat</span>
                 </button>
                 <button
@@ -992,7 +992,7 @@ export function ChatThread({
                   className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-[13px] font-semibold text-ink hover:bg-surface-alt"
                 >
                   <span className="flex items-center gap-2.5">
-                    <span>⭐</span>
+                    <Icon name="star" size={16} />
                     <span>Starred messages</span>
                   </span>
                   {starredMessages.length > 0 && (
@@ -1004,7 +1004,7 @@ export function ChatThread({
                   onClick={handleToggleMuteChat}
                   className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-[13px] font-semibold text-ink hover:bg-surface-alt"
                 >
-                  <span>{isMuted ? '🔔' : '🔕'}</span>
+                  <Icon name={isMuted ? 'bell' : 'bellOff'} size={16} />
                   <span>{isMuted ? 'Unmute notifications' : 'Mute notifications'}</span>
                 </button>
                 <button
@@ -1015,7 +1015,7 @@ export function ChatThread({
                   }}
                   className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-[13px] font-semibold text-ink hover:bg-surface-alt"
                 >
-                  <span>{soundMuted ? '🔊' : '🔇'}</span>
+                  <Icon name={soundMuted ? 'volume' : 'volumeOff'} size={16} />
                   <span>{soundMuted ? 'Unmute sounds' : 'Mute sounds'}</span>
                 </button>
                 <div className="my-1 h-[1px] bg-line/70" />
@@ -1027,7 +1027,7 @@ export function ChatThread({
                   }}
                   className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-[13px] font-semibold text-ink hover:bg-surface-alt"
                 >
-                  <span>🧹</span>
+                  <Icon name="broom" size={16} />
                   <span>Clear chat</span>
                 </button>
                 <button
@@ -1038,7 +1038,7 @@ export function ChatThread({
                   }}
                   className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-[13px] font-semibold text-danger hover:bg-danger/10"
                 >
-                  <span>🕊️</span>
+                  <Icon name="bird" size={16} />
                   <span>Fly away (Leave)</span>
                 </button>
                 <Link
@@ -1046,7 +1046,7 @@ export function ChatThread({
                   onClick={() => setShowHeaderMenu(false)}
                   className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-[13px] font-semibold text-danger hover:bg-danger/10"
                 >
-                  <span>🚩</span>
+                  <Icon name="flag" size={16} />
                   <span>Report or block</span>
                 </Link>
               </motion.div>
@@ -1119,7 +1119,7 @@ export function ChatThread({
             onClick={() => scrollToMessage(pinnedMessageId)}
             className="flex min-w-0 flex-1 items-center gap-2 text-left"
           >
-            <span className="text-[13px]">📌</span>
+            <Icon name="thumbtack" size={14} />
             <p className="truncate text-[12.5px] font-semibold text-ink">
               {messagesById.get(pinnedMessageId)!.body}
             </p>
@@ -1171,7 +1171,9 @@ export function ChatThread({
         </div>
       ) : chatEnded ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
-          <span className="text-4xl">🕊️</span>
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-surface-alt">
+            <Icon name="bird" size={34} />
+          </div>
           <div className="space-y-1">
             <h2 className="font-display text-[18px] font-bold text-ink">
               {otherName} flew away
@@ -1309,7 +1311,10 @@ export function ChatThread({
                           } ${isReplyTarget || isSearchMatch ? 'ring-2 ring-primary/60 shadow-md' : ''}`}
                       >
                         {isDeletedAll ? (
-                          <p className="italic opacity-75 text-[13.5px]">🚫 This message was deleted</p>
+                          <p className="flex items-center gap-1.5 italic opacity-75 text-[13.5px]">
+                            <Icon name="ban" size={14} />
+                            <span>This message was deleted</span>
+                          </p>
                         ) : (
                           <p className="whitespace-pre-wrap break-words">{m.body}</p>
                         )}
@@ -1317,7 +1322,11 @@ export function ChatThread({
                           className={`mt-0.5 flex items-center justify-end gap-1 text-[10.5px] leading-none select-none ${isMine ? 'text-white/80' : 'text-muted'
                             }`}
                         >
-                          {isStarred && !isDeletedAll && <span title="Starred">⭐</span>}
+                          {isStarred && !isDeletedAll && (
+                            <span title="Starred" className="inline-flex items-center">
+                              <Icon name="star" size={11} />
+                            </span>
+                          )}
                           {isEdited && !isDeletedAll && <span className="italic opacity-80">edited</span>}
                           <span suppressHydrationWarning>{formatMessageTime(m.created_at)}</span>
                           {isMine &&
@@ -1569,7 +1578,9 @@ export function ChatThread({
               onClick={(e) => e.stopPropagation()}
             >
               <div className="text-center">
-                <span className="text-3xl">🕊️</span>
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-surface-alt">
+                  <Icon name="bird" size={26} />
+                </div>
                 <h3 className="mt-2 font-display text-[17px] font-bold text-ink">
                   Fly away from this chat?
                 </h3>
@@ -1700,7 +1711,7 @@ export function ChatThread({
                   }}
                   className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-primary px-6 text-[13px] font-bold text-on-primary shadow-md active:scale-95 transition"
                 >
-                  <span>↩</span>
+                  <Icon name="reply" size={16} />
                   <span>Reply in Thread</span>
                 </button>
               </div>
@@ -1794,7 +1805,7 @@ export function ChatThread({
                         className="flex w-full items-center justify-between px-4 py-3 hover:bg-surface-alt active:bg-surface-alt"
                       >
                         <span>Reply</span>
-                        <span className="text-primary">↩</span>
+                        <Icon name="reply" size={16} />
                       </button>
                       <button
                         type="button"
@@ -1802,7 +1813,7 @@ export function ChatThread({
                         className="flex w-full items-center justify-between px-4 py-3 hover:bg-surface-alt active:bg-surface-alt"
                       >
                         <span>Copy</span>
-                        <span>📋</span>
+                        <Icon name="copy" size={16} />
                       </button>
                       <button
                         type="button"
@@ -1813,7 +1824,7 @@ export function ChatThread({
                         className="flex w-full items-center justify-between px-4 py-3 hover:bg-surface-alt active:bg-surface-alt"
                       >
                         <span>Forward / Share</span>
-                        <span>↗</span>
+                        <Icon name="share" size={16} className="text-muted" />
                       </button>
                       <button
                         type="button"
@@ -1821,7 +1832,7 @@ export function ChatThread({
                         className="flex w-full items-center justify-between px-4 py-3 hover:bg-surface-alt active:bg-surface-alt"
                       >
                         <span>{activeIsStarred ? 'Unstar' : 'Star'}</span>
-                        <span>{activeIsStarred ? '★' : '⭐'}</span>
+                        <Icon name="star" size={16} />
                       </button>
                       <button
                         type="button"
@@ -1829,7 +1840,7 @@ export function ChatThread({
                         className="flex w-full items-center justify-between px-4 py-3 hover:bg-surface-alt active:bg-surface-alt"
                       >
                         <span>{pinnedMessageId === activeMsg.id ? 'Unpin' : 'Pin'}</span>
-                        <span>📌</span>
+                        <Icon name="thumbtack" size={16} />
                       </button>
                       {activeCanEdit && (
                         <button
@@ -1841,7 +1852,7 @@ export function ChatThread({
                           className="flex w-full items-center justify-between px-4 py-3 hover:bg-surface-alt active:bg-surface-alt"
                         >
                           <span>Edit</span>
-                          <span>✏️</span>
+                          <Icon name="pen" size={16} className="text-muted" />
                         </button>
                       )}
                       {activeIsMine && (
@@ -1854,7 +1865,7 @@ export function ChatThread({
                           className="flex w-full items-center justify-between px-4 py-3 hover:bg-surface-alt active:bg-surface-alt"
                         >
                           <span>Message Info</span>
-                          <span>ℹ️</span>
+                          <Icon name="info" size={16} className="text-muted" />
                         </button>
                       )}
                       <button
@@ -1866,7 +1877,7 @@ export function ChatThread({
                         className="flex w-full items-center justify-between px-4 py-3 text-danger hover:bg-danger/10 active:bg-danger/10"
                       >
                         <span>Delete</span>
-                        <span>🗑️</span>
+                        <Icon name="trash" size={16} />
                       </button>
                     </div>
                   )}

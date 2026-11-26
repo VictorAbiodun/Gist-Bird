@@ -1,16 +1,17 @@
 import Link from 'next/link';
 import { getNotifications } from '@/lib/data';
 import { Empty, Header, timeAgo } from '@/components/ui';
+import { Icon, type IconName } from '@/components/Icon';
 import { MarkRead } from '@/components/MarkRead';
 
-const ICONS: Record<string, string> = {
-  new_message: '💬',
-  paper_landed: '📬',
-  paper_opened: '👀',
-  paper_accepted: '🤝',
-  paper_returned: '🕊️',
-  message_reaction: '❤️',
-  message_reply: '↩️',
+const ICONS: Record<string, IconName> = {
+  new_message: 'chat',
+  paper_landed: 'mail',
+  paper_opened: 'eye',
+  paper_accepted: 'heart',
+  paper_returned: 'bird',
+  message_reaction: 'heart',
+  message_reply: 'reply',
 };
 
 function getGroup(dateStr: string): string {
@@ -65,8 +66,8 @@ export default async function Notifications() {
                 {g.items.map((n) => (
                   <li key={n.id}>
                     <Link href={href(n)} className="flex items-start gap-3 rounded-card border-[1.5px] border-line bg-surface p-3.5 transition active:scale-[0.99]">
-                      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-alt text-[16px]">
-                        {ICONS[n.kind] || '📋'}
+                      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-alt text-primary">
+                        <Icon name={ICONS[n.kind] || 'bell'} size={16} />
                       </span>
                       {!n.read_at && <span className="mt-2.5 h-2.5 w-2.5 shrink-0 rounded-full bg-coral" aria-label="New" />}
                       <div className="min-w-0 flex-1">

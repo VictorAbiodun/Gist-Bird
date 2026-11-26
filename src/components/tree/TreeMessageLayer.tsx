@@ -9,6 +9,7 @@ import { CinematicLetterReader } from './CinematicLetterReader';
 import { inboxItemToEnvelope, type TreeEnvelope } from './treeEnvelope';
 import { normalizeUniText, findUniversity } from '@/lib/universities';
 import { UniversityLogo } from '@/components/UniversityLogo';
+import { Icon } from '@/components/Icon';
 import { playBirdLandSound } from '@/lib/sounds';
 import type { InboxItem } from '@/lib/types';
 
@@ -131,13 +132,14 @@ export function TreeMessageLayer({
         <button
           type="button"
           onClick={() => setCampusFilter('all')}
-          className={`rounded-full px-2.5 py-1 text-[11px] font-bold transition active:scale-95 ${
+          className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold transition active:scale-95 ${
             campusFilter === 'all'
               ? 'bg-primary text-on-primary shadow-xs'
               : 'text-muted hover:text-ink'
           }`}
         >
-          🌍 All ({inboxItems.length})
+          <Icon name="globe" size={13} />
+          <span>All ({inboxItems.length})</span>
         </button>
         <button
           type="button"
@@ -199,7 +201,9 @@ export function TreeMessageLayer({
         <div className="pointer-events-auto fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
           <div className="w-full max-w-[340px] rounded-2xl border border-line bg-surface p-5 shadow-2xl">
             <div className="text-center">
-              <span className="text-3xl">🏫</span>
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-surface-alt text-primary">
+                <Icon name="school" size={24} />
+              </div>
               <h3 className="mt-2 font-display text-[17px] font-bold text-ink">Set your Campus</h3>
               <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
                 Pick your Nigerian university in your profile to filter letters exclusively to your peers!
@@ -239,7 +243,8 @@ export function TreeMessageLayer({
               onClick={handleDismissOnboarding}
               className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-btn bg-primary text-[14px] font-bold text-on-primary shadow-xs transition active:scale-95"
             >
-              ✍️ Write your first paper
+              <Icon name="pen" size={16} />
+              <span>Write your first paper</span>
             </Link>
             <button
               type="button"

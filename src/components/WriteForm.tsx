@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button, Chip, Field, inputCls, Notice } from './ui';
+import { Icon } from './Icon';
 import { PROMPTS, MAX_PAPER, MIN_PAPER } from '@/lib/copy';
 import { CONTACT_NOTICE, hasContactInfo } from '@/lib/contentFilter';
 import { PICKABLE_SPOTS } from '@/lib/campus';
@@ -81,7 +82,8 @@ export function WriteForm({ initialBody = '', defaultOrigin, left }: { initialBo
               href="/home"
               className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-btn bg-primary px-5 text-body font-bold text-on-primary transition active:scale-95"
             >
-              🎁 Claim Daily Reward
+              <Icon name="gift" size={18} />
+              <span>Claim Daily Reward</span>
             </Link>
           </div>
         )}

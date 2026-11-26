@@ -13,13 +13,19 @@ export default function AppTemplate({ children }: { children: React.ReactNode })
     commitNavPath(pathname);
   }, [pathname]);
 
-  const initialX = dir === 1 ? '28%' : dir === -1 ? '-24%' : 0;
+  const initialX = dir === 1 ? '42%' : dir === -1 ? '-36%' : 0;
 
   return (
     <motion.div
-      initial={dir === 0 ? { opacity: 0 } : { x: initialX, opacity: 0.25 }}
+      initial={dir === 0 ? { opacity: 0 } : { x: initialX, opacity: 0.4 }}
       animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+      transition={{
+        type: 'spring',
+        stiffness: 320,
+        damping: 32,
+        mass: 0.8,
+      }}
+      style={{ willChange: 'transform, opacity' }}
       className="flex flex-1 flex-col overflow-x-hidden"
     >
       {children}

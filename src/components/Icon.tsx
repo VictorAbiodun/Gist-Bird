@@ -24,11 +24,7 @@ const PATHS: Record<string, React.ReactNode> = {
   repost: <><path d="M17 2l4 4-4 4" /><path d="M3 11V9a4 4 0 014-4h14" /><path d="M7 22l-4-4 4-4" /><path d="M21 13v2a4 4 0 01-4 4H3" /></>,
   bookmark: <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />,
   share: <><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" y1="2" x2="12" y2="15" /></>,
-  globe: <><circle cx="12" cy="12" r="9" /><path d="M3.6 9h16.8M3.6 15h16.8M12 3a14 14 0 010 18M12 3a14 14 0 000 18" /></>,
-  school: <><path d="M22 10v6M2 10l10-5 10 5-10 5z" /><path d="M6 12v5c3 2 9 2 12 0v-5" /></>,
-  gift: <><rect x="3" y="8" width="18" height="4" rx="1" /><path d="M12 8v13M19 12v7a2 2 0 01-2 2H7a2 2 0 01-2-2v-7M7.5 8a2.5 2.5 0 010-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 010 5" /></>,
   sparkles: <path d="M12 3l1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8L12 3zM5 17l.9 2.1L8 20l-2.1.9L5 23l-.9-2.1L2 20l2.1-.9L5 17zM19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15z" />,
-  bolt: <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" />,
 };
 
 const IMAGE_ICONS: Record<string, string> = {
@@ -45,6 +41,11 @@ const IMAGE_ICONS: Record<string, string> = {
   broom: '/icons/ui/broom.png',
   ban: '/icons/ui/ban.png',
   bird: '/icons/ui/bird.png',
+  gift: '/icons/ui/gift.png',
+  bolt: '/icons/ui/bolt.png',
+  logOut: '/icons/ui/log-out.png',
+  globe: '/icons/ui/globe.png',
+  school: '/icons/ui/school.png',
 };
 
 export type IconName =
@@ -59,7 +60,12 @@ export type IconName =
   | 'volumeOff'
   | 'broom'
   | 'ban'
-  | 'bird';
+  | 'bird'
+  | 'gift'
+  | 'bolt'
+  | 'logOut'
+  | 'globe'
+  | 'school';
 
 export function Icon({ name, size = 24, className = '' }: { name: IconName; size?: number; className?: string }) {
   if (IMAGE_ICONS[name]) {

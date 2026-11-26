@@ -21,7 +21,12 @@ export default function Settings() {
           <span className="flex-1">Dark mode</span>
           <DarkModeToggle />
         </div>
-        <form action={signOut}><button className="flex min-h-[56px] w-full items-center rounded-card border-[1.5px] border-line bg-surface p-3.5 text-left font-bold">Log out</button></form>
+        <form action={signOut}>
+          <button className="flex min-h-[56px] w-full items-center gap-3 rounded-card border-[1.5px] border-line bg-surface p-3.5 text-left font-bold">
+            <Icon name="logOut" size={18} />
+            <span className="flex-1">Log out</span>
+          </button>
+        </form>
         <Link href="/settings/delete" className="flex min-h-[56px] items-center rounded-card border-[1.5px] border-line bg-surface p-3.5 font-bold text-danger">Delete account</Link>
       </div>
       <p className="mt-6 pb-4 text-center text-[11px] text-muted">Gist Bird v0.1.0</p>

@@ -509,8 +509,9 @@ export function FlightScene({
               Lv. {birdLevel}
             </span>
             {speedBoostPercent > 0 && (
-              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary">
-                ⚡ +{speedBoostPercent}% speed
+              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary">
+                <Icon name="bolt" size={12} />
+                <span>+{speedBoostPercent}% speed</span>
               </span>
             )}
             <span className="rounded-full bg-lemon px-2.5 py-0.5 text-label font-bold text-ink">

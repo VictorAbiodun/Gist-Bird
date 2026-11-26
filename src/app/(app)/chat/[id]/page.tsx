@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getChat, getChatMessageMeta, getChatReadReceipt, getChats, getFriendProfilePreview, getMessageReactions, getMessageReplies } from '@/lib/data';
+import { getChat, getChatMessageMeta, getChatReadReceipt, getChats, getFriendProfilePreview, getMessageReactions, getMessageReplies, getUserLastSeen } from '@/lib/data';
 import { createClient } from '@/lib/supabase/server';
 import { ChatThread } from '@/components/ChatThread';
 import type { Message } from '@/lib/types';
@@ -7,9 +7,10 @@ import type { Message } from '@/lib/types';
 export default async function ChatPage({ params }: { params: { id: string } }) {
   const chat = await getChat(params.id);
   if (!chat) notFound();
-  const [{ data }, otherLastReadAt, reactions, replies, otherProfilePreview, messageMeta, allChats] = await Promise.all([
+  const [{ data }, otherLastReadAt, otherLastSeenAt, reactions, replies, otherProfilePreview, messageMeta, allChats] = await Promise.all([
     createClient().from('messages').select('*').eq('chat_id', chat.id).order('id').limit(300),
     getChatReadReceipt(chat.id, chat.other_id),
+    getUserLastSeen(chat.other_id),
     getMessageReactions(chat.id),
     getMessageReplies(chat.id),
     getFriendProfilePreview(chat.other_id),
@@ -22,6 +23,7 @@ export default async function ChatPage({ params }: { params: { id: string } }) {
       <ChatThread
         chatId={chat.id}
         me={chat.me}
+        otherId={chat.other_id}
         initial={(data ?? []) as Message[]}
         otherStarter={chat.other_starter}
         otherName={chat.other_name}
@@ -30,6 +32,7 @@ export default async function ChatPage({ params }: { params: { id: string } }) {
         paperBody={chat.paper_body}
         blocked={chat.blocked}
         initialOtherLastReadAt={otherLastReadAt}
+        initialOtherLastSeenAt={otherLastSeenAt}
         initialReactions={reactions}
         initialReplies={replies}
         initialMeta={messageMeta}

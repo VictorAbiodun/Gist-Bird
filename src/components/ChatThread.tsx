@@ -41,6 +41,7 @@ import type { Message, Scarf, MessageReactionsMap, MessageRepliesMap, ChatMessag
 interface ChatThreadProps {
   chatId: string;
   me: string;
+  otherId?: string;
   initial: Message[];
   otherStarter: string | null;
   otherName: string;
@@ -49,6 +50,7 @@ interface ChatThreadProps {
   paperBody: string;
   blocked?: boolean;
   initialOtherLastReadAt?: string | null;
+  initialOtherLastSeenAt?: string | null;
   initialReactions?: MessageReactionsMap;
   initialReplies?: MessageRepliesMap;
   initialMeta?: ChatMessageMeta;
@@ -56,9 +58,24 @@ interface ChatThreadProps {
   otherProfilePreview?: ProfilePreviewData | null;
 }
 
+function formatLastSeen(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return 'Tap to view profile';
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const day = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const diffDays = Math.round((today.getTime() - day.getTime()) / 86400000);
+  const timeStr = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase();
+
+  if (diffDays === 0) return `last seen today at ${timeStr}`;
+  if (diffDays === 1) return `last seen yesterday at ${timeStr}`;
+  return `last seen ${d.toLocaleDateString('en-GB')}`;
+}
+
 export function ChatThread({
   chatId,
   me,
+  otherId,
   initial,
   otherStarter,
   otherName,
@@ -67,6 +84,7 @@ export function ChatThread({
   paperBody,
   blocked: isBlocked = false,
   initialOtherLastReadAt = null,
+  initialOtherLastSeenAt = null,
   initialReactions = {},
   initialReplies = {},
   initialMeta,
@@ -81,6 +99,10 @@ export function ChatThread({
   const [viewportHeight, setViewportHeight] = useState<number | null>(null);
   const [otherTyping, setOtherTyping] = useState(false);
   const [otherLastReadAt, setOtherLastReadAt] = useState<string | null>(initialOtherLastReadAt);
+  const [otherLastSeenAt, setOtherLastSeenAt] = useState<string | null>(
+    initialOtherLastSeenAt ?? initialOtherLastReadAt
+  );
+  const [isOtherOnline, setIsOtherOnline] = useState(false);
   const [reactions, setReactions] = useState<MessageReactionsMap>(initialReactions);
   const [activeReactionMenuMsgId, setActiveReactionMenuMsgId] = useState<number | null>(null);
   const [isOffline, setIsOffline] = useState(false);
@@ -380,13 +402,41 @@ export function ChatThread({
       });
 
     channelRef.current = ch;
+
+    // Subscribe to global online-users presence for accurate online / last seen
+    const presenceCh = otherId
+      ? supabase
+          .channel('online-users', { config: { presence: { key: me } } })
+          .on('presence', { event: 'sync' }, () => {
+            const state = presenceCh?.presenceState() ?? {};
+            const present = Boolean(state[otherId] && state[otherId].length > 0);
+            setIsOtherOnline((prev) => {
+              if (prev && !present) {
+                setOtherLastSeenAt(new Date().toISOString());
+              }
+              return present;
+            });
+          })
+          .on('presence', { event: 'join' }, ({ key }) => {
+            if (key === otherId) setIsOtherOnline(true);
+          })
+          .on('presence', { event: 'leave' }, ({ key }) => {
+            if (key === otherId) {
+              setIsOtherOnline(false);
+              setOtherLastSeenAt(new Date().toISOString());
+            }
+          })
+          .subscribe()
+      : null;
+
     return () => {
       channelRef.current = null;
       if (clearOtherTypingTimerRef.current) clearTimeout(clearOtherTypingTimerRef.current);
       if (stopTypingTimerRef.current) clearTimeout(stopTypingTimerRef.current);
       supabase.removeChannel(ch);
+      if (presenceCh) supabase.removeChannel(presenceCh);
     };
-  }, [chatId, me]);
+  }, [chatId, me, otherId]);
 
   // Track whether bottom of stream is visible for scroll-to-bottom FAB & smart auto-scroll
   useEffect(() => {
@@ -856,12 +906,24 @@ export function ChatThread({
             <div className="min-w-0 flex-1">
               <h1 className="truncate font-display text-[15px] font-bold leading-5 text-ink">{otherName}</h1>
               <p className="flex items-center gap-1 text-[11px] font-semibold text-primary">
-                <span className={`inline-block h-1.5 w-1.5 rounded-full bg-primary ${otherTyping ? 'animate-ping' : ''}`} />
-                {otherTyping
-                  ? 'pecking a reply…'
-                  : otherLastReadAt
-                  ? `last seen ${formatMessageTime(otherLastReadAt)}`
-                  : 'Tap to view profile'}
+                <span
+                  className={`inline-block h-1.5 w-1.5 rounded-full ${
+                    otherTyping
+                      ? 'bg-primary animate-ping'
+                      : isOtherOnline
+                      ? 'bg-[#25D366]'
+                      : 'bg-muted/60'
+                  }`}
+                />
+                <span suppressHydrationWarning>
+                  {otherTyping
+                    ? 'pecking a reply…'
+                    : isOtherOnline
+                    ? 'online'
+                    : otherLastSeenAt
+                    ? formatLastSeen(otherLastSeenAt)
+                    : 'Tap to view profile'}
+                </span>
               </p>
             </div>
           </button>

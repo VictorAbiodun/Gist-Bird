@@ -1,8 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { MotionConfig } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
+import { touchLastSeen } from '@/app/actions/presence';
 import { TabBar } from './TabBar';
 import { InstallPrompt } from './InstallPrompt';
 import { PushNotificationManager } from './PushNotificationManager';
@@ -23,10 +25,60 @@ export function AppShell({
 }) {
   const path = usePathname();
   const hide = HIDE_BAR.some((h) => path.startsWith(h));
+  const lastTouchRef = useRef(0);
 
   useEffect(() => {
     initNavDirectionListener();
   }, []);
+
+  // Broadcast live presence & persist accurate last_seen_at
+  useEffect(() => {
+    if (!userId) return;
+    const supabase = createClient();
+
+    const pingLastSeen = (force = false) => {
+      const now = Date.now();
+      if (!force && now - lastTouchRef.current < 45_000) return;
+      lastTouchRef.current = now;
+      touchLastSeen().catch(() => {});
+    };
+
+    const presenceChannel = supabase.channel('online-users', {
+      config: { presence: { key: userId } },
+    });
+
+    presenceChannel.subscribe((status) => {
+      if (status === 'SUBSCRIBED' && document.visibilityState === 'visible') {
+        presenceChannel.track({ userId, onlineAt: new Date().toISOString() }).catch(() => {});
+        pingLastSeen(true);
+      }
+    });
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        presenceChannel.track({ userId, onlineAt: new Date().toISOString() }).catch(() => {});
+        pingLastSeen(false);
+      } else {
+        presenceChannel.untrack().catch(() => {});
+        pingLastSeen(true);
+      }
+    };
+
+    const handlePageHide = () => {
+      presenceChannel.untrack().catch(() => {});
+      pingLastSeen(true);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('pagehide', handlePageHide);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('pagehide', handlePageHide);
+      presenceChannel.untrack().catch(() => {});
+      supabase.removeChannel(presenceChannel);
+    };
+  }, [userId]);
 
   return (
     <MotionConfig reducedMotion="user">

@@ -72,6 +72,21 @@ export async function getChatReadReceipt(chatId: string, otherId: string): Promi
   }
 }
 
+export async function getUserLastSeen(userId: string): Promise<string | null> {
+  if (!userId) return null;
+  try {
+    const admin = createAdminClient();
+    const { data } = await admin.auth.admin.getUserById(userId);
+    const meta = (data?.user?.user_metadata ?? {}) as Record<string, unknown>;
+    if (typeof meta.last_seen_at === 'string') {
+      return meta.last_seen_at;
+    }
+    return data?.user?.last_sign_in_at ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function getMessageReactions(chatId: string): Promise<MessageReactionsMap> {
   try {
     const admin = createAdminClient();
